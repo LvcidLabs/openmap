@@ -9,6 +9,47 @@
   Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.)
   By Danpiel.
 
+- **A dungeon's map never covers your quest log**: beside the quest log it always opens on your quests;
+  the dungeon's panel shows only when you pick its tab. And **dungeon maps inside dungeons can be turned
+  off** (Options and the menu's Dungeons): off, the map opened inside a dungeon is the game's own there; a
+  dungeon's map still opens from its entrance. The first dungeon you're in says once where that switch is.
+  With Dungeon Journal or NeedRoll installed, their map is left to them inside a dungeon (#302, #267).
+
+- **Sharp map by default**: Soften and paper grain is off for everyone (turn it back on in Look > Up close).
+  It softened the map a moment after it stopped moving, sharp while zooming or panning, which read as the
+  map going blurry (#286, #118). Its tooltip now says so.
+
+- **The game's own frame rate limit while the map is open**: v0.8.9's 60 fps cap held the whole game at
+  60 while the map was open, below what many had set. It's off by default again (set once back to off
+  for everyone who had 60); the Map frame rate cap is still there to turn on (#273).
+
+- **Faster loading**: the stitched map is no longer built during the loading screen. It's built a few
+  seconds after it, a few milliseconds a frame (not in combat), so the map is ready by the time you open
+  it; opened sooner, the rest is built then. By Vennomfang.
+
+- **A smoother map on a Brazilian Portuguese client**: the zones' art from further out is drawn from
+  tiles baked from the ptBR client's own maps, place names and city banners in Portuguese, as an English
+  client's has been (it was every zone's art drawn live: panning at mid zoom took about half the frame
+  time). Other languages draw it live as before, until their own tiles are baked. (New textures:
+  restart the game.) By cscoder69, with thanks to developer-felipe, whose #265 took this on first.
+
+- **Less work while the map is closed**: the guild and friends lists are read at most every 30 seconds
+  (a raid's roster changes came each time), exploring somewhere recolours the map's art the next time
+  it opens rather than then, and another addon loading no longer looks through every global table
+  again.
+
+- **Smoother panning and zooming**: darkened unexplored land lets go of zones out of view (they were
+  laid out on every frame, more the more of the world you'd seen), and of a zone's old shading when
+  it's made again; the boat and zeppelin routes' finer dots are hidden, not only faded, from afar; the
+  continents' names rest their outer glow while the map moves; and the close-up minimap, the cursor's
+  place name and the coordinates skip work when nothing has changed. By cscoder69.
+
+- **Smoother with the map open**: "Quests from every zone" asked the game for the quests of every zone
+  and city in a single frame, half a second after each opening and again after each burst of quest log
+  updates while the map was open (and once more after it closed). The zones are now read a few a frame
+  and the icons put up together once all are in; nothing is read while the map is closed.
+  `/openmap status` says what the last reading cost. By Merryfett.
+
 ### Fixed
 
 - **Sharper at the middle zooms**: between a continent and a zone filling the view, the zones' art was
@@ -23,8 +64,6 @@
   moved. By wealdly.
 
 ## v0.8.10 (2026-11-16)
-
-### Fixed
 
 - **The map loads again for everyone**: for some players since v0.8.9 the map opened blank, with an
   error about GetMapInfoAtPosition. A view worked out while the map was still 0 px across (a divide
@@ -90,48 +129,9 @@
   remember, browsing the world map in a dungeon and opening it again went back to the whole continent
   each time. With nowhere to centre on, it reopens where you left it now.
 
-### Improved
-
-- **A dungeon's map never covers your quest log**: beside the quest log it always opens on your quests;
-  the dungeon's panel shows only when you pick its tab. And **dungeon maps inside dungeons can be turned
-  off** (Options and the menu's Dungeons): off, the map opened inside a dungeon is the game's own there; a
-  dungeon's map still opens from its entrance. The first dungeon you're in says once where that switch is.
-  With Dungeon Journal or NeedRoll installed, their map is left to them inside a dungeon (#302, #267).
-
-- **Sharp map by default**: Soften and paper grain is off for everyone (turn it back on in Look > Up close).
-  It softened the map a moment after it stopped moving, sharp while zooming or panning, which read as the
-  map going blurry (#286, #118). Its tooltip now says so.
-
-- **The game's own frame rate limit while the map is open**: v0.8.9's 60 fps cap held the whole game at
-  60 while the map was open, below what many had set. It's off by default again (set once back to off
-  for everyone who had 60); the Map frame rate cap is still there to turn on (#273).
-
-- **Faster loading**: the stitched map is no longer built during the loading screen. It's built a few
-  seconds after it, a few milliseconds a frame (not in combat), so the map is ready by the time you open
-  it; opened sooner, the rest is built then. By Vennomfang.
-
-- **A smoother map on a Brazilian Portuguese client**: the zones' art from further out is drawn from
-  tiles baked from the ptBR client's own maps, place names and city banners in Portuguese, as an English
-  client's has been (it was every zone's art drawn live: panning at mid zoom took about half the frame
-  time). Other languages draw it live as before, until their own tiles are baked. (New textures:
-  restart the game.) By cscoder69, with thanks to developer-felipe, whose #265 took this on first.
-
-- **Less work while the map is closed**: the guild and friends lists are read at most every 30 seconds
-  (a raid's roster changes came each time), exploring somewhere recolours the map's art the next time
-  it opens rather than then, and another addon loading no longer looks through every global table
-  again.
-
-- **Smoother panning and zooming**: darkened unexplored land lets go of zones out of view (they were
-  laid out on every frame, more the more of the world you'd seen), and of a zone's old shading when
-  it's made again; the boat and zeppelin routes' finer dots are hidden, not only faded, from afar; the
-  continents' names rest their outer glow while the map moves; and the close-up minimap, the cursor's
-  place name and the coordinates skip work when nothing has changed. By cscoder69.
-
-- **Smoother with the map open**: "Quests from every zone" asked the game for the quests of every zone
-  and city in a single frame, half a second after each opening and again after each burst of quest log
-  updates while the map was open (and once more after it closed). The zones are now read a few a frame
-  and the icons put up together once all are in; nothing is read while the map is closed.
-  `/openmap status` says what the last reading cost. By Merryfett.
+- **Quest icons show the quest's level on every map**: zoomed out, or over the next zone, OpenMap's own
+  quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do,
+  with the level and its difficulty colour ("[39+] The Crown of Will"). By Rambomst.
 
 ## v0.8.9 (2026-11-14)
 
