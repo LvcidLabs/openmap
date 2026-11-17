@@ -121,13 +121,15 @@ local function Apply()
 		end
 		if math.abs((map:GetScale() or 1) - mod.db.windowScale) > 0.001 then map:SetScale(mod.db.windowScale) end
 	end
-	local size = mod.db.windowSize
+	local size, refitted = mod.db.windowSize, false
 	if size and not InCombatLockdown() and (math.abs(map:GetWidth() - size[1]) > 0.5 or math.abs(map:GetHeight() - size[2]) > 0.5) then
 		map:SetSize(size[1], size[2])
 		if map.UpdateSpacerFrameAnchoring then map:UpdateSpacerFrameAnchoring() end
 		Refit()
+		refitted = true
 	end
 	ours = false
+	return refitted
 end
 
 -- maximized: Blizzard keeps the map art's shape (black bars at the sides on a wide
@@ -141,6 +143,7 @@ FillScreen = function()
 	if math.abs(map:GetWidth() - w) < 1 then return end
 	map:SetWidth(w)
 	Refit()
+	return true
 end
 
 local function Save()
@@ -185,6 +188,14 @@ local function FitRightGrip()
 	g:SetHitRectInsets(-inside, -GRIP_OUT, -inside, -GRIP_OUT)
 	g:SetFrameStrata(log and "HIGH" or map:GetFrameStrata())
 	g:SetFrameLevel(log and 9990 or OverIcons() + 1)
+end
+
+local function Clamp(w, h)
+	if not map or moveAny or classicMap or InCombatLockdown() then return end
+	w, h = w or map:GetWidth(), h or map:GetHeight()
+	if not (w and h) or w <= 0 then return end
+	local side = math.max(0, w - 160)
+	map:SetClampRectInsets(side, -side, -TOP_OFF, math.max(0, h - TOP_OFF - 80))
 end
 
 local function Grip(corner)
@@ -248,6 +259,7 @@ local function Grip(corner)
 		local h = math.max(MIN_H, start.h - (y - start.y) / s)
 		ours = true
 		if not moveAny then
+			Clamp(w, h)
 			map:ClearAllPoints()
 			-- (offsets in the map's own units, as GetLeft gives)
 			map:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left and start.right - w or start.left, start.top)
@@ -271,11 +283,18 @@ function mod:SetupWindow(worldMap)
 	moveAny = MoveAnyOn()
 	classicMap = ClassicMapOn()
 	if classicMap then C_Timer.After(5, AskClassicMap) end   -- (once the login's own popups are up)
+	local maxRefitted = false
+	local function RefitNative(refitted)
+		if refitted or maxRefitted then maxRefitted = false return end
+		if not map:IsShown() or (mod.IsStitched and mod.IsStitched()) then return end
+		if InCombatLockdown() then afterCombat = true return end
+		Refit()
+	end
 	-- (what waited out combat: the window laid out again, the question asked)
 	ns.RegisterEvent(windowOwner, "PLAYER_REGEN_ENABLED", function()
 		if not afterCombat then return end
 		afterCombat = false
-		if map:IsShown() then if Maximized() then FillScreen() else Apply() end end
+		if map:IsShown() then RefitNative(Maximized() and FillScreen() or Apply()) end
 		if classicMap then AskClassicMap() end
 	end)
 	-- Enhance QoL's Mover (World Map) sizes and places the map too, and the two fight over its scale (a
@@ -306,14 +325,8 @@ function mod:SetupWindow(worldMap)
 		map:SetClampedToScreen(true)
 		-- partly off the screen: sideways and down while some of it stays on, never up (its title bar is
 		-- what moves it; /openmap reset or the Look tab's Reset size and place bring it back)
-		local function Clamp()
-			local w, h = map:GetWidth(), map:GetHeight()
-			if not (w and h) or w <= 0 or InCombatLockdown() then return end
-			local side = math.max(0, w - 160)
-			map:SetClampRectInsets(side, -side, -TOP_OFF, math.max(0, h - TOP_OFF - 80))
-		end
 		Clamp()
-		map:HookScript("OnSizeChanged", Clamp)
+		map:HookScript("OnSizeChanged", function() Clamp() end)
 		if not Maximized() then blizzardSize = { map:GetWidth(), map:GetHeight() } end
 
 		-- the title bar: a strip along the top, clear of the corner buttons
@@ -391,10 +404,11 @@ function mod:SetupWindow(worldMap)
 	if not classicMap then grip = { Grip("BOTTOMRIGHT"), Grip("BOTTOMLEFT") } end
 	local function Mode()
 		local max = Maximized()
+		if not max then maxRefitted = false end
 		mod.ChatOverMap()
 		if handle then handle:SetShown(not max) end
 		for _, g in ipairs(grip) do g:SetShown(not max) end
-		if max then FillScreen() else Apply() end
+		RefitNative(max and FillScreen() or Apply())
 	end
 	if map.Maximize then hooksecurefunc(map, "Maximize", Mode) end
 	if map.Minimize then hooksecurefunc(map, "Minimize", Mode) end
@@ -427,9 +441,9 @@ function mod:SetupWindow(worldMap)
 	-- and a value OpenMap wrote taints that code: the map holds protected frames (the group members' pin),
 	-- so in combat its Hide was blocked and neither Escape nor M closed it, players' reports)
 	map:HookScript("OnShow", function() mod.ChatOverMap() end)
-	map:HookScript("OnHide", function() mod.ChatOverMap() end)
+	map:HookScript("OnHide", function() maxRefitted = false mod.ChatOverMap() end)
 	-- Blizzard re-sizes the maximized map when the screen or UI scale changes
-	if map.UpdateMaximizedSize then hooksecurefunc(map, "UpdateMaximizedSize", function() if Maximized() then FillScreen() end end) end
+	if map.UpdateMaximizedSize then hooksecurefunc(map, "UpdateMaximizedSize", function() if Maximized() and FillScreen() then maxRefitted = true end end) end
 	map:HookScript("OnShow", Mode)
 	for _, g in ipairs(grip) do g:SetFrameLevel(OverIcons() + 1) end
 	FitRightGrip()
