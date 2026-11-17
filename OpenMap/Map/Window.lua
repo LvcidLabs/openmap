@@ -31,6 +31,7 @@ local sizing = false            -- a grip is being dragged: the drag sizes the w
 local moveAny = false           -- Move Any owns position and scale, OpenMap owns viewport dimensions
 local classicMap = false        -- ClassicUI Forever's World map option owns the window (ClassicMapOn)
 local afterCombat = false       -- something here waited out combat: done as it ends
+local afterCombatRefit = false  -- resize spacer/refit waited out combat: done even if dimensions already match
 local windowOwner = {}          -- (its event handler's key)
 
 -- At PLAYER_LOGIN, enabled addons have finished loading. An installed but disabled
@@ -88,6 +89,11 @@ local function Refit()
 	end
 end
 
+local function UpdateSpacer()
+	if not map.UpdateSpacerFrameAnchoring then return end
+	if mod.KeepPadCursor then mod.KeepPadCursor(map.UpdateSpacerFrameAnchoring, map) else map:UpdateSpacerFrameAnchoring() end
+end
+
 local function Maximized()
 	return map.IsMaximized and map:IsMaximized()
 end
@@ -124,9 +130,10 @@ local function Apply()
 	local size, refitted = mod.db.windowSize, false
 	if size and not InCombatLockdown() and (math.abs(map:GetWidth() - size[1]) > 0.5 or math.abs(map:GetHeight() - size[2]) > 0.5) then
 		map:SetSize(size[1], size[2])
-		if map.UpdateSpacerFrameAnchoring then map:UpdateSpacerFrameAnchoring() end
+		UpdateSpacer()
 		Refit()
 		refitted = true
+		afterCombatRefit = false
 	end
 	ours = false
 	return refitted
@@ -236,8 +243,13 @@ local function Grip(corner)
 		mod.db.windowSize = { math.floor(map:GetWidth() + 0.5), math.floor(map:GetHeight() + 0.5) }
 		if not moveAny then Save() end
 		if map:IsShown() then
-			if map.UpdateSpacerFrameAnchoring then map:UpdateSpacerFrameAnchoring() end
-			Refit()
+			if InCombatLockdown() then
+				afterCombat = true
+				afterCombatRefit = true
+			else
+				UpdateSpacer()
+				Refit()
+			end
 		end   -- (laid out at the scale the drag showed: WorldMap.lua)
 		if mod.EndResize then mod.EndResize() end
 	end
@@ -292,9 +304,18 @@ function mod:SetupWindow(worldMap)
 	end
 	-- (what waited out combat: the window laid out again, the question asked)
 	ns.RegisterEvent(windowOwner, "PLAYER_REGEN_ENABLED", function()
-		if not afterCombat then return end
+		if not (afterCombat or afterCombatRefit) then return end
 		afterCombat = false
-		if map:IsShown() then RefitNative(Maximized() and FillScreen() or Apply()) end
+		if map:IsShown() then
+			local refitted = Maximized() and FillScreen() or Apply()
+			if afterCombatRefit then
+				afterCombatRefit = false
+				if not refitted then UpdateSpacer() Refit() end
+			else
+				RefitNative(refitted)
+			end
+		end
+		afterCombatRefit = false
 		if classicMap then AskClassicMap() end
 	end)
 	-- Enhance QoL's Mover (World Map) sizes and places the map too, and the two fight over its scale (a
@@ -627,7 +648,7 @@ SetupQuestLog = function()
 		if toggle and toggle:IsShown() then toggle:Refresh() end
 		FitRightGrip()
 		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring then
-			map:UpdateSpacerFrameAnchoring()
+			UpdateSpacer()
 			Refit()
 		end
 	end
