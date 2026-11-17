@@ -29,6 +29,7 @@ local mod = ns:NewModule("worldmap", {
 		flight = true,
 		hideWorldPinsInInstances = false,
 		playerArrow = true,     -- your own arrow on the world map (off: find your way old-school; the party still shows)
+		playerArrowScale = 1,   -- your own arrow at this times its own size (ARROW_SCALE)
 		iconsFrom = 0,          -- the places' icons from this zoom (ICONS_FROM; 1: the whole world); 0: each from its own (Auto)
 		iconScale = 1,          -- OpenMap's icons at this times their own size (ICON_SCALE)
 		brightness = 1,         -- brightness of the whole stitched map; icons keep their own colour
@@ -68,6 +69,8 @@ local ICONS_FROM = { 0, 20, 0.5 }   -- iconsFrom's least (0: Auto), most, step (
 mod.ICONS_FROM = ICONS_FROM
 local ICON_SCALE = { 0.6, 2, 0.05 } -- iconScale's least, most, step
 mod.ICON_SCALE = ICON_SCALE
+local ARROW_SCALE = { 0.6, 2.5, 0.05 } -- playerArrowScale's least, most, step
+mod.ARROW_SCALE = ARROW_SCALE
 
 local ZOOM_STEP = 1.25          -- each wheel notch
 local MAX_ZOOM = { 16, 192, 8 } -- the deepest zoom's setting: least, most, step (the minimap's own detail runs out
@@ -583,6 +586,26 @@ local function ScaleGroupBlips(pin)
 	groupBlipSizes[pin] = factor ~= 1 and { factor = factor, scale = scale } or nil
 end
 
+local playerBlipSizes = setmetatable({}, { __mode = "k" })
+local function ScalePlayerBlip(pin)
+	if not pin.SetPinSize or Locked(pin) then return end
+	if active and BlipOff("player") then
+		playerBlipSizes[pin] = nil
+		return
+	end
+	local applied = playerBlipSizes[pin]
+	local factor = active and tonumber(mod.db.playerArrowScale) or 1
+	if factor <= 0 then factor = 1 end
+	if factor == 1 and not applied then return end
+	local scale = map.GetCanvasScale and map:GetCanvasScale() or 1
+	if scale <= 0 or (applied and applied.factor == factor and applied.scale == scale) then return end
+	local provider = pin.dataProvider
+	local sizes = provider and provider.GetUnitPinSizesTable and provider:GetUnitPinSizesTable()
+	if not sizes or not sizes.player then return end
+	if not pcall(pin.SetPinSize, pin, "player", sizes.player * factor / scale) then return end
+	playerBlipSizes[pin] = factor ~= 1 and { factor = factor, scale = scale } or nil
+end
+
 -- The rim uses the size that could be applied to the stock dot.
 function mod.NativeGroupIconScale(pin)
 	local applied = groupBlipSizes[pin]
@@ -596,11 +619,13 @@ local function Blips(pin)
 		if pin.SetPinSize and type(pin.SynchronizePinSizes) == "function" then
 			hooksecurefunc(pin, "SynchronizePinSizes", function(self)
 				groupBlipSizes[self] = nil -- Blizzard just restored the provider's default sizes
+				playerBlipSizes[self] = nil
 				if Locked(self) then return end
 				for unit in pairs(BLIP_UNITS) do
 					if BlipOff(unit) then pcall(self.SetPinSize, self, unit, BLIP_GONE) end
 				end
 				ScaleGroupBlips(self)
+				ScalePlayerBlip(self)
 			end)
 		end
 		if ping then
@@ -627,6 +652,7 @@ local function Blips(pin)
 		end
 	end
 	ScaleGroupBlips(pin)
+	ScalePlayerBlip(pin)
 end
 
 local function RaisePlayer()
@@ -1755,6 +1781,7 @@ function mod:Refresh()
 	end
 	if S.RefreshRoutes then S.RefreshRoutes() end
 	S.SetPlayerHidden(self.db.playerArrow == false)
+	if S.SetPlayerScale then S.SetPlayerScale(self.db.playerArrowScale or 1) end
 	if active and map:IsShown() then RaisePlayer() end
 	S.SetPlacesFrom(self.db.iconsFrom)
 	S.SetFoundOnly(self.db.foundOnly)
@@ -1956,6 +1983,9 @@ function mod:Options()
 		iconScale = { type = "range", name = ns.L["Icon size"], order = 33.6, min = ICON_SCALE[1], max = ICON_SCALE[2], step = ICON_SCALE[3],
 			isPercent = true, get = get, set = set, disabled = off,
 			desc = ns.L["OpenMap's icons on the map (dungeons, flight masters, boats, townsfolk, your pins ...) at this size. Questie's icons have their own size, in Questie's options."] },
+		playerArrowScale = { type = "range", name = ns.L["Arrow size"], order = 33.65, min = ARROW_SCALE[1], max = ARROW_SCALE[2], step = ARROW_SCALE[3],
+			isPercent = true, get = get, set = set, disabled = off,
+			desc = ns.L["Your own arrow on the world map at this size."] },
 		allQuests = { type = "toggle", name = ns.L["Quests from every zone"], order = 33.7, get = get, set = set, disabled = off,
 			hidden = function() return mod.defaults.allQuests == nil end,   -- (Quests.lua: not in retail's toc)
 			desc = ns.L["The quests in your log on the map from every zone and at any zoom. Blizzard's map shows a zone's quests only once you've zoomed in on that zone."] },

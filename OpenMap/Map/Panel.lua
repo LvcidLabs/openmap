@@ -1524,6 +1524,12 @@ function mod:SetupPanel(worldMap)
 		fmt = "%d%%", show = function(v) return math.floor(v * 100 + 0.5) end,
 		tip = L["OpenMap's icons on the map at this size: dungeons, flight masters, boats, townsfolk, your pins. Questie's icons have their own size, in Questie's options."] })
 	menu.extraRows[#menu.extraRows + 1] = made.iconSize
+	made.arrowSize = SliderRow(sliders, COL, { label = L["Arrow size"], icon = { texture = "Interface\\Minimap\\MinimapArrow" }, range = mod.ARROW_SCALE,
+		get = function() return mod.db.playerArrowScale or 1 end,
+		set = function(v) mod.db.playerArrowScale = v mod:Refresh() if ns.NotifyOptions then ns.NotifyOptions() end end,
+		fmt = "%d%%", show = function(v) return math.floor(v * 100 + 0.5) end,
+		tip = L["Your own arrow on the world map at this size."] })
+	menu.extraRows[#menu.extraRows + 1] = made.arrowSize
 	for _, s in ipairs({
 		{ "windowScale", L["Map size"], Icon("INV_Misc_Spyglass_02") },
 		{ "brightness", L["Map brightness"], Icon("Spell_Shadow_DarkRitual") },
