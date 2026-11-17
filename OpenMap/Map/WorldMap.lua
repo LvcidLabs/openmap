@@ -656,9 +656,11 @@ local function Blips(pin)
 	ScalePlayerBlip(pin)
 end
 
+local STRATA_ABOVE = { BACKGROUND = "LOW", LOW = "MEDIUM", MEDIUM = "HIGH", HIGH = "DIALOG", DIALOG = "FULLSCREEN", FULLSCREEN = "FULLSCREEN_DIALOG" }
 local function RaisePlayer()
+	local baseStrata = (sc.GetFrameStrata and sc:GetFrameStrata()) or "MEDIUM"
 	local onTop = active and mod.db.playerArrowOnTop
-	local strata = onTop and "HIGH" or (sc.GetFrameStrata and sc:GetFrameStrata()) or "MEDIUM"
+	local strata = onTop and (STRATA_ABOVE[baseStrata] or baseStrata) or baseStrata
 	local level = onTop and 9990 or math.min(sc:GetFrameLevel() + PLAYER_ABOVE, 9500)
 	for pin in map:EnumeratePinsByTemplate("GroupMembersPinTemplate") do
 		if not Locked(pin) then
