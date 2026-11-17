@@ -1,14 +1,14 @@
 """The fog (Stitch.lua's Shade.Fog, Data/Forever/Fog.lua, Media/Textures/Forever/MapFog/, render.py --bake-fog): every
 piece's file there at its size; whichever of a zone's pieces are unexplored, their shares never come to more than
 the one shade (they don't stack darker where pieces overlap); and Shade.Fog.Show draws only the unexplored pieces',
-each over its piece's rectangle: python -P tools/offline-test/fog.py."""
+each over its piece's rectangle: python -P tools/offline-test/fog.py. (Lua 5.1 through lupa and the standard
+library only, as CI installs: the masks' DXT5 alpha read here)"""
 from pathlib import Path
 import random
 import re
+import struct
 import unittest
 
-import numpy as np
-from PIL import Image
 from lupa.lua51 import LuaRuntime
 
 
@@ -17,6 +17,7 @@ STITCH = ADDON / "Map" / "Stitch.lua"
 FOG = ADDON / "Data" / "Forever" / "Fog.lua"
 FILES = ADDON / "Media" / "Textures" / "Forever" / "MapFog"
 SHADE = 0.62                    # (Stitch.lua's UNDISCOVERED alpha: render.py's FOG_S)
+STEP = 4                        # (art px between the points checked)
 
 
 def zones():
@@ -28,12 +29,35 @@ def zones():
     return out
 
 
-def mask(mid, e):
-    """a piece's share on its rectangle (art px), as the client draws it"""
-    w, h, x, y, n, cw, ch, fw, fh = e
-    with Image.open(FILES / ("%d_%d.blp" % (mid, n))) as im:
-        a = np.asarray(im.convert("RGBA"))[:ch, :cw, 3]
-    return np.asarray(Image.fromarray(a).resize((w, h), Image.BILINEAR)).astype(np.float32) / 255
+def blp_size(path):
+    with open(path, "rb") as f:
+        head = f.read(20)
+    assert head[:4] == b"BLP2", path.name
+    return struct.unpack("<2I", head[12:20])
+
+
+def blp_alpha(path):
+    """a BLP2's (DXT5, as tools/map-textures/blp.py writes it) first level's alpha: (width, height, bytes)"""
+    data = path.read_bytes()
+    assert data[:4] == b"BLP2" and data[8] == 2 and data[10] == 7, path.name   # (encoding 2: DXT; alpha type 7: DXT5)
+    w, h = struct.unpack("<2I", data[12:20])
+    at = struct.unpack("<I", data[20:24])[0]
+    out = bytearray(w * h)
+    bw = (w + 3) // 4
+    for by in range((h + 3) // 4):
+        for bx in range(bw):
+            o = at + (by * bw + bx) * 16
+            a0, a1 = data[o], data[o + 1]
+            if a0 > a1:
+                pal = [a0, a1] + [((7 - k) * a0 + k * a1) // 7 for k in range(1, 7)]
+            else:
+                pal = [a0, a1] + [((5 - k) * a0 + k * a1) // 5 for k in range(1, 5)] + [0, 255]
+            bits = int.from_bytes(data[o + 2:o + 8], "little")
+            for i in range(16):
+                x, y = bx * 4 + i % 4, by * 4 + i // 4
+                if x < w and y < h:
+                    out[y * w + x] = pal[(bits >> (3 * i)) & 7]
+    return w, h, out
 
 
 class FileTests(unittest.TestCase):
@@ -46,8 +70,7 @@ class FileTests(unittest.TestCase):
                 w, h, x, y, n, cw, ch, fw, fh = e
                 p = FILES / ("%d_%d.blp" % (mid, n))
                 self.assertTrue(p.exists(), p.name)
-                with Image.open(p) as im:
-                    self.assertEqual(im.size, (fw, fh), p.name)
+                self.assertEqual(blp_size(p), (fw, fh), p.name)
                 self.assertTrue(0 < cw <= fw and 0 < ch <= fh, p.name)
 
 
@@ -55,13 +78,25 @@ class NeverDarkerTests(unittest.TestCase):
     def test_any_unexplored_set_is_at_most_the_shade(self):
         rng = random.Random(3)
         for mid, entries in zones().items():
-            masks = [(e, mask(mid, e)) for e in entries]
+            # at points of the zone's art every STEP px: each piece's share there (its mask's nearest px)
+            at = {}
+            for i, (w, h, x, y, n, cw, ch, fw, fh) in enumerate(entries):
+                mw, _, a = blp_alpha(FILES / ("%d_%d.blp" % (mid, n)))
+                for py in range((y + STEP - 1) // STEP * STEP, y + h, STEP):
+                    v = min(ch - 1, (py - y) * ch // h)
+                    for px in range((x + STEP - 1) // STEP * STEP, x + w, STEP):
+                        share = a[v * mw + min(cw - 1, (px - x) * cw // w)]
+                        if share:
+                            at.setdefault((px, py), []).append((i, share / 255))
             for trial in range(4):
-                un = [m for m in masks if trial == 0 or rng.random() < 0.5]   # (the first: all unexplored)
-                through = np.ones((900, 1300), np.float32)    # what shows through: prod(1 - share)
-                for (w, h, x, y, *_), a in un:
-                    through[y:y + h, x:x + w] *= 1 - a
-                worst = float((1 - through).max())
+                un = set(range(len(entries))) if trial == 0 else {i for i in range(len(entries)) if rng.random() < 0.5}
+                worst = 0
+                for shares in at.values():
+                    through = 1.0                       # what shows through: prod(1 - share)
+                    for i, sh in shares:
+                        if i in un:
+                            through *= 1 - sh
+                    worst = max(worst, 1 - through)
                 self.assertLessEqual(worst, SHADE + 0.03, "%d: %.3f darker than the shade" % (mid, worst))
 
 
