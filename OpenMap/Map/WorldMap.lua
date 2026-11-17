@@ -699,7 +699,7 @@ ticker:SetScript("OnUpdate", function(_, elapsed)
 
 	-- the player, when the map underneath can't show them
 	local pos = C_Map.GetPlayerMapPosition(mapID, "player")
-	if pos then
+	if pos and not (mod.db.playerArrowOnTop and not ns.MapWorld) then
 		S.SetPlayer(nil)
 	else
 		local best = C_Map.GetBestMapForUnit("player")
