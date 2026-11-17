@@ -124,6 +124,7 @@ local function Apply()
 	local size = mod.db.windowSize
 	if size and not InCombatLockdown() and (math.abs(map:GetWidth() - size[1]) > 0.5 or math.abs(map:GetHeight() - size[2]) > 0.5) then
 		map:SetSize(size[1], size[2])
+		if map.UpdateSpacerFrameAnchoring then map:UpdateSpacerFrameAnchoring() end
 		Refit()
 	end
 	ours = false
@@ -223,7 +224,10 @@ local function Grip(corner)
 		end
 		mod.db.windowSize = { math.floor(map:GetWidth() + 0.5), math.floor(map:GetHeight() + 0.5) }
 		if not moveAny then Save() end
-		if map:IsShown() then Refit() end   -- (laid out at the scale the drag showed: WorldMap.lua)
+		if map:IsShown() then
+			if map.UpdateSpacerFrameAnchoring then map:UpdateSpacerFrameAnchoring() end
+			Refit()
+		end   -- (laid out at the scale the drag showed: WorldMap.lua)
 		if mod.EndResize then mod.EndResize() end
 	end
 	g:SetScript("OnMouseUp", Finish)
@@ -605,8 +609,16 @@ SetupQuestLog = function()
 	end
 	if map.Maximize then hooksecurefunc(map, "Maximize", ShowToggle) end
 	if map.Minimize then hooksecurefunc(map, "Minimize", ShowToggle) end
-	Log():HookScript("OnShow", function() if toggle and toggle:IsShown() then toggle:Refresh() end FitRightGrip() end)
-	Log():HookScript("OnHide", function() if toggle and toggle:IsShown() then toggle:Refresh() end FitRightGrip() end)
+	local function OnLogToggle()
+		if toggle and toggle:IsShown() then toggle:Refresh() end
+		FitRightGrip()
+		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring then
+			map:UpdateSpacerFrameAnchoring()
+			Refit()
+		end
+	end
+	Log():HookScript("OnShow", OnLogToggle)
+	Log():HookScript("OnHide", OnLogToggle)
 	-- leaving full screen: hidden first (Blizzard only widens the window for a quest log it shows itself)
 	local mm = map.BorderFrame and map.BorderFrame.MaximizeMinimizeFrame
 	local minimize = mm and mm.MinimizeButton
