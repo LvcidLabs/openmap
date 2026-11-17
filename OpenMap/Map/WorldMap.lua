@@ -30,6 +30,7 @@ local mod = ns:NewModule("worldmap", {
 		hideWorldPinsInInstances = false,
 		playerArrow = true,     -- your own arrow on the world map (off: find your way old-school; the party still shows)
 		playerArrowScale = 1,   -- your own arrow at this times its own size (ARROW_SCALE)
+		playerArrowOnTop = false, -- draw the player arrow in HIGH strata so it sits above all map icons
 		iconsFrom = 0,          -- the places' icons from this zoom (ICONS_FROM; 1: the whole world); 0: each from its own (Auto)
 		iconScale = 1,          -- OpenMap's icons at this times their own size (ICON_SCALE)
 		brightness = 1,         -- brightness of the whole stitched map; icons keep their own colour
@@ -656,15 +657,18 @@ local function Blips(pin)
 end
 
 local function RaisePlayer()
-	local level = math.min(sc:GetFrameLevel() + PLAYER_ABOVE, 9500)
+	local onTop = active and mod.db.playerArrowOnTop
+	local strata = onTop and "HIGH" or (sc.GetFrameStrata and sc:GetFrameStrata()) or "MEDIUM"
+	local level = onTop and 9990 or math.min(sc:GetFrameLevel() + PLAYER_ABOVE, 9500)
 	for pin in map:EnumeratePinsByTemplate("GroupMembersPinTemplate") do
 		if not Locked(pin) then
+			if pin.SetFrameStrata and pin:GetFrameStrata() ~= strata then pcall(pin.SetFrameStrata, pin, strata) end
 			if pin:GetFrameLevel() ~= level then pin:SetFrameLevel(level) end
 			Blips(pin)
 			LayerGroupBlips(pin)
 		end
 	end
-	S.RaiseArrow(level + 1)
+	S.RaiseArrow(level + 1, strata)
 	if mod.RefreshNativeRingLayout then mod.RefreshNativeRingLayout() end
 end
 
@@ -1994,6 +1998,8 @@ function mod:Options()
 			desc = ns.L["In dungeons, raids and battlegrounds, temporarily hide OpenMap's friends, guild, transport and world quest markers. Party and raid members and other addons' maps and markers stay visible. Your marker settings are kept."] },
 		playerArrow = { type = "toggle", name = ns.L["Your arrow"], order = 33, get = get, set = set, disabled = off,
 			desc = ns.L["Your own arrow on the world map. Off, you find your way old-school, by the land around you; your party still shows, and so does the minimap."] },
+		playerArrowOnTop = { type = "toggle", name = ns.L["Your arrow on top"], order = 33.1, get = get, set = set, disabled = off,
+			desc = ns.L["Draw your player arrow in a higher strata so other addons' map icons cannot cover it."] },
 	}
 	if mod.ExtraOptions then mod:ExtraOptions(opts, get, set, off) end
 	if mod.NavOptions then mod:NavOptions(opts, get, set, off) end

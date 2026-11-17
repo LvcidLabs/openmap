@@ -220,6 +220,7 @@ local function Rows()
 		optRow(L["Only places you've found"], "foundOnly", Icon("INV_Misc_Spyglass_03")),
 		optRow(L["Boat and zeppelin routes"], "routes", { atlas = "Ships_CargoShip-Map", texture = "Interface\\Icons\\INV_Misc_Spyglass_02", icon = true }),
 		optRow(L["Your arrow"], "playerArrow", { texture = "Interface\\Minimap\\MinimapArrow" }),
+		optRow(L["Your arrow on top"], "playerArrowOnTop", { texture = "Interface\\Minimap\\MinimapArrow" }),
 		optRow(L["Party and raid members"], "group", Icon("Spell_Holy_PrayerOfFortitude")),
 		optRow(L["Friends on the map"], "friends", Icon("INV_Misc_GroupNeedMore")),
 		optRow(L["Guild members on the map"], "guild", Icon("INV_Shirt_GuildTabard_01")),

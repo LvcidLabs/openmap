@@ -2285,9 +2285,11 @@ end
 function S.PlayerShown() return arrow ~= nil and arrow:IsShown() end
 
 -- our arrow over every icon on the map, at frame level `level` (WorldMap.lua: with Blizzard's own)
-function S.RaiseArrow(level)
+function S.RaiseArrow(level, strata)
 	local f = arrow and arrow:GetParent()
-	if f and f:GetFrameLevel() ~= level then f:SetFrameLevel(level) end
+	if not f then return end
+	if strata and f.SetFrameStrata and f:GetFrameStrata() ~= strata then f:SetFrameStrata(strata) end
+	if f:GetFrameLevel() ~= level then f:SetFrameLevel(level) end
 end
 
 function S.SetPlayerScale(k)
