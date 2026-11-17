@@ -1458,10 +1458,16 @@ local function Setup()
 	dp.OnMapChanged = function()
 		HookHighlight()                             -- (a highlight pin made since: the toggle reaches it too, #262)
 		ApplyZoom()
-		if active then RaisePlayer() end
+		if active then
+			RaisePlayer()
+			C_Timer.After(0, function() if active and map:IsShown() then RaisePlayer() end end)
+		end
 		if mod.OnHostMapChanged then mod.OnHostMapChanged() end
 		if mod.RefreshPortrait then pcall(mod.RefreshPortrait) end   -- (OpenMap's icon only while stitching)
 	end
+	hooksecurefunc(map, "OnMapChanged", function()
+		if active then RaisePlayer() end
+	end)
 	dp.OnHide = function()
 		mod.instanceWorldBrowsing = nil
 		mod.instanceMapGeneration = (mod.instanceMapGeneration or 0) + 1
