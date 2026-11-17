@@ -1561,7 +1561,7 @@ function mod:SetupPanel(worldMap)
 	end
 	-- each column's sliders need to move when the panel grows wider.
 	local sliderColumns = {
-		{ "zoom", "icons", "iconSize", "windowScale", "brightness", "colorMatch", "desaturate" },
+		{ "zoom", "icons", "iconSize", "arrowSize", "windowScale", "brightness", "colorMatch", "desaturate" },
 		{ "from", "minimapMix", "opacity", "darkening", "moveFade", "mapFpsCap" },
 	}
 	local function LayoutSliders()
