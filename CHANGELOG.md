@@ -15,6 +15,10 @@
   drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now.
   And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.
 
+- **With Soften on, unexplored land stays darkened up close**: from Soften's zoom until the minimap came
+  in, a partly explored zone's unexplored land went nearly bright, and flickered back each time the map
+  moved. By wealdly.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed
