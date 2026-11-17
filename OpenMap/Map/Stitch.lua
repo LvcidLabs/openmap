@@ -163,7 +163,10 @@ end
 -- lettered: tiles in the client's own language: English's, or another language's own set where one is
 -- baked (MapZones\<locale>\, from that client's art: ns.MapZoneArt.locales); any other language draws
 -- the zones live, from the client's own art in its language
-local Baked = { FADE = { 1.2, 1.6 }, WARM = 0.85, tiles = {}, use = false, live = 1, warm = false, busy = false, holding = false,
+-- (FADE ends at 1.2, not 1.6: the tiles are 16 px a world unit, under half most zones' own art, so past a
+-- screen px a tile px they were magnified, soft, over sharper live art, and the middle zooms went blurry.
+-- Any sooner went over perf.py's budget for a zoom out: the live layers coming in that much earlier)
+local Baked = { FADE = { 0.95, 1.2 }, WARM = 0.85, tiles = {}, use = false, live = 1, warm = false, busy = false, holding = false,
 	path = TEX .. "MapZones\\", desat = 0, english = not GetLocale or GetLocale():sub(1, 2) == "en" }
 Baked.lettered = Baked.english
 if not Baked.english and ns.MapZoneArt and ns.MapZoneArt.locales and ns.MapZoneArt.locales[GetLocale()] then
@@ -235,11 +238,28 @@ local function ApplyDetail()
 	if Baked.frame then
 		-- (the live layers stack: a zone's base art and its overlays, each at d, cover 1 - (1 - d)^2 of
 		-- what's under them; the tiles are all of them in one, so they're drawn that strong)
-		local gone = Baked.holding and 0 or live
+		-- (the hold eased, not snapped: it comes and goes many times a pan or zoom as files load, and the tiles,
+		-- a zone not found ungreyed in them, jumped over the live art's greyed one: unexplored land flickered.
+		-- Baked.easer, below)
+		Baked.want = Baked.holding and 1 or 0
+		if Baked.hold == nil then Baked.hold = Baked.want end
+		if Baked.hold ~= Baked.want and Baked.easer then Baked.easer:Show() end
+		local gone = live * (1 - Baked.hold)
 		Fade(Baked.frame, math.floor((1 - (1 - d) ^ 2) * (1 - gone) * 100 + 0.5) / 100)
 		Baked.Cull()
 	end
 end
+-- the baked tiles' hold toward Baked.want: in quickly (parchment would show), out slowly (rates a second)
+Baked.easer = CreateFrame("Frame")
+Baked.easer:Hide()
+Baked.easer:SetScript("OnUpdate", function(self, elapsed)
+	local want, h = Baked.want or 0, Baked.hold or 0
+	h = h + (want - h) * math.min(1, elapsed * (want > h and 12 or 3))
+	if math.abs(want - h) < 0.02 then h = want self:Hide() end
+	Baked.hold = h
+	appliedDetail = nil                     -- (ApplyDetail again, for the tiles' alpha)
+	ApplyDetail()
+end)
 S.stats = { zones = 0, tiles = 0, overlays = 0, pins = 0, cities = {} }
 S.viewHooks = {}                -- fn(u, v, hu, hv, zoom) on every pan / zoom (Close.lua's S.SetView calls them)
 

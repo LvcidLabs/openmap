@@ -1,5 +1,13 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **Sharper at the middle zooms**: between a continent and a zone filling the view, the zones' art was
+  drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now.
+  And unexplored land no longer flickers as the zones' art comes in while you pan.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed
