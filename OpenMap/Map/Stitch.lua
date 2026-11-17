@@ -1355,7 +1355,7 @@ function S.BuildNow(parent, artLevel, range, iconLevel)
 	arrow = CreateFrame("Frame", nil, pinRoot):CreateTexture(nil, "OVERLAY", nil, 7)
 	arrow:SetTexture("Interface\\Minimap\\MinimapArrow")
 	local ps = S.playerScale or 1
-	arrow:SetSize(28 * ps, 28 * ps)
+	arrow:SetSize(42 * ps, 42 * ps)
 	arrow:Hide()
 
 	-- the sea runs on well past the world art, so a wide (or tall) view shows more ocean,
@@ -2297,7 +2297,7 @@ function S.SetPlayerScale(k)
 	if k <= 0 then k = 1 end
 	if k == (S.playerScale or 1) then return end
 	S.playerScale = k
-	if arrow then arrow:SetSize(28 * k, 28 * k) end
+	if arrow then arrow:SetSize(42 * k, 42 * k) end
 end
 
 -- colour matching: the border copies move `strength` of the way to the shared
