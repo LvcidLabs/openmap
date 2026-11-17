@@ -1458,6 +1458,7 @@ local function Setup()
 	dp.OnMapChanged = function()
 		HookHighlight()                             -- (a highlight pin made since: the toggle reaches it too, #262)
 		ApplyZoom()
+		if active then RaisePlayer() end
 		if mod.OnHostMapChanged then mod.OnHostMapChanged() end
 		if mod.RefreshPortrait then pcall(mod.RefreshPortrait) end   -- (OpenMap's icon only while stitching)
 	end
