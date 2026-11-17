@@ -547,5 +547,7 @@
  "Dungeon maps inside dungeons": "地城內顯示地城地圖",
  "Opening the map inside a dungeon or raid shows that dungeon's map. Off: the map opens there as the game's own would, and a dungeon's map still opens from its entrance on the world map. With Dungeon Journal installed, its map is left to it inside a dungeon it has a page for.": "在地城或團隊副本內打開地圖時顯示該地城的地圖。關閉：在那裡地圖像遊戲內建的一樣打開，地城的地圖仍可從世界地圖上的入口打開。安裝了 Dungeon Journal 時，在它有頁面的地城內，地圖交給它顯示。",
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "放大後，手繪地圖的像素不夠用：此選項會柔化地圖並疊上紙張紋理。地圖移動時柔化會暫停，所以縮放或拖曳時地圖是清晰的，停下片刻後才變柔和。關閉（預設）：始終清晰。",
- "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "在地城中打開地圖會顯示 OpenMap 的地城地圖。關閉方法：OpenMap 選單 > 地城 > 地城內顯示地城地圖。"
+ "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "在地城中打開地圖會顯示 OpenMap 的地城地圖。關閉方法：OpenMap 選單 > 地城 > 地城內顯示地城地圖。",
+ "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "放到最大時，手繪地圖的像素不足：將其柔化並疊上紙張紋理。",
+ "the quest level on OpenMap's quest icons": "OpenMap 任務圖示上的任務等級"
 }

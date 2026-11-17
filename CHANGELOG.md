@@ -11,6 +11,10 @@
 
 ### Fixed
 
+- **Quest icons show the quest's level on every map**: zoomed out, or over the next zone, OpenMap's own
+  quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do,
+  with the level and its difficulty colour ("[39+] The Crown of Will"). By Rambomst.
+
 - **Sharper at the middle zooms**: between a continent and a zone filling the view, the zones' art was
   drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now.
   And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.
