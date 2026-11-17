@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Improved
+
+- **A smoother map on a Russian client**: the zones' art from further out is drawn from tiles baked
+  from the ruRU client's own maps, place names and city banners in Russian, as on an English or a
+  Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.)
+  By Danpiel.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed
