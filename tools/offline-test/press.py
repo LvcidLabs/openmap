@@ -60,7 +60,7 @@ class CtrlClickTests(unittest.TestCase):
             function FitZoom() return 2 end
             function GlideTo() glided = glided + 1 end
         """)
-        chunk = SOURCE[SOURCE.index('local function Dropping('):SOURCE.index('-- our icons: a press')]
+        chunk = SOURCE[SOURCE.index('local function BlizzardPinButton('):SOURCE.index('-- our icons: a press')]
         self.lua.execute(chunk + '\n_G.OnCanvasClick = OnCanvasClick\n')
 
     def check(self, code):
@@ -76,6 +76,18 @@ class CtrlClickTests(unittest.TestCase):
 
     def test_plain_click_still_zooms_when_turned_off(self):
         self.check("mod.db.ctrlClickPin = false assert(OnCanvasClick(true, 'LeftButton') == true) assert(glided == 1)")
+
+    def test_blizzard_pin_button_drops_and_disarms(self):
+        self.check("""
+            local armed = true
+            local pinBtn = {
+                ActiveTexture = { IsShown = function() return armed end },
+                SetActive = function(_, on) armed = on and true or false end,
+            }
+            map = { overlayFrames = { pinBtn } }
+            assert(OnCanvasClick(true, 'LeftButton') == true)
+            assert(dropped == 1 and glided == 0 and armed == false)
+        """)
 
 
 if __name__ == '__main__':
