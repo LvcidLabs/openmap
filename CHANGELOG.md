@@ -1,5 +1,13 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **With Soften on, unexplored land stays darkened up close**: from Soften's zoom until the minimap came
+  in, a partly explored zone's unexplored land went nearly bright, and flickered back each time the map
+  moved.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed

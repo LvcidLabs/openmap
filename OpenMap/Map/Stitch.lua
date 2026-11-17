@@ -453,7 +453,8 @@ local function PlaceTiles(parent, p, files, x, y, w, h, drawLayer, sub, overlay,
 						if mask2 then tex:AddMaskTexture(mask2) end
 						if list == graded then
 							local e = { tex, p.mapID, piece, layer = layer, u0 = u0, v0 = v0, u1 = u1, v1 = v1,
-								under = not overlay and p.under and p.under[(j - 1) * cols + k] }
+								under = not overlay and p.under and p.under[(j - 1) * cols + k],
+								blur = parent.omShift or nil }   -- (a blur copy's: ShowZone)
 							graded[#graded + 1] = e
 							local list = zoneTex[p.mapID] or {}
 							zoneTex[p.mapID] = list
@@ -2921,6 +2922,10 @@ ShowZone = function(mapID)
 		local un = e[3] and e[3].unexplored
 		-- (a base tile under its zone's pieces only when the unexplored ones are hidden: ns.MapUnder)
 		drawn = drawn and not (e.under and not hide)
+			-- (and not an unexplored piece's blur copy while unexplored land is darkened: the blur's four copies sit
+			-- over the darkened ones (Shade.Pieces), covering four fifths, so from Soften's zoom to the minimap's
+			-- the darkening all but went, and came back each time the map moved and the blur rested)
+			and not (e.blur and un and Shade.on)
 		if near and drawn and inside and (detailLive or Live.seen) and tex.omFile and not tex.omQueued then
 			tex.omQueued = true
 			loadQueue[#loadQueue + 1] = tex
