@@ -15,6 +15,9 @@
   drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now.
   And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.
 
+- **Roogug where he is now**: in Razorfen Kraul he stands in the middle of the dungeon past the rope
+  bridge (needed for the warriors' Fire Hardened Mail); his pin was at his old spot (#318).
+
 - **With Soften on, unexplored land stays darkened up close**: from Soften's zoom until the minimap came
   in, a partly explored zone's unexplored land went nearly bright, and flickered back each time the map
   moved. By wealdly.

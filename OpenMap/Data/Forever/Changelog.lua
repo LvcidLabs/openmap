@@ -7,6 +7,7 @@ ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [2] = "Fixed", }, items = {
 		"|cff6e2c0aA smoother map on a Russian client|r: the zones' art from further out is drawn from tiles baked from the ruRU client's own maps, place names and city banners in Russian, as on an English or a Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.) By Danpiel.",
 		"|cff6e2c0aSharper at the middle zooms|r: between a continent and a zone filling the view, the zones' art was drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now. And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.",
+		"|cff6e2c0aRoogug where he is now|r: in Razorfen Kraul he stands in the middle of the dungeon past the rope bridge (needed for the warriors' Fire Hardened Mail); his pin was at his old spot (#318).",
 		"|cff6e2c0aWith Soften on, unexplored land stays darkened up close|r: from Soften's zoom until the minimap came in, a partly explored zone's unexplored land went nearly bright, and flickered back each time the map moved. By wealdly.",
 	} },
 	{ version = "v0.8.10", date = "2026-11-16", heads = { [1] = "Fixed", [16] = "Improved", }, items = {
