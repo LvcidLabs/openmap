@@ -134,14 +134,17 @@ class InstanceTests(unittest.TestCase):
         """)
 
     def test_events_apply_with_map_closed_and_on_login(self):
-        block = re.search(r'\tfor _, event in ipairs\(\{ "PLAYER_ENTERING_WORLD".*?\n\tmod:RefreshInstancePins\(\)', WORLD, re.S).group()
+        block = re.search(r'\tfor _, event in ipairs\(\{ "PLAYER_ENTERING_WORLD".*?\n\tmod.NoteDungeonWing\(\)', WORLD, re.S).group()
         self.lua.execute("""
             events = {}
+            local wingChecks = 0
+            function mod.NoteDungeonWing() wingChecks = wingChecks + 1 end
             self = { instancePinsEvents = {} }
             function ns.RegisterEvent(owner, event, fn) events[event] = fn end
             inside, kind = true, 'party'
         """ + block + """
             Check(true)
+            assert(wingChecks == 1, 'did not check the wing at login')
             for _, event in ipairs({ 'PLAYER_ENTERING_WORLD', 'ZONE_CHANGED_NEW_AREA', 'ZONE_CHANGED', 'ZONE_CHANGED_INDOORS' }) do
                 inside, kind = false, 'none'
                 events[event]()
@@ -150,6 +153,7 @@ class InstanceTests(unittest.TestCase):
                 events[event]()
                 Check(true)
             end
+            assert(wingChecks == 9, 'did not check the wing on each instance and zone event')
         """)
 
 

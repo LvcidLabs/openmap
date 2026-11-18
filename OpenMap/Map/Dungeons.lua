@@ -2345,19 +2345,82 @@ function mod:DungeonOptions(opts, get, set, off)
 		desc = L["With Dungeon Journal installed, an entrance can open that dungeon's page in it instead of its map (its map still opens where Dungeon Journal has no page for it)."] }
 end
 
+-- Forever's LFGDungeons table distinguishes these wings. The Dungeon Finder lists
+-- Scarlet Monastery as one dungeon, so its wings are matched by area name.
+local WING_LFG = {
+	[189] = {},
+	[229] = { [31] = "Lower Blackrock Spire", [43] = "Upper Blackrock Spire" },
+	[429] = { [33] = "Dire Maul - East", [35] = "Dire Maul - West", [37] = "Dire Maul - North" },
+}
+local wingNames = {}
+
+local function InstanceIDs()
+	if not Safe.Call(IsInInstance) then return end
+	local _, _, _, _, _, _, _, instID, _, lfgID = GetInstanceInfo()
+	instID = Safe.Value(instID)
+	if instID and instID ~= 0 then return instID, Safe.Value(lfgID) end
+end
+
+local function WingHere(instID, lfgID)
+	local lfgs = ns.Client == "Forever" and WING_LFG[instID]
+	if not lfgs then return end
+	local wing = lfgs[lfgID]
+	if not wing then
+		local names = wingNames[instID]
+		if not names then
+			names = {}
+			for _, floor in ipairs((ns.MapDungeonMaps or {})[instID] or {}) do
+				local name = floor.wing or (instID == 189 and floor.name and "Scarlet Monastery - " .. floor.name)
+				if name then
+					names[Plain(name)] = name
+					if floor.name then names[Plain(floor.name)] = name end
+				end
+			end
+			for id, name in pairs(lfgs) do
+				local info = C_LFGInfo and Safe.Call(C_LFGInfo.GetDungeonInfo, id)
+				local localized = info and Safe.Value(info.name)
+				if localized and localized ~= "" then names[Plain(localized)] = name end
+			end
+			wingNames[instID] = names
+		end
+		wing = names[Plain(Safe.Call(GetSubZoneText))] or names[Plain(Safe.Call(GetMinimapZoneText))]
+			or names[Plain(Safe.Call(GetZoneText))]
+	end
+	local saved = mod.char and mod.char.dungeonWing
+	if wing then
+		if mod.char and (type(saved) ~= "table" or saved[1] ~= instID or saved[2] ~= wing) then
+			mod.char.dungeonWing = { instID, wing }
+		end
+		return wing
+	end
+	if type(saved) == "table" and saved[1] == instID then return saved[2] end
+end
+
+-- Instance and zone events can arrive before Blizzard's world map has loaded.
+function mod.NoteDungeonWing()
+	if ns.Client ~= "Forever" then return end
+	local instID, lfgID = InstanceIDs()
+	if instID then WingHere(instID, lfgID) end
+end
+
 -- the dungeon you're in, as Places.lua has it (nil: not in one, or one it doesn't list); one with no
 -- entrance yet (unplaced) too. (WoW Forever's own the tables had no mapID for were never found: The
 -- Drowned City's map didn't open inside it; they have their instance's mapID now, #149)
 local function InstanceHere()
-	if not IsInInstance or not IsInInstance() then return end
-	local instID = select(8, GetInstanceInfo())
-	if not instID or instID == 0 then return end   -- (0: no instance, never one of the name-keyed)
+	local instID, lfgID = InstanceIDs()
+	if not instID then return end
+	local wing = WingHere(instID, lfgID)
 	local places = Places()
+	local first
 	for _, g in ipairs(places.instances or {}) do
 		for _, inst in ipairs(g[4]) do
-			if inst[1] == instID then return inst end
+			if inst[1] == instID then
+				if not wing or inst[2] == wing then return inst end
+				first = first or inst
+			end
 		end
 	end
+	if first then return first end
 	for _, inst in ipairs(places.unplaced or {}) do
 		if inst[1] == instID then return inst end
 	end
