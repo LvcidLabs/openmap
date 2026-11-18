@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### New
+
+- **Show places to explore** (the map's menu and Options, off until turned on): for each zone's Explore
+  achievement, the places you haven't explored yet, each with a soft gold outline of the ground that
+  explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and
+  the achievement's progress. Further out, each zone shows how many places it has left.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

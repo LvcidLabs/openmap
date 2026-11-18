@@ -48,6 +48,7 @@ python -P tools/offline-test/combat.py
 python -P tools/offline-test/caves.py
 python -P tools/offline-test/explored.py
 python -P tools/offline-test/chart.py
+python -P tools/offline-test/explore.py
 python -P tools/offline-test/friends.py
 python -P tools/offline-test/padfriends.py
 python -P tools/offline-test/version.py
