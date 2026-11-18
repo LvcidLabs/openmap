@@ -1,5 +1,21 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **The controller map opens where you set it**: with the Gamepad UI, "When reopening the map"
+  (center on you, keep the zoom, your zone, remember) was only used the first time the map opened;
+  after that it opened wherever it was last left. It's used every time now.
+
+- **Place names under the controller's cursor**: the zone (with its levels) or the area under the
+  cursor is named at the top of the map, as it is under the mouse. Blizzard's own label, which named
+  places on its map hidden under OpenMap's, is hidden while OpenMap's map is up.
+
+- **Quest areas on the controller map**: pointing at a quest's icon shades its area, as Blizzard's map
+  does for its own icons, and the area stays in place while zooming. The focused quest's icon is
+  Blizzard's gold one, and its area stays shown when the cursor isn't on another quest.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed
