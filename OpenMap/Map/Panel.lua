@@ -293,6 +293,9 @@ local function Rows()
 	-- (this character's own choice of the two, or every character's)
 	rows[#rows + 1] = row(L["Only for this character"], "unexploredOwn", Icon("INV_Misc_Head_Human_01"),
 		function() return mod.char and mod.char.unexploredOwn or false end, function(v) mod.SetUnexploredOwn(v) end)
+	if ns.MapExplore then                        -- (the Explore achievements' places: Data\Forever\Explore.lua)
+		rows[#rows + 1] = optRow(L["Show places to explore"], "explore", Icon("Ability_Hunter_Pathfinding"))
+	end
 	rows[#rows + 1] = { L["The map"] }
 	if ns.MapChart then                          -- (the sea chart is WoW Forever's: Data\Forever\Chart.lua)
 		rows[#rows + 1] = optRow(L["Responsive ocean & border"], "chart", Icon("INV_Misc_Map02"))

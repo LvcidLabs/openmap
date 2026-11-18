@@ -262,6 +262,7 @@ Baked.easer:SetScript("OnUpdate", function(self, elapsed)
 end)
 S.stats = { zones = 0, tiles = 0, overlays = 0, pins = 0, cities = {} }
 S.viewHooks = {}                -- fn(u, v, hu, hv, zoom) on every pan / zoom (Close.lua's S.SetView calls them)
+S.exploredHooks = {}            -- fn() once pieces have been explored (S.RefreshExplored; Explore.lua)
 
 --------------------------------------------------------------------------------
 -- Geometry
@@ -638,6 +639,8 @@ local function Piece(mapID, key, unexplored)
 	piece.unexplored = unexplored
 	return piece
 end
+-- a zone's pieces as the map has them: key -> { key, unexplored }, or nil before its overlays are placed
+function S.Pieces(mapID) return pieces[mapID] end
 ForEachPiece = function(mapID, fn)
 	local explored = C_MapExplorationInfo.GetExploredMapTextures(mapID) or {}
 	local reveal = ns.MapReveal and ns.MapReveal[C_Map.GetMapArtID(mapID) or 0]
@@ -3426,6 +3429,7 @@ function S.RefreshExplored()
 	if changed then Shade.Places.Refresh() end
 	if changed and lastGrade then S.ApplyGrade(unpack(lastGrade)) end
 	if changed then S.RefreshFound() end
+	if changed then for _, fn in ipairs(S.exploredHooks) do fn() end end
 end
 
 -- /openmap status: a zone's explored-area pieces, explored and all, and the game's own count of what it

@@ -1754,6 +1754,7 @@ function mod:Refresh()
 		if set then S.SetPinSetOn(set, self.db[opt]) end
 	end
 	if S.RefreshRoutes then S.RefreshRoutes() end
+	if self.RefreshExplore then self.RefreshExplore() end
 	S.SetPlayerHidden(self.db.playerArrow == false)
 	if active and map:IsShown() then RaisePlayer() end
 	S.SetPlacesFrom(self.db.iconsFrom)
@@ -1935,6 +1936,9 @@ function mod:Options()
 		darkenColorReset = { type = "execute", name = ns.L["Default colour"], order = 23.56, width = "half",
 			func = function() mod.db.darkenColor = false mod:Refresh() end,
 			disabled = function() return off() or mod.Unexplored() ~= "dim" or not mod.db.darkenColor end },
+		explore = { type = "toggle", name = ns.L["Show places to explore"], order = 23.57, get = get, set = set, disabled = off,
+			hidden = function() return not ns.MapExplore end,     -- (Explore.lua's data: WoW Forever's toc only)
+			desc = ns.L["Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left."] },
 		maxZoom = { type = "range", name = ns.L["Deepest zoom"], order = 24, min = MAX_ZOOM[1], max = MAX_ZOOM[2], step = MAX_ZOOM[3],
 			get = get, set = function(_, v) mod.SetMaxZoom(v) if mod.RefreshPanel then mod:RefreshPanel() end end, disabled = off,
 			desc = ns.L["How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged."] },
