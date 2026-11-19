@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "При сильном приближении у нарисованной карты не хватает пикселей: эта настройка смягчает её и накладывает зернистость бумаги. Пока карта движется, смягчение приостанавливается, поэтому при масштабировании или перемещении карта чёткая, а через мгновение после остановки становится мягче. Выкл. (по умолчанию): всегда чёткая.",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "При открытии карты в подземелье показывается карта OpenMap этого подземелья. Чтобы отключить: меню OpenMap > Подземелья > Карты подземелий внутри подземелий.",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "При самом крупном масштабе рисованной карте не хватает пикселей: смягчить ее и наложить поверх фактуру бумаги.",
- "the quest level on OpenMap's quest icons": "уровень задания на значках заданий OpenMap"
+ "the quest level on OpenMap's quest icons": "уровень задания на значках заданий OpenMap",
+ "Battleground maps": "Карты полей боя",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "Карту поля боя можно приближать, как карту мира, а вблизи мини-карта игры показывает её детали (как задано в «Детали мини-карты»). Выкл.: собственная карта игры, как раньше.",
+ "Battleground": "Поле боя"
 }

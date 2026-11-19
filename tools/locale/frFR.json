@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "En zoom rapproché, la carte peinte manque de pixels : ceci l'adoucit et y pose un grain de papier. L'adoucissement se met en pause pendant que la carte bouge : elle est nette quand vous zoomez ou la déplacez, et s'adoucit un instant après l'arrêt. Désactivé (par défaut) : toujours nette.",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Ouvrir la carte dans un donjon affiche la carte OpenMap de celui-ci. Pour la désactiver : menu d'OpenMap > Donjons > Cartes des donjons à l'intérieur.",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "Au zoom le plus proche, la carte peinte manque de pixels : l'adoucir et y ajouter un grain de papier.",
- "the quest level on OpenMap's quest icons": "le niveau de la quête sur les icônes de quête d'OpenMap"
+ "the quest level on OpenMap's quest icons": "le niveau de la quête sur les icônes de quête d'OpenMap",
+ "Battleground maps": "Cartes des champs de bataille",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "La carte d'un champ de bataille se zoome comme la carte du monde, et de près la minicarte du jeu en montre les détails (selon le réglage Détail de la minicarte). Désactivé : la carte du jeu, telle qu'elle était.",
+ "Battleground": "Champ de bataille"
 }

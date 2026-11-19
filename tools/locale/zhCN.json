@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "放大后，手绘地图的像素不够用：此选项会柔化地图并叠加纸张纹理。地图移动时柔化会暂停，所以缩放或拖动时地图是清晰的，停下片刻后才变柔和。关闭（默认）：始终清晰。",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "在地下城中打开地图会显示 OpenMap 的地下城地图。关闭方法：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "放大到最大时，手绘地图的像素已不够用：将其柔化并叠加纸张纹理。",
- "the quest level on OpenMap's quest icons": "OpenMap 任务图标上的任务等级"
+ "the quest level on OpenMap's quest icons": "OpenMap 任务图标上的任务等级",
+ "Battleground maps": "战场地图",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "战场地图可以像世界地图一样放大，近处由游戏的小地图显示细节（按“小地图细节”的设置）。关闭：游戏自己的地图，保持原样。",
+ "Battleground": "战场"
 }

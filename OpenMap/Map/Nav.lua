@@ -316,6 +316,10 @@ local function Places()
 		local u, v = S.FromYards(node[2], node[3], node[4])
 		add(node[1], L["Flight master"], u, v)
 	end
+	-- battlegrounds: no place on the world, their own map opens (Battlegrounds.lua)
+	for _, bg in ipairs(mod.BattlegroundPlaces and mod.BattlegroundPlaces() or {}) do
+		places[#places + 1] = { name = bg.name, lower = bg.name:lower(), kind = L["Battleground"], open = bg.mapID }
+	end
 	return places
 end
 
@@ -334,7 +338,9 @@ end
 local function Go(p)
 	box:ClearFocus()
 	list:Hide()
-	if p[1] == p[3] then
+	if p.open then
+		S.OpenMap(p.open)
+	elseif p[1] == p[3] then
 		mod.Glide(p[1], p[2], math.max(14, select(3, mod.ViewNow()) or 1))
 		Ping(p[1], p[2])
 	else

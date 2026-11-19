@@ -101,6 +101,7 @@ table CSVs, `<tex>` a texture cache. Order matters where one step reads another'
 | --- | --- | --- | --- |
 | 1 | `tools/map-data/build.py <cache>` | `Data/Reveal.lua`, `Data/Places.lua` | `ENTRANCES` (below) |
 | 2 | `tools/map-data/minimap.py <cache>` | `Data/Minimap.lua` | |
+| 2a | `tools/map-data/battlegrounds.py <cache> <WoW folder> [build]` (Forever; the build whose tables have every battleground's uiMap: 1.60.1.70959) | `Data/Battlegrounds.lua` | |
 | 3 | `tools/map-flights/flights.py <db2> OpenMap/Data/Forever/FlightData.lua` | `Data/FlightData.lua` | |
 | 4 | `tools/map-caves/build.py <cache>` (best with `OPENMAP_WOW`: it reads the caves' WMOs, `wmo.py`) | `Data/Caves.lua`, `MapCave/` | |
 | 4a | `tools/map-caves/minimap.py <cache>` (best with `OPENMAP_WOW`) | `Data/CaveMinimap.lua` | 4 |

@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "Com o zoom aproximado, o mapa pintado fica sem pixels: isto o suaviza e põe uma textura de papel por cima. A suavização pausa enquanto o mapa se move, então ele fica nítido ao dar zoom ou arrastar e suaviza um instante depois de parar. Desativado (padrão): sempre nítido.",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Abrir o mapa numa masmorra mostra o mapa dela do OpenMap. Para desativar: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras.",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "No zoom mais próximo, o mapa pintado fica sem pixels: suaviza a imagem e aplica textura de papel por cima.",
- "the quest level on OpenMap's quest icons": "o nível da missão nos ícones de missão do OpenMap"
+ "the quest level on OpenMap's quest icons": "o nível da missão nos ícones de missão do OpenMap",
+ "Battleground maps": "Mapas de campos de batalha",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "O mapa de um campo de batalha aproxima como o mapa-múndi, e de perto o minimapa do jogo mostra seus detalhes (conforme o ajuste Detalhe do minimapa). Desligado: o próprio mapa do jogo, como era.",
+ "Battleground": "Campo de Batalha"
 }

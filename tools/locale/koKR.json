@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "가까이 확대하면 그려진 지도의 화소가 부족해집니다. 이 옵션은 지도를 부드럽게 하고 종이 질감을 입힙니다. 지도가 움직이는 동안에는 부드럽게 하기가 멈추므로, 확대하거나 이동할 때는 선명하고 멈춘 잠시 뒤에 부드러워집니다. 끄기(기본값): 항상 선명합니다.",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전에서 지도를 열면 OpenMap의 던전 지도가 표시됩니다. 끄려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도.",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "최대로 확대하면 그려진 지도의 해상도가 부족해집니다. 이를 부드럽게 처리하고 종이 질감을 입힙니다.",
- "the quest level on OpenMap's quest icons": "OpenMap 퀘스트 아이콘의 퀘스트 레벨"
+ "the quest level on OpenMap's quest icons": "OpenMap 퀘스트 아이콘의 퀘스트 레벨",
+ "Battleground maps": "전장 지도",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "전장 지도를 세계 지도처럼 확대할 수 있고, 가까이에서는 게임의 미니맵이 세부 모습을 보여 줍니다(「미니맵 세부 묘사」 설정에 따름). 끄면: 원래대로 게임 자체의 지도입니다.",
+ "Battleground": "전장"
 }

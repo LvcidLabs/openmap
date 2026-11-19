@@ -11,7 +11,8 @@
 --     continent) you're looking at, so quest areas, coordinates and the zone
 --     name always match what's on screen
 --   * left-click zooms into the place under the cursor, right-click out a level
--- Other maps (dungeons, battlegrounds) behave as Blizzard made them.
+-- Other maps (dungeons, battlegrounds) behave as Blizzard made them (a battleground's zooms, with
+-- its minimap's detail: Battlegrounds.lua).
 --------------------------------------------------------------------------------
 
 local _, ns = ...
@@ -1465,6 +1466,7 @@ local function Setup()
 	Timed("Friends", mod.SetupFriends, mod, map)
 	Timed("Quests", mod.SetupQuests, mod, map)
 	Timed("Dungeons", mod.SetupDungeons, mod, map)
+	Timed("Battlegrounds", mod.SetupBattlegrounds, mod, map)
 	Timed("Combat", mod.SetupCombat, mod, map)
 	ns.RegisterEvent(viewOwner, "PLAYER_REGEN_ENABLED", mod.FlushWaitingView)
 	-- (the map built ahead once the loading screen is gone: Prebuild)
@@ -1940,6 +1942,7 @@ function mod:Options()
 	if mod.PinOptions then mod:PinOptions(opts, get, set, off) end
 	if mod.FriendsOptions then mod:FriendsOptions(opts, get, set, off) end
 	if mod.DungeonOptions then mod:DungeonOptions(opts, get, set, off) end
+	if mod.BattlegroundOptions then mod:BattlegroundOptions(opts, get, set, off) end
 	if mod.LauncherOptions then mod:LauncherOptions(opts, get, off) end
 	if mod.SketchOptions then mod:SketchOptions(opts, get, set, off) end
 	if mod.WindowOptions then mod:WindowOptions(opts, get, set, off) end

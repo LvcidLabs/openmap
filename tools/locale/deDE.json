@@ -549,5 +549,8 @@
  "Zoomed in, the painted map runs out of pixels: this softens it and lays paper grain over it. The softening rests while the map moves, so the map is sharp while you zoom or pan and softens a moment after it stops. Off (the default): always sharp.": "Weit hineingezoomt gehen der gemalten Karte die Pixel aus: Dies zeichnet sie weich und legt Papiermaserung darüber. Das Weichzeichnen pausiert, solange sich die Karte bewegt: Beim Zoomen oder Verschieben ist sie scharf und wird einen Moment nach dem Anhalten weich. Aus (Standard): immer scharf.",
  "Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Wird die Karte in einem Dungeon geöffnet, zeigt sie OpenMaps Karte davon. Ausschalten: OpenMaps Menü > Dungeons > Dungeonkarten in Dungeons.",
  "At the closest zoom the painted map runs out of pixels: soften it and lay paper grain over it.": "Auf der stärksten Zoomstufe gehen der gemalten Karte die Pixel aus: Sie wird weichgezeichnet und mit Papierstruktur überzogen.",
- "the quest level on OpenMap's quest icons": "die Queststufe auf OpenMaps Questsymbolen"
+ "the quest level on OpenMap's quest icons": "die Queststufe auf OpenMaps Questsymbolen",
+ "Battleground maps": "Schlachtfeldkarten",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "Die Karte eines Schlachtfelds lässt sich wie die Weltkarte vergrößern, und aus der Nähe zeigt die Minikarte des Spiels ihre Details (wie bei Minikarten-Details eingestellt). Aus: die Karte des Spiels, wie sie war.",
+ "Battleground": "Schlachtfeld"
 }

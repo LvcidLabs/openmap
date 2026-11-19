@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New
+
+- **Battleground maps zoom in**: in Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear Islands
+  the map zooms in like the world map, and up close the game's own minimap of the battleground shows
+  its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with
+  your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open
+  its map from anywhere. To turn it off: OpenMap's menu > Dungeons > Battleground maps.
+
 ### Improved
 
 - **A smoother map on a Russian client**: the zones' art from further out is drawn from tiles baked

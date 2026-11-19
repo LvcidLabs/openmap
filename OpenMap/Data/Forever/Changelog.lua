@@ -4,7 +4,8 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [2] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [3] = "Fixed", }, items = {
+		"|cff6e2c0aBattleground maps zoom in|r: in Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear Islands the map zooms in like the world map, and up close the game's own minimap of the battleground shows its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open its map from anywhere. To turn it off: OpenMap's menu > Dungeons > Battleground maps.",
 		"|cff6e2c0aA smoother map on a Russian client|r: the zones' art from further out is drawn from tiles baked from the ruRU client's own maps, place names and city banners in Russian, as on an English or a Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.) By Danpiel.",
 		"|cff6e2c0aQuest icons show the quest's level on every map|r: zoomed out, or over the next zone, OpenMap's own quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do, with the level and its difficulty colour (\"[39+] The Crown of Will\"). By Rambomst.",
 		"|cff6e2c0aSharper at the middle zooms|r: between a continent and a zone filling the view, the zones' art was drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now. And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.",

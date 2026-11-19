@@ -69,6 +69,13 @@ local function Tint(tone)
 	return PAPER[1] + (r - PAPER[1]) * TONE_SHARE, PAPER[2] + (g - PAPER[2]) * TONE_SHARE, PAPER[3] + (b - PAPER[3]) * TONE_SHARE
 end
 
+-- a battleground's minimap tiles look as the world's do (Battlegrounds.lua): the parchment's warmth, no
+-- zone's colour (their maps have no tone)
+function S.MiniTileLook(tex)
+	tex:SetDesaturation(MINI_DESAT)
+	tex:SetVertexColor(Tint(DEFAULT_TONE))
+end
+
 local function TileTone(u, v)
 	local chain = S.ChainAt(u, v)
 	return Tint(ns.MapTones and ns.MapTones[chain[#chain]] or DEFAULT_TONE)
