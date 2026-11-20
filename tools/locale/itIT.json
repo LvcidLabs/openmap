@@ -557,5 +557,12 @@
  "Say when OpenMap has an update": "Avvisa se c'è un aggiornamento di OpenMap",
  "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Quando un amico, un membro della gilda o del gruppo ha un OpenMap più recente, una riga in chat lo dice, una volta per sessione. La tua versione viaggia solo nei messaggi che OpenMap già invia loro. Disattivato, non viene detto nulla e la tua versione non viene inviata.",
  "Show places to explore": "Mostra luoghi da esplorare",
- "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contorni e segnalini dove devi ancora andare per esplorare ogni zona, per la sua impresa di esplorazione; più da lontano, quanti luoghi restano in ogni zona."
+ "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contorni e segnalini dove devi ancora andare per esplorare ogni zona, per la sua impresa di esplorazione; più da lontano, quanti luoghi restano in ogni zona.",
+ "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "la mappa in combattimento, la finestra di ClassicUI Forever ed Esc sulla mappa di una spedizione",
+ "baked zone tiles in each client's language, and less work while the map is closed": "le tessere di zona precalcolate nella lingua di ogni client, e meno lavoro a mappa chiusa",
+ "quests from every zone read a few at a time": "le missioni di tutte le zone lette poco alla volta",
+ "sharper middle zooms, and unexplored land darkened as one shade": "zoom intermedi più nitidi, e le terre inesplorate scurite con un'unica tonalità",
+ "baked zone tiles for the Russian client": "le tessere di zona precalcolate per il client russo",
+ "Forever City Labels' pins on the stitched map": "i segnalini di Forever City Labels sulla mappa unita",
+ "your position read safely, the maximized dungeon map, the Stockade's map, and German": "la tua posizione letta in sicurezza, la mappa della spedizione ingrandita, la mappa delle Segrete e il tedesco"
 }

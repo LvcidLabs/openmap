@@ -557,5 +557,12 @@
  "Say when OpenMap has an update": "Avisar si hay actualización de OpenMap",
  "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Cuando un amigo, un miembro de la hermandad o del grupo tiene un OpenMap más nuevo, una línea en el chat lo indica, una vez por sesión. Tu versión solo va en mensajes que OpenMap ya les envía. Desactivado, no se avisa nada y tu versión no se envía.",
  "Show places to explore": "Mostrar lugares por explorar",
- "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contornos y marcadores donde aún tienes que ir para explorar cada zona, para su logro de exploración; de más lejos, cuántos lugares le quedan a cada zona."
+ "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contornos y marcadores donde aún tienes que ir para explorar cada zona, para su logro de exploración; de más lejos, cuántos lugares le quedan a cada zona.",
+ "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "el mapa en combate, la ventana de ClassicUI Forever y Esc en el mapa de una mazmorra",
+ "baked zone tiles in each client's language, and less work while the map is closed": "teselas de zona precalculadas en el idioma de cada cliente, y menos trabajo con el mapa cerrado",
+ "quests from every zone read a few at a time": "las misiones de todas las zonas leídas poco a poco",
+ "sharper middle zooms, and unexplored land darkened as one shade": "zooms intermedios más nítidos, y la tierra inexplorada oscurecida con un solo tono",
+ "baked zone tiles for the Russian client": "teselas de zona precalculadas para el cliente ruso",
+ "Forever City Labels' pins on the stitched map": "los marcadores de Forever City Labels en el mapa unido",
+ "your position read safely, the maximized dungeon map, the Stockade's map, and German": "tu posición leída con seguridad, el mapa de mazmorra maximizado, el mapa de Las Mazmorras y el alemán"
 }

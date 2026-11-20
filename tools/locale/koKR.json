@@ -557,5 +557,12 @@
  "Say when OpenMap has an update": "OpenMap 업데이트 알림",
  "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "친구, 길드원 또는 파티원이 더 새로운 OpenMap을 쓰고 있으면 접속당 한 번 대화창에 알려 줍니다. 내 버전은 OpenMap이 이미 보내는 메시지에만 담깁니다. 끄면 알림이 없고 내 버전도 보내지 않습니다.",
  "Show places to explore": "탐험할 장소 표시",
- "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "각 지역의 탐험 업적을 위해 아직 가야 할 곳에 윤곽선과 표시를 보여줍니다. 더 멀리서는 지역마다 남은 장소의 수를 보여줍니다."
+ "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "각 지역의 탐험 업적을 위해 아직 가야 할 곳에 윤곽선과 표시를 보여줍니다. 더 멀리서는 지역마다 남은 장소의 수를 보여줍니다.",
+ "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "전투 중 지도, ClassicUI Forever 창, 던전 지도에서 Esc",
+ "baked zone tiles in each client's language, and less work while the map is closed": "클라이언트 언어별로 미리 만든 지역 타일, 지도를 닫았을 때 줄어든 작업",
+ "quests from every zone read a few at a time": "모든 지역의 퀘스트를 조금씩 읽기",
+ "sharper middle zooms, and unexplored land darkened as one shade": "더 선명한 중간 확대, 하나의 색조로 어두워지는 미탐험 지역",
+ "baked zone tiles for the Russian client": "러시아어 클라이언트용으로 미리 만든 지역 타일",
+ "Forever City Labels' pins on the stitched map": "이어 붙인 지도 위의 Forever City Labels 핀",
+ "your position read safely, the maximized dungeon map, the Stockade's map, and German": "안전한 위치 읽기, 최대화된 던전 지도, 스톰윈드 지하감옥 지도, 독일어"
 }

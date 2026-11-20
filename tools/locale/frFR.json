@@ -557,5 +557,12 @@
  "Say when OpenMap has an update": "Signaler une mise à jour d'OpenMap",
  "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Quand un ami, un membre de la guilde ou du groupe a un OpenMap plus récent, une ligne dans la discussion le signale, une fois par session. Votre version n'est envoyée que dans les messages qu'OpenMap leur envoie déjà. Désactivé, rien n'est signalé et votre version n'est pas envoyée.",
  "Show places to explore": "Afficher les lieux à explorer",
- "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contours et marqueurs là où vous devez encore aller pour explorer chaque zone, pour son haut fait d'exploration ; en dézoomant, le nombre de lieux restants dans chaque zone."
+ "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contours et marqueurs là où vous devez encore aller pour explorer chaque zone, pour son haut fait d'exploration ; en dézoomant, le nombre de lieux restants dans chaque zone.",
+ "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "la carte en combat, la fenêtre de ClassicUI Forever et Échap sur la carte d'un donjon",
+ "baked zone tiles in each client's language, and less work while the map is closed": "les tuiles de zone précalculées dans la langue de chaque client, et moins de travail carte fermée",
+ "quests from every zone read a few at a time": "les quêtes de toutes les zones lues petit à petit",
+ "sharper middle zooms, and unexplored land darkened as one shade": "des zooms intermédiaires plus nets, et les terres inexplorées assombries d'une seule teinte",
+ "baked zone tiles for the Russian client": "les tuiles de zone précalculées du client russe",
+ "Forever City Labels' pins on the stitched map": "les marqueurs de Forever City Labels sur la carte assemblée",
+ "your position read safely, the maximized dungeon map, the Stockade's map, and German": "votre position lue sans risque, la carte de donjon agrandie, la carte de la Prison et l'allemand"
 }

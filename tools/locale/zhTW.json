@@ -557,5 +557,12 @@
  "Say when OpenMap has an update": "OpenMap 有更新時提示",
  "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "當好友、公會成員或隊伍成員使用較新版本的 OpenMap 時，聊天視窗會提示一行，每次登入一次。你的版本只隨 OpenMap 本來就會傳給他們的訊息送出。關閉後不會提示，也不會送出你的版本。",
  "Show places to explore": "顯示待探索的地點",
- "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "在你還需前往的地方顯示輪廓和標記，以完成每個區域的探索成就；縮小後顯示每個區域還剩多少地點。"
+ "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "在你還需前往的地方顯示輪廓和標記，以完成每個區域的探索成就；縮小後顯示每個區域還剩多少地點。",
+ "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "戰鬥中的地圖、ClassicUI Forever 的視窗，以及在地城地圖上按 Esc",
+ "baked zone tiles in each client's language, and less work while the map is closed": "依各客戶端語言預先產生的區域圖塊，以及地圖關閉時更少的工作",
+ "quests from every zone read a few at a time": "逐步讀取所有區域的任務",
+ "sharper middle zooms, and unexplored land darkened as one shade": "更清晰的中等縮放，以及以同一色調變暗的未探索區域",
+ "baked zone tiles for the Russian client": "為俄文客戶端預先產生的區域圖塊",
+ "Forever City Labels' pins on the stitched map": "拼接地圖上的 Forever City Labels 標記",
+ "your position read safely, the maximized dungeon map, the Stockade's map, and German": "安全讀取你的位置、最大化的地城地圖、監獄的地圖，以及德文"
 }
