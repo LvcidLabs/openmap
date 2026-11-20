@@ -1,5 +1,13 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view
+  all read where you are the same careful way, so a hidden position in combat or in a restricted instance
+  can't raise a Lua error. By gOOvER.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved
