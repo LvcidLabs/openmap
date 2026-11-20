@@ -275,7 +275,7 @@
  "OpenMap bench: Ctrl-A, Ctrl-C to copy": "Prueba de rendimiento de OpenMap: Ctrl+A, Ctrl+C para copiar",
  "OpenMap button on the map": "Botón de OpenMap en el mapa",
  "OpenMap is in beta: draw on the map where something looks wrong (a dungeon's map too) and tell us about it.": "OpenMap está en beta: dibuja en el mapa donde algo se vea mal (también en el mapa de un calabozo) y cuéntanos.",
- "OpenMap is made by |cffe6b85cJi|r, and it's open source: join in on GitHub": "OpenMap es obra de |cffe6b85cJi|r y es de código abierto: participa en GitHub",
+ "OpenMap is made by |cffe6b85cJi Unit (RP-PvP Horde)|r, and it's open source: join in on GitHub": "OpenMap es obra de |cffe6b85cJi Unit (RP-PvP Horde)|r y es de código abierto: participa en GitHub",
  "OpenMap's icons on the map (dungeons, flight masters, boats, townsfolk, your pins ...) at this size. Questie's icons have their own size, in Questie's options.": "Los íconos de OpenMap en el mapa (calabozos, maestros de vuelo, barcos, ciudadanos, tus marcadores...) a este tamaño. Los íconos de Questie tienen su propio tamaño, en las opciones de Questie.",
  "OpenMap's icons on the map at this size: dungeons, flight masters, boats, townsfolk, your pins. Questie's icons have their own size, in Questie's options.": "Los íconos de OpenMap en el mapa a este tamaño: calabozos, maestros de vuelo, barcos, ciudadanos, tus marcadores. Los íconos de Questie tienen su propio tamaño, en las opciones de Questie.",
  "OpenMap: zoom update %.1f ms, close-up %.1f ms (worst %.1f)": "OpenMap: actualización del zoom %.1f ms, vista de cerca %.1f ms (peor %.1f)",

@@ -275,7 +275,7 @@
  "OpenMap bench: Ctrl-A, Ctrl-C to copy": "OpenMap 벤치마크: Ctrl-A, Ctrl-C로 복사",
  "OpenMap button on the map": "지도 위 OpenMap 버튼",
  "OpenMap is in beta: draw on the map where something looks wrong (a dungeon's map too) and tell us about it.": "OpenMap은 베타 버전입니다. 이상해 보이는 곳이 있으면(던전 지도 포함) 지도에 그려서 알려 주십시오.",
- "OpenMap is made by |cffe6b85cJi|r, and it's open source: join in on GitHub": "OpenMap 제작: |cffe6b85cJi|r. 오픈 소스이니 GitHub에서 함께해 주십시오",
+ "OpenMap is made by |cffe6b85cJi Unit (RP-PvP Horde)|r, and it's open source: join in on GitHub": "OpenMap 제작: |cffe6b85cJi Unit (RP-PvP Horde)|r. 오픈 소스이니 GitHub에서 함께해 주십시오",
  "OpenMap's icons on the map (dungeons, flight masters, boats, townsfolk, your pins ...) at this size. Questie's icons have their own size, in Questie's options.": "OpenMap이 지도에 표시하는 아이콘(던전, 비행 조련사, 배, 마을 주민, 내 핀 등)의 크기입니다. Questie 아이콘의 크기는 Questie 설정에서 따로 정합니다.",
  "OpenMap's icons on the map at this size: dungeons, flight masters, boats, townsfolk, your pins. Questie's icons have their own size, in Questie's options.": "OpenMap이 지도에 표시하는 아이콘의 크기입니다: 던전, 비행 조련사, 배, 마을 주민, 내 핀. Questie 아이콘의 크기는 Questie 설정에서 따로 정합니다.",
  "OpenMap: zoom update %.1f ms, close-up %.1f ms (worst %.1f)": "OpenMap: 확대 갱신 %.1f ms, 근접 표시 %.1f ms (최악 %.1f)",
