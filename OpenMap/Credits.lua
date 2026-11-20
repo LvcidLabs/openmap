@@ -10,7 +10,7 @@ local L = ns.L
 
 ns.Credits = {
 	{ L["Made by"], {
-		{ "Ji" },
+		{ "Ji Unit (RP-PvP Horde)" },
 	} },
 	{ L["Maps painted by hand"], {
 		{ "Santiago Reyes", L["Hand painted custom art for OpenMap including the sea elements, blank land between zones, and his maps of WoW Forever dungeons."] },
