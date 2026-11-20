@@ -19,6 +19,12 @@
 - **The Stockade's entrance opens its map**: clicking it found neither the game's dungeon map nor its
   Dungeon Journal page (#289). By gOOvER.
 
+- **A map window saved off the screen comes back**: dragged out of reach, it opens where Blizzard puts it
+  again (`/openmap reset` does the same at any time) (#375).
+
+- **No Lua error from the cursor's coordinates** over a part of the map with no zone of its own, as on
+  retail's maps outside the stitched world (#343).
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

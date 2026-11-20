@@ -92,8 +92,12 @@ local function PlaceAt()
 			local chain = S.ChainAt(u, v)
 			id, lastU, lastV, lastId = chain[#chain], u, v, chain[#chain]
 		end
-		local l, r, t, b = S.Rect(id)
 		local hx, hy = mod.FromWorld(mapID, u, v)
+		local l, r, t, b
+		if id then l, r, t, b = S.Rect(id) end
+		-- (no zone with a place on the stitch under the cursor, as with retail's maps outside it: the map on
+		-- screen's own place, not arithmetic on nothing, #343 #208)
+		if not l or r <= l or b <= t then return mapID, hx, hy, hx, hy end
 		return id, (u - l) / (r - l), (v - t) / (b - t), hx, hy
 	end
 	local x, y

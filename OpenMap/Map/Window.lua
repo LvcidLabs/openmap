@@ -99,6 +99,16 @@ local function Locked()
 	return false
 end
 
+-- the window as good as off the screen: less than its title bar's worth left on it to drag it back by
+local function OffScreen()
+	local l, r, t, b = map:GetLeft(), map:GetRight(), map:GetTop(), map:GetBottom()
+	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
+	if not (l and r and t and b and w and h) then return false end
+	local s = (map:GetEffectiveScale() or 1) / (UIParent:GetEffectiveScale() or 1)
+	l, r, t, b = l * s, r * s, t * s, b * s
+	return r < 40 or l > w - 40 or t < 30 or t > h + 10 or b > h - 30
+end
+
 local function Apply()
 	if not map or Maximized() or ours or sizing or classicMap then return end
 	if Locked() then return end
@@ -120,6 +130,9 @@ local function Apply()
 			end
 		end
 		if math.abs((map:GetScale() or 1) - mod.db.windowScale) > 0.001 then map:SetScale(mod.db.windowScale) end
+		-- (a window saved off the screen, with no title bar left on it to drag it back by: put back where
+		-- Blizzard opens it, once this is done; /openmap reset does the same, #375)
+		if w and OffScreen() then C_Timer.After(0, function() mod:ResetWindow() end) end
 	end
 	local size, refitted = mod.db.windowSize, false
 	if size and not InCombatLockdown() and (math.abs(map:GetWidth() - size[1]) > 0.5 or math.abs(map:GetHeight() - size[2]) > 0.5) then
