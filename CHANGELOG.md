@@ -57,6 +57,10 @@
   does for its own icons, and the area stays in place while zooming. The focused quest's icon is
   Blizzard's gold one, and its area stays shown when the cursor isn't on another quest. By kr0ozin.
 
+### Also
+
+- I've also made OpenGroup, a group finder that shows groups from every shard. It's in beta and gets more useful the more people use it. Search OpenGroup on CurseForge.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed
