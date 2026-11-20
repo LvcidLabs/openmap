@@ -14,6 +14,9 @@
 
 ### Fixed
 
+- **Forever City Labels' pins show on the stitched map**: its service, profession and class trainer pins
+  were drawn under OpenMap's art. By marquesm91.
+
 - **No more green squares over the map** where the game can't find OpenMap's map tiles (not installed,
   or the game not restarted since an update): such a tile is left out, and with several missing the map
   is drawn without them. `/openmap status` says how many (#349, #353).

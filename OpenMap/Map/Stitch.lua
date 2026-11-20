@@ -3428,6 +3428,17 @@ function S.RefreshExplored()
 	if changed then S.RefreshFound() end
 end
 
+-- /openmap status: a zone's explored-area pieces, explored and all, and the game's own count of what it
+-- reports explored there (a mismatch: pieces darkened that the game says are found, #357 #360)
+function S.ExploredCount(mapID)
+	local list = pieces[mapID]
+	if not list then return end
+	local all, found = 0, 0
+	for _, piece in pairs(list) do all = all + 1 if not piece.unexplored then found = found + 1 end end
+	local ok, game = pcall(C_MapExplorationInfo.GetExploredMapTextures, mapID)
+	return found, all, ok and type(game) == "table" and #game or 0
+end
+
 -- Only places you've found (the menu's): a dungeon's entrance, a dock or a zeppelin tower shown once
 -- you've explored the zone's land where it is (or a little round it: a dock stands in the water), as
 -- Blizzard's own map reveals it; one in no zone always (a player's request)

@@ -1810,6 +1810,12 @@ function mod:Diag()
 	if next(after.close) then ns:Print("As the map last closed (ms): %s.", Worst(after.close)) end
 	if mod.dungeonOpenMs then ns:Print("Opening the latest dungeon's map took %.0f ms (OpenMap's part).", mod.dungeonOpenMs) end
 	if mod.FlightStatus then ns:Print("%s", mod.FlightStatus()) end
+	do   -- (the zone you're in: its explored pieces, as OpenMap and the game count them: #357 #360)
+		local here = ns.Safe.Call(C_Map.GetBestMapForUnit, "player")
+		local found, all, game
+		if here and S.ExploredCount then found, all, game = S.ExploredCount(here) end
+		if found then ns:Print("Explored here (map %d): %d of %d pieces; the game reports %d explored.", here, found, all, game) end
+	end
 	local missing, where = 0, nil
 	if S.BakedMissing then missing, where = S.BakedMissing() end
 	if missing and missing > 0 then ns:Print("Baked zone tiles the game couldn't find: %d (in %s); restart the game, or reinstall OpenMap if it goes on.", missing, where) end
