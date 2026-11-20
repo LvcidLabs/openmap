@@ -1,5 +1,12 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Improved
+
+- **"The game's map" on a dungeon's map**: inside a dungeon, a button at the top of OpenMap's dungeon map
+  switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed

@@ -4,8 +4,11 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [2] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
+		"|cff6e2c0a\"The game's map\" on a dungeon's map|r: inside a dungeon, a button at the top of OpenMap's dungeon map switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).",
 		"|cff6e2c0aA smoother map on a Russian client|r: the zones' art from further out is drawn from tiles baked from the ruRU client's own maps, place names and city banners in Russian, as on an English or a Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.) By Danpiel.",
+		"|cff6e2c0aNo more green squares over the map|r where the game can't find OpenMap's map tiles (not installed, or the game not restarted since an update): such a tile is left out, and with several missing the map is drawn without them. /openmap status says how many (#349, #353).",
+		"|cff6e2c0aTranslations of the ClassicUI Forever question read right again|r: in every language they showed as garbled letters (Ð’ ...).",
 		"|cff6e2c0aQuest icons show the quest's level on every map|r: zoomed out, or over the next zone, OpenMap's own quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do, with the level and its difficulty colour (\"[39+] The Crown of Will\"). By Rambomst.",
 		"|cff6e2c0aSharper at the middle zooms|r: between a continent and a zone filling the view, the zones' art was drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now. And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.",
 		"|cff6e2c0aRoogug where he is now|r: in Razorfen Kraul he stands in the middle of the dungeon past the rope bridge (needed for the warriors' Fire Hardened Mail); his pin was at his old spot (#318).",

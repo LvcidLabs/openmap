@@ -4,12 +4,22 @@
 
 ### Improved
 
+- **"The game's map" on a dungeon's map**: inside a dungeon, a button at the top of OpenMap's dungeon map
+  switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).
+
 - **A smoother map on a Russian client**: the zones' art from further out is drawn from tiles baked
   from the ruRU client's own maps, place names and city banners in Russian, as on an English or a
   Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.)
   By Danpiel.
 
 ### Fixed
+
+- **No more green squares over the map** where the game can't find OpenMap's map tiles (not installed,
+  or the game not restarted since an update): such a tile is left out, and with several missing the map
+  is drawn without them. `/openmap status` says how many (#349, #353).
+
+- **Translations of the ClassicUI Forever question read right again**: in every language they showed as
+  garbled letters (Ð’ ...).
 
 - **Quest icons show the quest's level on every map**: zoomed out, or over the next zone, OpenMap's own
   quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do,

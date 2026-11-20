@@ -300,6 +300,22 @@ class InstanceHostTests(unittest.TestCase):
             assert(Active() and not S.filtered and not target)
         """)
 
+    def test_the_game_s_map_button_only_inside_that_dungeon(self):
+        # (#371: on a dungeon's map, "The game's map" turns its maps inside dungeons off; shown only inside it)
+        dungeons = (ROOT / 'OpenMap/Map/Dungeons.lua').read_text(encoding='utf-8')
+        fn = re.search(r'function mod.InsideThisDungeon\(.*?\nend\n', dungeons, re.S).group()
+        self.lua.execute("""
+            local inside, here = false, 0
+            function IsInInstance() return inside end
+            function GetInstanceInfo() return nil, nil, nil, nil, nil, nil, nil, here end
+        """ + fn + """
+            assert(mod.InsideThisDungeon({ 47 }) == false, 'outside')
+            inside, here = true, 47
+            assert(mod.InsideThisDungeon({ 47 }) == true, 'inside it')
+            assert(mod.InsideThisDungeon({ 36 }) == false, 'inside another')
+            assert(mod.InsideThisDungeon({ 0, "Hall" }) == false, 'no instance ID')
+        """)
+
     def test_ragefire_chasm_uses_entrance_and_orgrimmar_zoom(self):
         self.lua.execute((ROOT / 'OpenMap/Data/Forever/Places.lua').read_text(), 'OpenMap', self.lua.globals().ns)
         dungeons = (ROOT / 'OpenMap/Map/Dungeons.lua').read_text()
