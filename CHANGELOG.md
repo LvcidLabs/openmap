@@ -9,6 +9,14 @@
   explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and
   the achievement's progress. Further out, each zone shows how many places it has left.
 
+### Improved
+
+- **Unexplored land darkens as one, the same at every zoom** (Unexplored areas: Darken): in a zone you've been
+  to, the unexplored parts were darker where the game's map pieces overlap, a different shade once the
+  minimap's detail came in, and could jump between the two as you zoomed. Each piece's share of the darkening
+  is now worked out ahead of time so that, whichever pieces you've explored, the rest come to one even shade,
+  drawn over the map and the minimap alike (#317). By wealdly.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved
