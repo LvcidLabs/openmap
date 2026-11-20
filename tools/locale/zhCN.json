@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "OpenMap 任务图标上的任务等级",
  "The game's map": "游戏地图",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "在地下城内打开游戏自带的地图，而不是 OpenMap 的地下城地图。随时可重新开启：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "已关闭地下城内的 OpenMap 地下城地图。重新开启：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。"
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "已关闭地下城内的 OpenMap 地下城地图。重新开启：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。",
+ "place names and quest areas on the controller map, and it reopening as you set": "手柄地图上的地名与任务区域，以及按设置重新打开地图"
 }

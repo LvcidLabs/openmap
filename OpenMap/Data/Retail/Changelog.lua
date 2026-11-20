@@ -4,8 +4,11 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [2] = "Fixed", }, items = {
 		"|cff6e2c0a\"The game's map\" on a dungeon's map|r: inside a dungeon, a button at the top of OpenMap's dungeon map switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).",
+		"|cff6e2c0aThe controller map opens where you set it|r: with the Gamepad UI, \"When reopening the map\" (center on you, keep the zoom, your zone, remember) was only used the first time the map opened; after that it opened wherever it was last left. It's used every time now.",
+		"|cff6e2c0aPlace names under the controller's cursor|r: the zone (with its levels) or the area under the cursor is named at the top of the map, as it is under the mouse. Blizzard's own label, which named places on its map hidden under OpenMap's, is hidden while OpenMap's map is up.",
+		"|cff6e2c0aQuest areas on the controller map|r: pointing at a quest's icon shades its area, as Blizzard's map does for its own icons, and the area stays in place while zooming. The focused quest's icon is Blizzard's gold one, and its area stays shown when the cursor isn't on another quest. By kr0ozin.",
 	} },
 	{ version = "v0.8.10", date = "2026-11-16", heads = { [1] = "Fixed", [12] = "Improved", }, items = {
 		"|cff6e2c0aThe map loads again for everyone|r: for some players since v0.8.9 the map opened blank, with an error about GetMapInfoAtPosition. A view worked out while the map was still 0 px across (a divide by zero) was put into the map, and every view after it was worked out from it, so the map stayed blank. A view that isn't one is never put up now, the map's last view and its saved window place and size are checked as they're read back, and a bad one is forgotten (#260, #261, #263). The cause, found by OlehPetrykUA: v0.8.9 put the map together during its very first build, before it had a size.",

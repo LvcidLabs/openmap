@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "le niveau de la quête sur les icônes de quête d'OpenMap",
  "The game's map": "Carte du jeu",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Dans les donjons, ouvrir la carte du jeu plutôt que la carte de donjon d'OpenMap. Pour la réactiver à tout moment : menu d'OpenMap > Donjons > Cartes des donjons à l'intérieur.",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Les cartes de donjon d'OpenMap sont désactivées dans les donjons. Pour les réactiver : menu d'OpenMap > Donjons > Cartes des donjons à l'intérieur."
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Les cartes de donjon d'OpenMap sont désactivées dans les donjons. Pour les réactiver : menu d'OpenMap > Donjons > Cartes des donjons à l'intérieur.",
+ "place names and quest areas on the controller map, and it reopening as you set": "les noms de lieux et les zones de quête sur la carte à la manette, et sa réouverture selon vos réglages"
 }

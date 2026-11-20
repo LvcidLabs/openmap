@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "уровень задания на значках заданий OpenMap",
  "The game's map": "Карта игры",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "В подземельях открывать карту самой игры вместо карты подземелья OpenMap. Включить снова можно в любой момент: меню OpenMap > Подземелья > Карты подземелий внутри подземелий.",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Карты подземелий OpenMap внутри подземелий выключены. Чтобы включить их снова: меню OpenMap > Подземелья > Карты подземелий внутри подземелий."
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Карты подземелий OpenMap внутри подземелий выключены. Чтобы включить их снова: меню OpenMap > Подземелья > Карты подземелий внутри подземелий.",
+ "place names and quest areas on the controller map, and it reopening as you set": "названия мест и области заданий на карте для контроллера, а также повторное открытие карты согласно настройкам"
 }

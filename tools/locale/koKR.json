@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "OpenMap 퀘스트 아이콘의 퀘스트 레벨",
  "The game's map": "게임 지도",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전 안에서 OpenMap의 던전 지도 대신 게임 기본 지도를 엽니다. 언제든 다시 켜려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도.",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전 안에서 OpenMap의 던전 지도가 꺼졌습니다. 다시 켜려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도."
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전 안에서 OpenMap의 던전 지도가 꺼졌습니다. 다시 켜려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도.",
+ "place names and quest areas on the controller map, and it reopening as you set": "컨트롤러 지도의 지명과 퀘스트 지역 표시, 그리고 설정한 대로 다시 열리는 지도"
 }

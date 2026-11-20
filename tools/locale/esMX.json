@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "el nivel de la misión en los íconos de misión de OpenMap",
  "The game's map": "Mapa del juego",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Dentro de los calabozos, abre el mapa del propio juego en vez del mapa de calabozo de OpenMap. Vuelve a activarlo cuando quieras: menú de OpenMap > Calabozos > Mapas de calabozo dentro de calabozos.",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Los mapas de calabozo de OpenMap están desactivados dentro de los calabozos. Para volver a activarlos: menú de OpenMap > Calabozos > Mapas de calabozo dentro de calabozos."
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Los mapas de calabozo de OpenMap están desactivados dentro de los calabozos. Para volver a activarlos: menú de OpenMap > Calabozos > Mapas de calabozo dentro de calabozos.",
+ "place names and quest areas on the controller map, and it reopening as you set": "nombres de lugares y zonas de misión en el mapa con control, y que se vuelva a abrir según lo configurado"
 }

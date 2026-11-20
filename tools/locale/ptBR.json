@@ -551,5 +551,6 @@
  "the quest level on OpenMap's quest icons": "o nível da missão nos ícones de missão do OpenMap",
  "The game's map": "Mapa do jogo",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Dentro das masmorras, abre o mapa do próprio jogo em vez do mapa de masmorra do OpenMap. Reative quando quiser: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras.",
- "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Os mapas de masmorra do OpenMap estão desativados dentro das masmorras. Para reativá-los: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras."
+ "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Os mapas de masmorra do OpenMap estão desativados dentro das masmorras. Para reativá-los: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras.",
+ "place names and quest areas on the controller map, and it reopening as you set": "nomes de lugares e áreas de missão no mapa com controle, e a reabertura conforme configurado"
 }
