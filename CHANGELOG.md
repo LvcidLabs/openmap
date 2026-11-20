@@ -23,6 +23,12 @@
   all read where you are the same careful way, so a hidden position in combat or in a restricted instance
   can't raise a Lua error. By gOOvER.
 
+- **A dungeon's map fills the screen when maximized**: going from the quest log (L) to the maximized map (M)
+  inside a dungeon left its map small in the middle (#297). By gOOvER.
+
+- **The Stockade's entrance opens its map**: clicking it found neither the game's dungeon map nor its
+  Dungeon Journal page (#289). By gOOvER.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved
