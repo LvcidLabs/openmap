@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Improved
+
+- **German reads better**: missing German texts filled in and others reworded, in the game's own terms.
+  By gOOvER.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view

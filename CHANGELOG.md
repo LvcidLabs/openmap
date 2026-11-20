@@ -17,6 +17,9 @@
   is now worked out ahead of time so that, whichever pieces you've explored, the rest come to one even shade,
   drawn over the map and the minimap alike (#317). By wealdly.
 
+- **German reads better**: missing German texts filled in and others reworded, in the game's own terms.
+  By gOOvER.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view
