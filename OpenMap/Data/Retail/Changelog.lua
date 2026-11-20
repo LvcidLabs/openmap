@@ -4,7 +4,7 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
+	{ version = "v0.8.11", date = "2026-11-20", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
 		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",
 		"|cff6e2c0a\"The game's map\" on a dungeon's map|r: inside a dungeon, a button at the top of OpenMap's dungeon map switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).",
 		"|cff6e2c0aThe quest tracker keeps working in combat with OpenMap|r: clicking a tracked quest, or opening the map, in a fight gave \"Interface action failed because of an AddOn\", and the objective tracker then stopped updating until you collapsed and opened it again. OpenMap no longer puts its own code in place of the game's map functions (it runs after them), and changes nothing of the game's map in a fight: the map opened in combat is the game's view of it, and OpenMap's comes back as the fight ends (#345, #347, #368).",
