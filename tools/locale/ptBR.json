@@ -552,5 +552,8 @@
  "The game's map": "Mapa do jogo",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Dentro das masmorras, abre o mapa do próprio jogo em vez do mapa de masmorra do OpenMap. Reative quando quiser: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras.",
  "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Os mapas de masmorra do OpenMap estão desativados dentro das masmorras. Para reativá-los: menu do OpenMap > Masmorras > Mapas de masmorra dentro das masmorras.",
- "place names and quest areas on the controller map, and it reopening as you set": "nomes de lugares e áreas de missão no mapa com controle, e a reabertura conforme configurado"
+ "place names and quest areas on the controller map, and it reopening as you set": "nomes de lugares e áreas de missão no mapa com controle, e a reabertura conforme configurado",
+ "OpenMap %s is out (you have %s). Update through CurseForge.": "O OpenMap %s já saiu (você tem a %s). Atualize pelo CurseForge.",
+ "Say when OpenMap has an update": "Avisar quando houver atualização do OpenMap",
+ "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Quando um amigo, membro da guilda ou do grupo tem um OpenMap mais novo, uma linha no bate-papo avisa, uma vez por sessão. Sua versão vai só nas mensagens que o OpenMap já envia a eles. Desligado, nada é avisado e sua versão não é enviada."
 }

@@ -552,5 +552,8 @@
  "The game's map": "Karte des Spiels",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "In Dungeons die eigene Karte des Spiels statt OpenMaps Dungeonkarte öffnen. Jederzeit wieder einschalten: OpenMaps Menü > Dungeons > Dungeonkarten in Dungeons.",
  "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "OpenMaps Dungeonkarten sind in Dungeons aus. Wieder einschalten: OpenMaps Menü > Dungeons > Dungeonkarten in Dungeons.",
- "place names and quest areas on the controller map, and it reopening as you set": "Ortsnamen und Questgebiete auf der Controller-Karte, und dass sie sich wie eingestellt wieder öffnet"
+ "place names and quest areas on the controller map, and it reopening as you set": "Ortsnamen und Questgebiete auf der Controller-Karte, und dass sie sich wie eingestellt wieder öffnet",
+ "OpenMap %s is out (you have %s). Update through CurseForge.": "OpenMap %s ist erschienen (du hast %s). Aktualisiere über CurseForge.",
+ "Say when OpenMap has an update": "Bei OpenMap-Update Bescheid geben",
+ "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Hat ein Freund, Gildenmitglied oder Gruppenmitglied ein neueres OpenMap, sagt es eine Zeile im Chat, einmal pro Sitzung. Deine Version steht nur in Nachrichten, die OpenMap ihnen ohnehin schickt. Aus: Es wird nichts gesagt und deine Version wird nicht gesendet."
 }

@@ -552,5 +552,8 @@
  "The game's map": "Карта игры",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "В подземельях открывать карту самой игры вместо карты подземелья OpenMap. Включить снова можно в любой момент: меню OpenMap > Подземелья > Карты подземелий внутри подземелий.",
  "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "Карты подземелий OpenMap внутри подземелий выключены. Чтобы включить их снова: меню OpenMap > Подземелья > Карты подземелий внутри подземелий.",
- "place names and quest areas on the controller map, and it reopening as you set": "названия мест и области заданий на карте для контроллера, а также повторное открытие карты согласно настройкам"
+ "place names and quest areas on the controller map, and it reopening as you set": "названия мест и области заданий на карте для контроллера, а также повторное открытие карты согласно настройкам",
+ "OpenMap %s is out (you have %s). Update through CurseForge.": "Вышел OpenMap %s (у вас %s). Обновитесь через CurseForge.",
+ "Say when OpenMap has an update": "Сообщать об обновлении OpenMap",
+ "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "Если у друга, согильдийца или участника группы более новый OpenMap, об этом сообщит строка в чате, один раз за сеанс. Ваша версия передаётся только в сообщениях, которые OpenMap им и так отправляет. Если выключено, ничего не сообщается и ваша версия не отправляется."
 }

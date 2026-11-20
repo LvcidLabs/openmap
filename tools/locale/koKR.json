@@ -552,5 +552,8 @@
  "The game's map": "게임 지도",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전 안에서 OpenMap의 던전 지도 대신 게임 기본 지도를 엽니다. 언제든 다시 켜려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도.",
  "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "던전 안에서 OpenMap의 던전 지도가 꺼졌습니다. 다시 켜려면: OpenMap 메뉴 > 던전 > 던전 안에서 던전 지도.",
- "place names and quest areas on the controller map, and it reopening as you set": "컨트롤러 지도의 지명과 퀘스트 지역 표시, 그리고 설정한 대로 다시 열리는 지도"
+ "place names and quest areas on the controller map, and it reopening as you set": "컨트롤러 지도의 지명과 퀘스트 지역 표시, 그리고 설정한 대로 다시 열리는 지도",
+ "OpenMap %s is out (you have %s). Update through CurseForge.": "OpenMap %s 버전이 나왔습니다 (현재 %s). CurseForge에서 업데이트하세요.",
+ "Say when OpenMap has an update": "OpenMap 업데이트 알림",
+ "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "친구, 길드원 또는 파티원이 더 새로운 OpenMap을 쓰고 있으면 접속당 한 번 대화창에 알려 줍니다. 내 버전은 OpenMap이 이미 보내는 메시지에만 담깁니다. 끄면 알림이 없고 내 버전도 보내지 않습니다."
 }

@@ -4,7 +4,8 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [4] = "Fixed", }, items = {
+		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",
 		"|cff6e2c0a\"The game's map\" on a dungeon's map|r: inside a dungeon, a button at the top of OpenMap's dungeon map switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).",
 		"|cff6e2c0aA smoother map on a Russian client|r: the zones' art from further out is drawn from tiles baked from the ruRU client's own maps, place names and city banners in Russian, as on an English or a Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.) By Danpiel.",
 		"|cff6e2c0aForever City Labels' pins show on the stitched map|r: its service, profession and class trainer pins were drawn under OpenMap's art. By marquesm91.",

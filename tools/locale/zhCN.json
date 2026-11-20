@@ -552,5 +552,8 @@
  "The game's map": "游戏地图",
  "Inside dungeons, open the game's own map instead of OpenMap's dungeon map. Turn it back on any time: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "在地下城内打开游戏自带的地图，而不是 OpenMap 的地下城地图。随时可重新开启：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。",
  "OpenMap's dungeon maps are off inside dungeons. To turn them back on: OpenMap's menu > Dungeons > Dungeon maps inside dungeons.": "已关闭地下城内的 OpenMap 地下城地图。重新开启：OpenMap 菜单 > 地下城 > 地下城内显示地下城地图。",
- "place names and quest areas on the controller map, and it reopening as you set": "手柄地图上的地名与任务区域，以及按设置重新打开地图"
+ "place names and quest areas on the controller map, and it reopening as you set": "手柄地图上的地名与任务区域，以及按设置重新打开地图",
+ "OpenMap %s is out (you have %s). Update through CurseForge.": "OpenMap %s 已发布（你的版本是 %s）。请通过 CurseForge 更新。",
+ "Say when OpenMap has an update": "OpenMap 有更新时提示",
+ "When a friend, guild member or group member has a newer OpenMap, a line in chat says so, once a session. Your version goes only in messages OpenMap already sends them. Off, nothing is said and your version isn't sent.": "当好友、公会成员或队伍成员使用更新版本的 OpenMap 时，聊天框中会提示一行，每次登录一次。你的版本只随 OpenMap 本来就会发给他们的消息发送。关闭后不会提示，也不会发送你的版本。"
 }

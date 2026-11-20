@@ -4,6 +4,12 @@
 
 ### Improved
 
+- **Told when a newer OpenMap is out**: when a friend, guild member or group member has a newer release,
+  a line in chat says so, once a session ("OpenMap X is out (you have Y). Update through CurseForge.").
+  Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your
+  first shared place to your guild, a pin share to your group); older copies pass over it. Options' "Say
+  when OpenMap has an update" turns it off, and then your version isn't sent either.
+
 - **"The game's map" on a dungeon's map**: inside a dungeon, a button at the top of OpenMap's dungeon map
   switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).
 
