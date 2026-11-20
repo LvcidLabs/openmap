@@ -20,6 +20,12 @@
 
 ### Fixed
 
+- **The quest tracker keeps working in combat with OpenMap**: clicking a tracked quest, or opening the map,
+  in a fight gave "Interface action failed because of an AddOn", and the objective tracker then stopped
+  updating until you collapsed and opened it again. OpenMap no longer puts its own code in place of the
+  game's map functions (it runs after them), and changes nothing of the game's map in a fight: the map
+  opened in combat is the game's view of it, and OpenMap's comes back as the fight ends (#345, #347, #368).
+
 - **Forever City Labels' pins show on the stitched map**: its service, profession and class trainer pins
   were drawn under OpenMap's art. By marquesm91.
 

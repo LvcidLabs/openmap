@@ -26,6 +26,7 @@ class InstanceTests(unittest.TestCase):
             mod = { db = { hideWorldPinsInInstances = true } }
             ns = { Safe = { Value = function(v) if v ~= 'secret' then return v end end } }
             function IsInInstance() return inside, kind end
+            function InCombatLockdown() return fighting or false end
             inside, kind = false, 'none'
         """)
         helpers = STITCH[STITCH.index('local places ='):STITCH.index('-- the menu\'s Icon size:')]
@@ -184,6 +185,7 @@ class InstanceHostTests(unittest.TestCase):
             end
             inside, kind = false, 'none'
             function IsInInstance() return inside, kind end
+            function InCombatLockdown() return fighting or false end
             local map = { id = 947, shown = true }
             function map:GetMapID() return self.id end
             function map:IsShown() return self.shown end

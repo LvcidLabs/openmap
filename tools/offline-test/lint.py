@@ -223,6 +223,18 @@ for _p in sorted(glob.glob(os.path.join(ROOT, "..", "tools", "locale", "*.json")
             continue
         if _m != _v:
             problems.append("%s: %s is mojibake (UTF-8 read as Windows-1252)" % (os.path.basename(_p), ascii(_k[:50])))
+# A method of Blizzard's world map or quest log replaced, not hooked: the game's own code then calls OpenMap's,
+# which taints what it does next, and its protected calls are blocked in combat (the quest tracker: #345).
+# hooksecurefunc after it instead. (OpenMap's map with the controller, padMap, a test that's off: allowed)
+_BLIZZ = re.compile(r"^\s*(sc|map|WorldMapFrame|QuestMapFrame|WorldMapFrame\.ScrollContainer|sc\.Child)\.([A-Z]\w*)\s*=[^=]")
+for _f in sorted(glob.glob(os.path.join(ROOT, "**", "*.lua"), recursive=True)):
+    if os.sep + "Libs" + os.sep in _f:
+        continue
+    for _i, _line in enumerate(open(_f, encoding="utf-8"), 1):
+        _m = _BLIZZ.match(_line)
+        if _m and "padMap only" not in _line:
+            problems.append("%s:%d: %s.%s replaced: hook it after Blizzard's (hooksecurefunc), or the game's own code is tainted (#345)"
+                            % (os.path.relpath(_f, ROOT), _i, _m.group(1), _m.group(2)))
 # WoW Forever's cave and dungeon tiles are drawn from OpenMap's own copies (Data/Forever/Tiles.lua):
 # one not copied is a missing texture in game (green) on every client
 import importlib.util
