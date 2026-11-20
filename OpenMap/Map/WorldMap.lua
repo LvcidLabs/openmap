@@ -1810,6 +1810,9 @@ function mod:Diag()
 	if next(after.close) then ns:Print("As the map last closed (ms): %s.", Worst(after.close)) end
 	if mod.dungeonOpenMs then ns:Print("Opening the latest dungeon's map took %.0f ms (OpenMap's part).", mod.dungeonOpenMs) end
 	if mod.FlightStatus then ns:Print("%s", mod.FlightStatus()) end
+	local missing, where = 0, nil
+	if S.BakedMissing then missing, where = S.BakedMissing() end
+	if missing and missing > 0 then ns:Print("Baked zone tiles the game couldn't find: %d (in %s); restart the game, or reinstall OpenMap if it goes on.", missing, where) end
 	if mod.QuestsStatus then ns:Print("%s", mod.QuestsStatus()) end
 	local registered, shown, placed, ours, moved
 	if mod.QuestieStatus then registered, shown, placed, ours, moved = mod.QuestieStatus() end

@@ -3033,7 +3033,7 @@ function S.ApplyGrade(strength, desat, unexplored)
 	-- and with tiles in the client's language (Baked.lettered)
 	local art = ns.MapZoneArt
 	Baked.use = (art and Baked.frame and strength == art.colorMatch and desat >= art.desaturate - 0.001
-		and unexplored ~= "hide" and not Baked.noFills and Baked.lettered) and true or false
+		and unexplored ~= "hide" and not Baked.noFills and Baked.lettered and (Baked.missing or 0) < 3) and true or false
 	local bd = art and math.max(0, (desat - art.desaturate) / (1 - art.desaturate)) or 0
 	if Baked.use and math.abs(bd - Baked.desat) > 0.001 then
 		Baked.desat = bd
@@ -3159,6 +3159,9 @@ function Baked.Build()
 	end
 end
 
+-- /openmap status: baked tiles the game couldn't find (#349, #353), and where it looked
+function S.BakedMissing() return Baked.missing or 0, Baked.path end
+
 function Baked.Cull()
 	local f, box = Baked.frame, cullBox
 	if not f or not f:IsShown() then return end
@@ -3166,13 +3169,22 @@ function Baked.Cull()
 		local near = not box or (t.u1 > box[1] and t.u0 < box[3] and t.v1 > box[2] and t.v0 < box[4])
 		if near and not t.tex then
 			t.tex = f:CreateTexture(nil, "ARTWORK")
-			t.tex:SetTexture(Baked.path .. t.name, nil, nil, "TRILINEAR")
+			local ok = t.tex:SetTexture(Baked.path .. t.name, nil, nil, "TRILINEAR")
 			t.tex:SetTexCoord(Baked.inset, 1 - Baked.inset, Baked.inset, 1 - Baked.inset)
 			t.tex:SetDesaturation(Baked.desat)
 			Record(t.tex, t.x, t.y, t.size, t.size)
 			t.shown = true
+			-- (a tile the game can't find draws as a solid green square, the size of a zone or more: #349,
+			-- #353, an install that hasn't got them, or a game not restarted since. That one's left out; a few
+			-- missing and the zones are drawn live instead, as on a client with no tiles of its language)
+			if ok == false then
+				t.missing, t.shown = true, false
+				t.tex:Hide()
+				Baked.missing = (Baked.missing or 0) + 1
+				if Baked.missing == 3 and lastGrade then C_Timer.After(0, function() S.ApplyGrade(unpack(lastGrade)) end) end
+			end
 		end
-		if t.tex and t.shown ~= near then
+		if t.tex and not t.missing and t.shown ~= near then
 			t.shown = near
 			t.tex:SetShown(near)
 		end
