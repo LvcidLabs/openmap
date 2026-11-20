@@ -11,6 +11,7 @@ ns.MapChangelog = {
 		"|cff6e2c0aThe Stockade's entrance opens its map|r: clicking it found neither the game's dungeon map nor its Dungeon Journal page (#289). By gOOvER.",
 		"|cff6e2c0aA map window saved off the screen comes back|r: dragged out of reach, it opens where Blizzard puts it again (/openmap reset does the same at any time) (#375).",
 		"|cff6e2c0aNo Lua error from the cursor's coordinates|r over a part of the map with no zone of its own, as on retail's maps outside the stitched world (#343).",
+		"|cff6e2c0aExplored land keeps its detail up close with Hide unexplored areas|r: zoomed in where the minimap's detail comes in, land you'd explored near an unexplored part (Redridge, Tarren Mill and others) got the painted map back over it, as if unexplored. Only the unexplored parts' own shapes are hidden now (#166, #156, #163, #247, #279, #370).",
 	} },
 	{ version = "v0.8.11", date = "2026-11-20", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
 		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",

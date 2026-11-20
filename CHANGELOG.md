@@ -38,6 +38,11 @@
 - **No Lua error from the cursor's coordinates** over a part of the map with no zone of its own, as on
   retail's maps outside the stitched world (#343).
 
+- **Explored land keeps its detail up close with Hide unexplored areas**: zoomed in where the minimap's
+  detail comes in, land you'd explored near an unexplored part (Redridge, Tarren Mill and others) got the
+  painted map back over it, as if unexplored. Only the unexplored parts' own shapes are hidden now
+  (#166, #156, #163, #247, #279, #370).
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

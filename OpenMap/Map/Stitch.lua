@@ -2855,6 +2855,31 @@ function Shade.Hide.Tiles(mapID, p)
 	return out
 end
 
+-- the unexplored pieces' tiles in the zone's art px, each the shape its art's alpha gives: { file, x0, y0,
+-- x1, y1 (the art it shows), fw, fh (its whole file, the next power of two at an edge) }; masks made as needed
+function Shade.Hide.Shapes(mapID, p)
+	local out = {}
+	local tw, th = p.layer.tileWidth, p.layer.tileHeight
+	ForEachPiece(mapID, function(files, x, y, w, h, _, piece)
+		if not piece.unexplored then return end
+		local cols, rows = math.ceil(w / tw), math.ceil(h / th)
+		for j = 1, rows do
+			local ph = (j < rows) and th or (h - (rows - 1) * th)
+			for k = 1, cols do
+				local file = files[(j - 1) * cols + k]
+				file = tonumber(file) or file
+				local pw = (k < cols) and tw or (w - (cols - 1) * tw)
+				if file and pw > 0 and ph > 0 then
+					local x0, y0 = x + (k - 1) * tw, y + (j - 1) * th
+					out[#out + 1] = { file = file, x0 = x0, y0 = y0, x1 = x0 + pw, y1 = y0 + ph,
+						fw = (k < cols) and tw or Pow2(pw), fh = (j < rows) and th or Pow2(ph) }
+				end
+			end
+		end
+	end)
+	return out
+end
+
 -- a zone's blank art over its hidden rectangles, drawn as its base art is (PlaceBase: on its territory,
 -- its colour-matched copy through its border band too)
 function Shade.Hide.Build(mapID, rects, un, grade)
@@ -2892,24 +2917,38 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 	local strength, desat = gradeNow[1], gradeNow[2]
 	local tw, th = p.layer.tileWidth, p.layer.tileHeight
 	local cols = math.ceil(p.layer.layerWidth / tw)
+	-- (only through each unexplored piece's own shape, its art's alpha: a rectangle also covered the land
+	-- around the shape, which the zone's art paints and which shows zoomed out, so up close that land got
+	-- the painted map over the minimap's detail, as if unexplored: #166 #156 #163 #247 #279 #370)
+	local shapes = Shade.Hide.Shapes(mapID, p)
 	for _, r in ipairs(rects) do
 		for j = math.floor(r[2] / th), math.ceil(r[4] / th) - 1 do
 			for k = math.floor(r[1] / tw), math.ceil(r[3] / tw) - 1 do
 				local file = files[j * cols + k + 1]
 				file = tonumber(file) or file
-				local x0, y0 = math.max(r[1], k * tw), math.max(r[2], j * th)
-				local x1, y1 = math.min(r[3], (k + 1) * tw), math.min(r[4], (j + 1) * th)
-				if file and x1 > x0 and y1 > y0 then
-					for copy = 1, band and 2 or 1 do
-						local tex = f:CreateTexture(nil, "ARTWORK", nil, copy - 1)
-						tex:SetTexture(file, nil, nil, "TRILINEAR")
-						tex:SetTexCoord((x0 - k * tw) / tw, (x1 - k * tw) / tw, (y0 - j * th) / th, (y1 - j * th) / th)
-						Record(tex, p.left + x0 * p.sx, p.top + y0 * p.sy, (x1 - x0) * p.sx, (y1 - y0) * p.sy)
-						tex:AddMaskTexture(mask)
-						tex:SetDesaturation(desat)
-						if copy == 2 then
-							tex:AddMaskTexture(band)
-							if m then tex:SetVertexColor(1 + (m[1] - 1) * strength, 1 + (m[2] - 1) * strength, 1 + (m[3] - 1) * strength, 1) end
+				local cx0, cy0 = math.max(r[1], k * tw), math.max(r[2], j * th)
+				local cx1, cy1 = math.min(r[3], (k + 1) * tw), math.min(r[4], (j + 1) * th)
+				for _, s in ipairs(file and cx1 > cx0 and cy1 > cy0 and shapes or NONE) do
+					local x0, y0 = math.max(cx0, s.x0), math.max(cy0, s.y0)
+					local x1, y1 = math.min(cx1, s.x1), math.min(cy1, s.y1)
+					if x1 > x0 and y1 > y0 then
+						if not s.mask then
+							s.mask = f:CreateMaskTexture()
+							s.mask:SetTexture(s.file, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+							Record(s.mask, p.left + s.x0 * p.sx, p.top + s.y0 * p.sy, s.fw * p.sx, s.fh * p.sy)   -- (the whole file)
+						end
+						for copy = 1, band and 2 or 1 do
+							local tex = f:CreateTexture(nil, "ARTWORK", nil, copy - 1)
+							tex:SetTexture(file, nil, nil, "TRILINEAR")
+							tex:SetTexCoord((x0 - k * tw) / tw, (x1 - k * tw) / tw, (y0 - j * th) / th, (y1 - j * th) / th)
+							Record(tex, p.left + x0 * p.sx, p.top + y0 * p.sy, (x1 - x0) * p.sx, (y1 - y0) * p.sy)
+							tex:AddMaskTexture(mask)
+							tex:AddMaskTexture(s.mask)
+							tex:SetDesaturation(desat)
+							if copy == 2 then
+								tex:AddMaskTexture(band)
+								if m then tex:SetVertexColor(1 + (m[1] - 1) * strength, 1 + (m[2] - 1) * strength, 1 + (m[3] - 1) * strength, 1) end
+							end
 						end
 					end
 				end
