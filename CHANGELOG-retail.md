@@ -1,5 +1,38 @@
 # OpenMap changelog
 
+## v0.8.11 (2026-11-20)
+
+### Improved
+
+- **Told when a newer OpenMap is out**: when a friend, guild member or group member has a newer release,
+  a line in chat says so, once a session ("OpenMap X is out (you have Y). Update through CurseForge.").
+  Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your
+  first shared place to your guild, a pin share to your group); older copies pass over it. Options' "Say
+  when OpenMap has an update" turns it off, and then your version isn't sent either.
+
+- **"The game's map" on a dungeon's map**: inside a dungeon, a button at the top of OpenMap's dungeon map
+  switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).
+
+### Fixed
+
+- **The quest tracker keeps working in combat with OpenMap**: clicking a tracked quest, or opening the map,
+  in a fight gave "Interface action failed because of an AddOn", and the objective tracker then stopped
+  updating until you collapsed and opened it again. OpenMap no longer puts its own code in place of the
+  game's map functions (it runs after them), and changes nothing of the game's map in a fight: the map
+  opened in combat is the game's view of it, and OpenMap's comes back as the fight ends (#345, #347, #368).
+
+- **The controller map opens where you set it**: with the Gamepad UI, "When reopening the map"
+  (center on you, keep the zoom, your zone, remember) was only used the first time the map opened;
+  after that it opened wherever it was last left. It's used every time now.
+
+- **Place names under the controller's cursor**: the zone (with its levels) or the area under the
+  cursor is named at the top of the map, as it is under the mouse. Blizzard's own label, which named
+  places on its map hidden under OpenMap's, is hidden while OpenMap's map is up.
+
+- **Quest areas on the controller map**: pointing at a quest's icon shades its area, as Blizzard's map
+  does for its own icons, and the area stays in place while zooming. The focused quest's icon is
+  Blizzard's gold one, and its area stays shown when the cursor isn't on another quest. By kr0ozin.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed

@@ -1,5 +1,72 @@
 # OpenMap changelog
 
+## v0.8.11 (2026-11-20)
+
+### Improved
+
+- **Told when a newer OpenMap is out**: when a friend, guild member or group member has a newer release,
+  a line in chat says so, once a session ("OpenMap X is out (you have Y). Update through CurseForge.").
+  Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your
+  first shared place to your guild, a pin share to your group); older copies pass over it. Options' "Say
+  when OpenMap has an update" turns it off, and then your version isn't sent either.
+
+- **"The game's map" on a dungeon's map**: inside a dungeon, a button at the top of OpenMap's dungeon map
+  switches to the game's own map there, and says how to turn OpenMap's back on (menu > Dungeons) (#371).
+
+- **A smoother map on a Russian client**: the zones' art from further out is drawn from tiles baked
+  from the ruRU client's own maps, place names and city banners in Russian, as on an English or a
+  Brazilian Portuguese client (it was every zone's art drawn live). (New textures: restart the game.)
+  By Danpiel.
+
+### Fixed
+
+- **The quest tracker keeps working in combat with OpenMap**: clicking a tracked quest, or opening the map,
+  in a fight gave "Interface action failed because of an AddOn", and the objective tracker then stopped
+  updating until you collapsed and opened it again. OpenMap no longer puts its own code in place of the
+  game's map functions (it runs after them), and changes nothing of the game's map in a fight: the map
+  opened in combat is the game's view of it, and OpenMap's comes back as the fight ends (#345, #347, #368).
+
+- **Forever City Labels' pins show on the stitched map**: its service, profession and class trainer pins
+  were drawn under OpenMap's art. By marquesm91.
+
+- **No more green squares over the map** where the game can't find OpenMap's map tiles (not installed,
+  or the game not restarted since an update): such a tile is left out, and with several missing the map
+  is drawn without them. `/openmap status` says how many (#349, #353).
+
+- **Translations of the ClassicUI Forever question read right again**: in every language they showed as
+  garbled letters (Ð’ ...).
+
+- **Quest icons show the quest's level on every map**: zoomed out, or over the next zone, OpenMap's own
+  quest icons had only the quest's name on their tooltip. They now read as Blizzard's own quest icons do,
+  with the level and its difficulty colour ("[39+] The Crown of Will"). By Rambomst.
+
+- **Sharper at the middle zooms**: between a continent and a zone filling the view, the zones' art was
+  drawn from tiles stretched past their pixels for a while; the zones' own art takes over sooner now.
+  And unexplored land no longer flickers as the zones' art comes in while you pan. By wealdly.
+
+- **Roogug where he is now**: in Razorfen Kraul he stands in the middle of the dungeon past the rope
+  bridge (needed for the warriors' Fire Hardened Mail); his pin was at his old spot (#318).
+
+- **With Soften on, unexplored land stays darkened up close**: from Soften's zoom until the minimap came
+  in, a partly explored zone's unexplored land went nearly bright, and flickered back each time the map
+  moved. By wealdly.
+
+- **The controller map opens where you set it**: with the Gamepad UI, "When reopening the map"
+  (center on you, keep the zoom, your zone, remember) was only used the first time the map opened;
+  after that it opened wherever it was last left. It's used every time now.
+
+- **Place names under the controller's cursor**: the zone (with its levels) or the area under the
+  cursor is named at the top of the map, as it is under the mouse. Blizzard's own label, which named
+  places on its map hidden under OpenMap's, is hidden while OpenMap's map is up.
+
+- **Quest areas on the controller map**: pointing at a quest's icon shades its area, as Blizzard's map
+  does for its own icons, and the area stays in place while zooming. The focused quest's icon is
+  Blizzard's gold one, and its area stays shown when the cursor isn't on another quest. By kr0ozin.
+
+### Also
+
+- I've also made OpenGroup, a group finder that shows groups from every shard. It's in beta and gets more useful the more people use it. Search OpenGroup on CurseForge.
+
 ## v0.8.10 (2026-11-16)
 
 ### Fixed

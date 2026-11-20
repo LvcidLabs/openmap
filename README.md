@@ -51,6 +51,10 @@ I'm using Claude (Anthropic's AI) as a coding partner: it helps write and review
 
 This is a first release, so expect rough edges. If something looks wrong, let me know with an issue here or the "Report a problem" button.
 
+## Also by the same author
+
+[OpenGroup](https://www.curseforge.com/wow/addons/opengroup), a group finder for WoW Forever that shows groups from every shard, not just yours. It's in beta and gets more useful the more people use it.
+
 ## Install (development)
 
 Link the `OpenMap` folder into the game's AddOns folder. In PowerShell (as admin or with developer mode on), from the repo root:
