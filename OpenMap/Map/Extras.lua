@@ -316,7 +316,7 @@ local function AreaLabelOnUpdate(self)
 	self:ClearLabel(MAP_AREA_LABEL_TYPE.AREA_NAME)
 	if mod.InstanceWorldHidden() then self:EvaluateLabels() return end
 	local m = self.dataProvider:GetMap()
-	if m:IsCanvasMouseFocus() or mod.PadCursor() then
+	if m:IsCanvasMouseFocus() or mod.PadCursor() or (mod.OwnViewHover and mod.OwnViewHover()) then
 		local mapID = m:GetMapID()
 		local id, _, _, x, y = PlaceAt()
 		local name, fish

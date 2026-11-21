@@ -238,6 +238,26 @@ function mod.ZoneWaypoint()
 	zoning = false
 end
 
+-- In a fight the map is OpenMap's own view (OwnView.lua): a Ctrl-click (with "Ctrl-click drops a pin" off) is
+-- Blizzard's waypoint, which its canvas under the view never gets then: set here as Blizzard's would be, on the
+-- zone under the cursor, and followed. True if set
+function mod.OwnViewWaypoint()
+	if not mod.CursorWorld then return false end
+	local u, v = mod.CursorWorld()
+	if not u then return false end
+	local chain = S.ChainAt(u, v)
+	local zone = chain and chain[#chain]
+	if not zone or zone == S.WORLD then return false end
+	if C_Map.CanSetUserWaypointOnMap and not C_Map.CanSetUserWaypointOnMap(zone) then return false end
+	local zx, zy = mod.FromWorld(zone, u, v)
+	if not (zx and zy and zx >= 0 and zx <= 1 and zy >= 0 and zy <= 1 and UiMapPoint) then return false end
+	zoning = true
+	local ok = pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(zone, zx, zy))
+	if ok and C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true) end
+	zoning = false
+	return ok
+end
+
 -- the waypoint now: map, x, y, and whether it's our own (not Blizzard's)
 function mod.WaypointPoint()
 	local mapID, x, y = BlizzardPin()
@@ -518,14 +538,6 @@ local function TryNativeRings(stockPin, host, units, roster)
 	return false
 end
 
-local function Ring(pin)
-	if pin.Ring then return end
-	pin.Ring = pin:CreateTexture(nil, "BACKGROUND")
-	pin.Ring:SetSize(RING_SIZE, RING_SIZE)
-	pin.Ring:SetPoint("CENTER")
-	pin.Ring:SetTexture(RING_TEXTURE)
-end
-
 local function GroupLook(unit)
 	local _, class = UnitClass(unit)
 	class = Safe.Value(class) or "PRIEST"
@@ -537,6 +549,110 @@ local function GroupLook(unit)
 	end
 	return look
 end
+
+-- In a fight the map is OpenMap's own view (OwnView.lua) and Blizzard's dots are on its canvas under it,
+-- see-through then: your group is drawn on the view by frames of the same kind as Blizzard's, OpenMap's own,
+-- which the game fills in as it does Blizzard's (from places it keeps from addons, too): the dots in Blizzard's
+-- look and size, each in its class colour, and the gold rings under them; the names on hover, as Blizzard's give
+local ownGroup                  -- { dots, rings, key }
+local ownGroupFailed
+local function OwnGroupFrame(parent)
+	local f = CreateFrame("UnitPositionFrame", nil, parent)
+	if f:IsProtected() then error("group frame is protected") end
+	f:SetAllPoints(parent)
+	f:EnableMouse(false)
+	return f
+end
+local function HideOwnGroup()
+	if not ownGroup then return end
+	ownGroup.dots:Hide()
+	ownGroup.rings:Hide()
+	ownGroup.key, ownGroup.tip = nil, nil
+	if GameTooltip:IsOwned(ownGroup.dots) then GameTooltip:Hide() end
+end
+local function OwnGroupTip(f)
+	local units = { pcall(f.GetMouseOverUnits, f) }
+	local names = {}
+	for i = 2, units[1] and #units or 0 do
+		local unit = Safe.Value(units[i])
+		if type(unit) == "string" and not UnitIsUnit(unit, "player") then names[#names + 1] = Safe.Call(UnitName, unit) or "?" end
+	end
+	local tip = table.concat(names, "\n")
+	if tip == ownGroup.tip then return end
+	ownGroup.tip = tip
+	if tip == "" then
+		if GameTooltip:IsOwned(f) then GameTooltip:Hide() end
+		return
+	end
+	GameTooltip:SetOwner(f, "ANCHOR_CURSOR_RIGHT")
+	GameTooltip:SetText(tip)
+end
+local function DrawOwnGroup(stockPin, host, members)
+	local parent, scale, level, strata = mod.OwnCanvas()
+	if not ownGroup then
+		ownGroup = { dots = OwnGroupFrame(parent), rings = OwnGroupFrame(parent) }
+		ownGroup.dots:SetScript("OnUpdate", OwnGroupTip)
+	end
+	local g = ownGroup
+	local party, factor = mod.GroupDotSize(stockPin, "party")
+	local raidSize = mod.GroupDotSize(stockPin, "raid")
+	local inRaid = IsInRaid() and true or false
+	local roster = {}
+	for _, unit in ipairs(members) do roster[#roster + 1] = unit .. "=" .. (Safe.Call(UnitGUID, unit) or "") end
+	local key = table.concat(roster, " ") .. "|" .. host .. "|" .. scale .. "|" .. tostring(party) .. "|" .. tostring(raidSize)
+	g.rings:SetFrameStrata(strata)
+	g.dots:SetFrameStrata(strata)
+	g.rings:SetFrameLevel(math.min(9900, level + 1))
+	g.dots:SetFrameLevel(math.min(9900, level + 2))
+	if g.key ~= key then
+		g.key = nil
+		local ring = RING_SIZE * (factor or 1) / scale
+		for _, f in ipairs({ g.rings, g.dots }) do
+			f:SetUiMapID(host)
+			f:ClearUnits()
+		end
+		for _, unit in ipairs(members) do
+			local sub = not inRaid or Safe.Call(UnitInSubgroup, unit)
+			local size = sub and party or raidSize
+			if size then
+				local c = GroupLook(unit).color                -- (its class colour, as OpenMap's own dots)
+				local r, gr, b = c[1], c[2], c[3]
+				local atlas = (inRaid and sub) and "WhiteDotCircle-RaidBlips" or "WhiteCircle-RaidBlips"
+				g.dots:AddUnit(unit, atlas, size / scale, size / scale, r, gr, b, 1, 7, false)
+			end
+			g.rings:AddUnit(unit, RING_TEXTURE, ring, ring, 1, 1, 1, 1, 7, false)
+		end
+		g.rings:FinalizeUnits()
+		g.dots:FinalizeUnits()
+		g.key = key
+	end
+	g.rings:Show()
+	g.dots:Show()
+	return true
+end
+-- true when the game draws your group on the own view (on a zone's or continent's map: Blizzard's own dots
+-- are on those only)
+local function TryOwnGroup(stockPin, host, members)
+	if ownGroupFailed or not stockPin or not host or host == S.WORLD or #members == 0 or not mod.OwnCanvas()
+		or not mod.GroupDotSize then
+		HideOwnGroup()
+		return false
+	end
+	local ok = pcall(DrawOwnGroup, stockPin, host, members)
+	if ok then return true end
+	ownGroupFailed = true
+	HideOwnGroup()
+	return false
+end
+
+local function Ring(pin)
+	if pin.Ring then return end
+	pin.Ring = pin:CreateTexture(nil, "BACKGROUND")
+	pin.Ring:SetSize(RING_SIZE, RING_SIZE)
+	pin.Ring:SetPoint("CENTER")
+	pin.Ring:SetTexture(RING_TEXTURE)
+end
+
 
 local function ShowGroupTooltip(pin, name)
 	pin.tooltipName = name
@@ -640,6 +756,7 @@ local function RefreshGroup(afterMapChange)
 		ringHandoff = nil
 		if nativeRings then nativeRings.members = nil end
 		HideNativeRings()
+		HideOwnGroup()
 		S.ClearPinSet(groupSet)
 		wipe(groupPins)
 		return
@@ -680,8 +797,23 @@ local function RefreshGroup(afterMapChange)
 			end
 		end
 	end
-	local hasNativeRings = TryNativeRings(stockPin, host, units, table.concat(roster, " "))
-	if nativeRings then nativeRings.members = hasNativeRings and eligible or nil end
+	local hasNativeRings
+	if mod.OwnViewOn and mod.OwnViewOn() then
+		-- (in a fight: the game's dots on OpenMap's own view, for everyone in a zone that's on this map; the rest,
+		-- elsewhere, OpenMap's dots as ever)
+		HideNativeRings()
+		hasNativeRings = TryOwnGroup(stockPin, host, members)
+		eligible = {}
+		for _, unit in ipairs(members) do
+			local best = Safe.Call(C_Map.GetBestMapForUnit, unit)
+			if not best or BlizzardShows(best, host) then eligible[unit] = true end
+		end
+		if nativeRings then nativeRings.members = nil end
+	else
+		HideOwnGroup()
+		hasNativeRings = TryNativeRings(stockPin, host, units, table.concat(roster, " "))
+		if nativeRings then nativeRings.members = hasNativeRings and eligible or nil end
+	end
 	local inZone, seen = {}, {}
 	for _, unit in ipairs(members) do
 		if not (hasNativeRings and eligible[unit]) then
@@ -724,7 +856,7 @@ function mod.RefreshNativeRingLayout()
 end
 
 function mod.RefreshWaypoint() RefreshWaypoint() end   -- (PadView.lua: it has no SetupNav)
-function mod.RefreshGroup() RefreshGroup() end         -- (PadView.lua: its own ticker)
+function mod.RefreshGroup() RefreshGroup() end         -- (PadView.lua: its own ticker; OwnView.lua, as it comes and goes)
 
 function mod:BuildNav()
 	wpSet = S.PinSet("waypoint", 0, 5)

@@ -639,6 +639,19 @@ local function ScalePlayerBlip(pin)
 	playerBlipSizes[pin] = factor ~= 1 and { factor = factor, scale = scale } or nil
 end
 
+-- for Nav.lua, your group's dots on the own view in a fight: Blizzard's size for a `kind` ("party", "raid"), with
+-- the icon-size setting, as Blizzard's own dots are out of one (nil: the dots are off), and that setting
+function mod.GroupDotSize(pin, kind)
+	if BlipOff(kind) then return end
+	local dp = pin and pin.dataProvider
+	local sizes = dp and dp.GetUnitPinSizesTable and dp:GetUnitPinSizesTable()
+	local base = sizes and tonumber(sizes[kind]) or (kind == "raid" and 8.25 or 11)
+	local factor = active and tonumber(mod.db.iconScale) or 1
+	if not factor or factor <= 0 then factor = 1 end
+	if base <= 0 then return end
+	return base * factor, factor
+end
+
 -- The rim uses the size that could be applied to the stock dot.
 function mod.NativeGroupIconScale(pin)
 	local applied = groupBlipSizes[pin]
@@ -1304,7 +1317,11 @@ local function OnCanvasClick(from, button)
 	if from and button == "LeftButton" and IsShiftKeyDown() then return PathTo() end
 	-- (Ctrl-click with "Ctrl-click drops a pin" off is other addons', Map Pin Enhanced's, and Blizzard's
 	-- own waypoint: passed on, not a zoom that ends the click here (#19))
-	if from and button == "LeftButton" and IsControlKeyDown() and mod.db.ctrlClickPin == false then return false end
+	if from and button == "LeftButton" and IsControlKeyDown() and mod.db.ctrlClickPin == false then
+		-- (in a fight Blizzard's canvas is under OpenMap's own view and never gets it: the waypoint set from here, Nav.lua)
+		if own.on and mod.OwnViewWaypoint then mod.OwnViewWaypoint() return true end
+		return false
+	end
 	-- (right-click with "Right-click zooms out" off is the map's and other addons', Questie's objectives:
 	-- passed on, #117. The controller's B, `from` nil, still steps out)
 	if from and button == "RightButton" and mod.db.rightClickOut == false then return false end

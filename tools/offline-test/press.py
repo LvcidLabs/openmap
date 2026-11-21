@@ -49,6 +49,7 @@ class CtrlClickTests(unittest.TestCase):
             function IsControlKeyDown() return ctrl end
             function IsShiftKeyDown() return shift end
             active, dropped, glided = true, 0, 0
+            own = { on = false }     -- (OwnView.lua's view in a fight: off)
             mod = { db = {}, DropWaypoint = function() dropped = dropped + 1 end,
                 CursorWorld = function() return 0.5, 0.5 end }
             sc = { mouseButtonInfo = { LeftButton = { down = false } } }
@@ -74,6 +75,12 @@ class CtrlClickTests(unittest.TestCase):
         self.check("ctrl = true mod.db.ctrlClickPin = false "
                    "assert(OnCanvasClick(true, 'LeftButton') == false, 'the Ctrl-click was kept from other addons') "
                    "assert(dropped == 0 and glided == 0)")
+
+    def test_ctrl_click_in_a_fight_sets_blizzards_waypoint(self):
+        # (the own view: Blizzard's canvas under it never gets the click, the waypoint is set from OpenMap's code)
+        self.check("ctrl = true mod.db.ctrlClickPin = false own.on = true set = 0 "
+                   "mod.OwnViewWaypoint = function() set = set + 1 return true end "
+                   "assert(OnCanvasClick(true, 'LeftButton') == true) assert(set == 1 and dropped == 0 and glided == 0)")
 
     def test_plain_click_still_zooms_when_turned_off(self):
         self.check("mod.db.ctrlClickPin = false assert(OnCanvasClick(true, 'LeftButton') == true) assert(glided == 1)")

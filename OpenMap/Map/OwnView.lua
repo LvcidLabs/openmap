@@ -34,6 +34,7 @@ local ICON_STRATA = "HIGH"      -- the icons' strata on the view: over the art's
 local levelOf = {}              -- an addon's icon -> { level, fixed }: its own before (given back too)
 local drag                      -- { sx, sy, u, v, zoom, moved }: a drag under way
 local scanAt = 0
+local placedScale             -- the view's scale your group's dots were last sized for
 
 -- every copy of the pins library loaded: name -> library (as the controller view's, PadView.lua)
 local function PinLibs()
@@ -167,6 +168,12 @@ function mod.OwnViewPlace()
 	canvas:SetPoint("TOPLEFT", view, "TOPLEFT", view:GetWidth() / 2 / own.scale - own.x * w,
 		-(view:GetHeight() / 2 / own.scale - own.y * h))
 	PlaceIcons()
+	if mod.OwnQuestAreaMoved then mod.OwnQuestAreaMoved() end     -- (a quest's area: PadView.lua)
+	-- (your group's dots are sized for the view's scale: Nav.lua's)
+	if own.scale ~= placedScale then
+		placedScale = own.scale
+		if mod.RefreshGroup then pcall(mod.RefreshGroup) end
+	end
 end
 
 -- OpenMap's frames moved up to the view's levels (and given their own back), keeping their order. Every
@@ -277,6 +284,15 @@ function mod.OwnDragStop()
 end
 
 function mod.OwnViewOn() return own and own.on or false end
+-- for what draws on the view itself (your party's dots, Nav.lua; a quest's area, PadView.lua): its canvas, its
+-- scale, and the level and strata of OpenMap's icons on it; nil while it's down
+function mod.OwnCanvas()
+	if not (own and own.on and canvas) then return end
+	local _, pinRoot = S.Roots()
+	return canvas, own.scale, pinRoot:GetFrameLevel(), pinRoot:GetFrameStrata()
+end
+-- for Extras.lua's place name: the cursor over the view (Blizzard's canvas, under it, never has the mouse then)
+function mod.OwnViewHover() return own and own.on and view and view:IsMouseOver() or false end
 
 -- up, at the view Blizzard's canvas has now (nothing moves on screen): true if it's up
 function mod.OwnViewStart()
@@ -322,6 +338,7 @@ function mod.OwnViewStart()
 	ScanIcons()
 	mod.OwnViewPlace()
 	if mod.RefreshQuests then pcall(mod.RefreshQuests, mod) end   -- (your quests as OpenMap's icons: Quests.lua)
+	if mod.RefreshGroup then pcall(mod.RefreshGroup) end     -- (your group on the view: Nav.lua)
 	return true
 end
 
@@ -341,6 +358,7 @@ function mod.OwnViewStop(sync)
 	if view then view:Hide() end
 	sc.Child:SetAlpha(1)
 	if mod.RefreshQuests then pcall(mod.RefreshQuests, mod) end
+	if mod.RefreshGroup then pcall(mod.RefreshGroup) end
 end
 
 -- /openmap combatcheck: where the own view's frames are, printed and saved (OpenMapDB: worldmap, combatcheck)
