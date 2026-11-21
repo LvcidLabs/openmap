@@ -559,12 +559,12 @@
  "Show places to explore": "Afficher les lieux à explorer",
  "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Contours et marqueurs là où vous devez encore aller pour explorer chaque zone, pour son haut fait d'exploration ; en dézoomant, le nombre de lieux restants dans chaque zone.",
  "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "la carte en combat, la fenêtre de ClassicUI Forever et Échap sur la carte d'un donjon",
- "baked zone tiles in each client's language, and less work while the map is closed": "les tuiles de zone précalculées dans la langue de chaque client, et moins de travail carte fermée",
  "quests from every zone read a few at a time": "les quêtes de toutes les zones lues petit à petit",
  "sharper middle zooms, and unexplored land darkened as one shade": "des zooms intermédiaires plus nets, et les terres inexplorées assombries d'une seule teinte",
  "baked zone tiles for the Russian client": "les tuiles de zone précalculées du client russe",
  "Forever City Labels' pins on the stitched map": "les marqueurs de Forever City Labels sur la carte assemblée",
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "votre position lue sans risque, la carte de donjon agrandie, la carte de la Prison et l'allemand",
  "Right-click zooms out": "Le clic droit dézoome",
- "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Un clic droit sur la carte remonte à la zone ou au continent qui l'entoure. Désactivé, le clic droit est laissé à la carte et aux autres addons (les objectifs de Questie) ; la sortie par le menu fonctionne toujours."
+ "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Un clic droit sur la carte remonte à la zone ou au continent qui l'entoure. Désactivé, le clic droit est laissé à la carte et aux autres addons (les objectifs de Questie) ; la sortie par le menu fonctionne toujours.",
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "les tuiles des zones précalculées en portugais du Brésil, moins de travail quand la carte est fermée ou en mouvement, et ses images prêtes avant son ouverture"
 }

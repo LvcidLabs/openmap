@@ -559,12 +559,12 @@
  "Show places to explore": "Показывать места для исследования",
  "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "Контуры и метки там, куда ещё нужно попасть, чтобы исследовать каждую зону для её достижения «Исследование»; при отдалении — сколько мест осталось в каждой зоне.",
  "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "карта в бою, окно ClassicUI Forever и Esc на карте подземелья",
- "baked zone tiles in each client's language, and less work while the map is closed": "заранее подготовленные фрагменты зон на языке каждого клиента и меньше работы при закрытой карте",
  "quests from every zone read a few at a time": "задания всех зон, читаемые понемногу",
  "sharper middle zooms, and unexplored land darkened as one shade": "более чёткие средние масштабы и неисследованные земли, затемнённые одним тоном",
  "baked zone tiles for the Russian client": "заранее подготовленные фрагменты зон для русского клиента",
  "Forever City Labels' pins on the stitched map": "метки Forever City Labels на сшитой карте",
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "безопасное чтение вашего положения, развёрнутая карта подземелья, карта Тюрьмы и немецкий язык",
  "Right-click zooms out": "Правый щелчок отдаляет",
- "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Правый щелчок по карте выходит на окружающую зону или континент. Если выключено, правый щелчок остаётся карте и другим модификациям (целям Questie); выход через меню по-прежнему работает."
+ "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Правый щелчок по карте выходит на окружающую зону или континент. Если выключено, правый щелчок остаётся карте и другим модификациям (целям Questie); выход через меню по-прежнему работает.",
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "заранее отрисованные тайлы зон на бразильском португальском, меньше работы, пока карта закрыта или движется, и её изображение, готовое ещё до открытия"
 }

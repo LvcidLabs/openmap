@@ -559,12 +559,12 @@
  "Show places to explore": "显示待探索的地点",
  "Outlines and pins where you still need to go to explore each zone, for its Explore achievement; further out, how many places each zone has left.": "在你还需前往的地方显示轮廓和标记，以完成每个区域的探索成就；缩小后显示每个区域还剩多少地点。",
  "the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map": "战斗中的地图、ClassicUI Forever 的窗口，以及在地下城地图上按 Esc",
- "baked zone tiles in each client's language, and less work while the map is closed": "按各客户端语言预先生成的区域图块，以及地图关闭时更少的工作",
  "quests from every zone read a few at a time": "逐步读取所有区域的任务",
  "sharper middle zooms, and unexplored land darkened as one shade": "更清晰的中等缩放，以及以同一色调变暗的未探索区域",
  "baked zone tiles for the Russian client": "为俄语客户端预先生成的区域图块",
  "Forever City Labels' pins on the stitched map": "拼接地图上的 Forever City Labels 标记",
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "安全读取你的位置、最大化的地下城地图、监狱的地图，以及德语",
  "Right-click zooms out": "右键缩小",
- "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "在地图上右键点击会退到周围的区域或大陆。关闭后，右键交给地图和其他插件（Questie 的任务目标）；通过菜单退出仍然可用。"
+ "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "在地图上右键点击会退到周围的区域或大陆。关闭后，右键交给地图和其他插件（Questie 的任务目标）；通过菜单退出仍然可用。",
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "以巴西葡萄牙语预渲染的区域图块、地图关闭或移动时更少的运算，以及打开前就已准备好的地图图像"
 }

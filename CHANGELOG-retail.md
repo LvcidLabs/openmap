@@ -10,6 +10,12 @@
 - **Right-click can be left to other addons**: Options' "Right-click zooms out" (on, as before) turned off
   leaves right-click on the map to the map and other addons, such as Questie's objectives (#117).
 
+- **The map's art ready before it opens**: the art round you is read in while the map is closed, a few
+  files a frame and out of combat, once the map is built after a login or a /reload and again when you
+  reach a new zone. At a session's first opening, and after travelling, it used to come in over a moment
+  (the files held from the last opening were another place's, or none). The part of the view still
+  fading in as you closed the map is held too. By cscoder69.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view

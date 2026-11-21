@@ -36,7 +36,7 @@ ns.Credits = {
 		{ "Rambomst", L["the quest level on OpenMap's quest icons"] },
 		{ "kr0ozin", L["place names and quest areas on the controller map, and it reopening as you set"] },
 		{ "Vennomfang", L["the map in combat, ClassicUI Forever's window, and Esc on a dungeon's map"] },
-		{ "cscoder69", L["baked zone tiles in each client's language, and less work while the map is closed"] },
+		{ "cscoder69", L["the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens"] },
 		{ "Merryfett", L["quests from every zone read a few at a time"] },
 		{ "wealdly", L["sharper middle zooms, and unexplored land darkened as one shade"] },
 		{ "Danpiel", L["baked zone tiles for the Russian client"] },
