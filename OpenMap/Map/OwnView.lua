@@ -29,6 +29,8 @@ local map, sc, view, canvas, iconLayer, input
 local own                       -- WorldMap.lua's mod.own: { on, scale, x, y, u, v, zoom }
 local levels = {}               -- OpenMap's frame -> its level on Blizzard's canvas (given back as the view ends)
 local moved = {}                -- an addon's icon -> its parent before (given back as the view ends)
+local strataOf = {}             -- OpenMap's icon layers -> their strata before (given back as the view ends)
+local ICON_STRATA = "HIGH"      -- the icons' strata on the view: over the art's (the map's own), whatever the levels
 local levelOf = {}              -- an addon's icon -> { level, fixed }: its own before (given back too)
 local drag                      -- { sx, sy, u, v, zoom, moved }: a drag under way
 local scanAt = 0
@@ -108,6 +110,8 @@ local function PlaceIcons()
 				levelOf[icon] = was
 				moved[icon] = icon:GetParent() or false
 				icon:SetParent(iconLayer)
+				was.strata = was.strata or icon:GetFrameStrata()
+				icon:SetFrameStrata(ICON_STRATA)
 				-- (Questie fixes its icons' levels, from 2015 up: a fixed level stays put whatever the parent's,
 				-- under the view's art. Over the layer here, in Questie's own order; given back as the view ends)
 				if icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(false) end
@@ -136,6 +140,7 @@ local function GiveBackIcons()
 				icon:SetParent(parent)
 				if was then
 					if icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(false) end
+					if was.strata then icon:SetFrameStrata(was.strata) end
 					icon:SetFrameLevel(was.level)
 					if was.fixed and icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(true) end
 				end
@@ -297,6 +302,11 @@ function mod.OwnViewStart()
 	S.Rehost(canvas)
 	Lift(list, step)
 	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)
+	-- (and a strata over the art's, so no level of the art's, or one an addon sets on its icons, can cover them)
+	for _, f in ipairs({ pinRoot, iconLayer }) do
+		strataOf[f] = strataOf[f] or f:GetFrameStrata()
+		f:SetFrameStrata(ICON_STRATA)
+	end
 	-- OpenMap's own frames on the map's view that sit over the art (the coordinates, the brightness shade):
 	-- over this view too, in their order (they're under it otherwise: the coordinates went in a fight)
 	local over = {}
@@ -325,6 +335,8 @@ function mod.OwnViewStop(sync)
 	if sync and not InCombatLockdown() and mod.SetViewNow then mod.SetViewNow(scale, x, y) end
 	GiveBackIcons()
 	S.Rehost(nil)
+	for f, strata in pairs(strataOf) do f:SetFrameStrata(strata) end
+	wipe(strataOf)
 	Lower()                       -- (after the move back: the game resets the levels of a frame given another parent)
 	if view then view:Hide() end
 	sc.Child:SetAlpha(1)

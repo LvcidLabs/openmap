@@ -78,6 +78,8 @@ def frames_stub():
         function f:SetAlpha(a) self.alpha = a end
         function f:GetAlpha() return self.alpha end
         function f:SetFixedFrameLevel(on) self.fixed = on end
+        function f:SetFrameStrata(st) self.strata = st end
+        function f:GetFrameStrata() return self.strata or (self.parent and self.parent:GetFrameStrata()) or "MEDIUM" end
         function f:HasFixedFrameLevel() return self.fixed or false end
         function f:EnableMouse() end
         function f:EnableMouseWheel() end
@@ -179,6 +181,13 @@ class OwnViewTests(unittest.TestCase):
                           self.lua.eval("set.level")), (2100, 2120, 2190, 2193))
         self.assertEqual(self.lua.eval("sc.Child.alpha"), 1)
         self.assertIsNone(self.lua.eval("rehosted"))
+
+    def test_icons_on_a_strata_over_the_arts_and_given_back(self):
+        self.lua.eval("mod.OwnViewStart")()
+        self.assertEqual(self.lua.eval("icons:GetFrameStrata()"), "HIGH")
+        self.assertEqual(self.lua.eval("art:GetFrameStrata()"), "MEDIUM")
+        self.lua.execute("fight = false mod.OwnViewStop(false)")
+        self.assertEqual(self.lua.eval("icons:GetFrameStrata()"), "MEDIUM")
 
     def test_icons_over_the_art_and_not_under_the_see_through_canvas(self):
         # (no icons in a fight, test11: every level counted twice put the art at the top, over the icons)
