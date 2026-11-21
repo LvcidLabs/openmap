@@ -256,6 +256,16 @@ function mod.OwnViewStart()
 	if chart then table.insert(tops, 1, chart) end
 	Lift(tops, step)
 	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)
+	-- OpenMap's own frames on the map's view that sit over the art (the coordinates, the brightness shade):
+	-- over this view too, in their order (they're under it otherwise: the coordinates went in a fight)
+	local over = {}
+	local bar = mod.CoordsBar and mod.CoordsBar()
+	if mod.brightnessShade then over[#over + 1] = mod.brightnessShade end
+	if bar then over[#over + 1] = bar end
+	for i, f in ipairs(over) do
+		if levels[f] == nil then levels[f] = f:GetFrameLevel() lifted[#lifted + 1] = f end
+		f:SetFrameLevel(math.min(9900, iconLayer:GetFrameLevel() + (f == bar and 20 or -ICONS_OVER - 1)))
+	end
 	sc.Child:SetAlpha(0)          -- (Blizzard's canvas and its icons, under the view: unseen; nothing of it written)
 	view:Show()
 	ScanIcons()

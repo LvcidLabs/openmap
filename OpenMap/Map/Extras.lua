@@ -200,6 +200,7 @@ local function PlaceCoords()
 	bar:SetPoint("BOTTOMRIGHT", sc, "BOTTOMRIGHT", -x, y)
 end
 mod.PlaceCoords = PlaceCoords
+function mod.CoordsBar() return bar end   -- (OwnView.lua: kept over its view in a fight)
 
 -- the labels' left edge (Panel.lua's favourites stop short of it), nil while they're hidden
 function mod.CoordsLeft()
