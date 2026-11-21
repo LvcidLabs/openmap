@@ -147,5 +147,49 @@ class ArrowSizeTests(unittest.TestCase):
         self.lua.execute("S.playerScale = 1 S.SetPlayerScale(2)")
         self.assertEqual(self.lua.eval("arrow.w"), 56)
 
+
+class ArrowFollowTests(unittest.TestCase):
+    """OpenMap's arrow (yours in a fight) turns and moves every frame, as Blizzard's does: its frame's OnUpdate,
+    with no throttle (on WorldMap.lua's tenth-of-a-second ticker it stepped round, test20)"""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        stitch = (Path(__file__).resolve().parents[2] / "OpenMap" / "Map" / "Stitch.lua").read_text(encoding="utf-8")
+        self.assertIn('arrow:GetParent():SetScript("OnUpdate", function() S.FollowPlayer() end)', stitch)
+        names = (r"S\.SetPlayer", r"S\.PlacePlayer", r"S\.FollowPlayer")
+        chunks = [re.search(r"\nfunction %s\(.*?\nend\n" % n, stitch, re.S).group(0) for n in names]
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            S, player, playerHidden = {}, {}, false
+            root, W, H, scaleNow, host = {}, 100, 100, 1, { k = 1 }
+            turns, moves = 0, 0
+            arrow = { shown = true }
+            function arrow:IsShown() return self.shown end
+            function arrow:Show() self.shown = true end
+            function arrow:Hide() self.shown = false end
+            function arrow:ClearAllPoints() end
+            function arrow:SetPoint() moves = moves + 1 end
+            function arrow:SetRotation(r) turns = turns + 1 self.r = r end
+            here = { 0.5, 0.5, 0 }
+            function S.PlayerSource() return here[1], here[2], here[3] end
+        """ + "".join(chunks) + "\nOnUpdate = function() S.FollowPlayer() end\n")
+
+    def test_turns_every_frame(self):
+        self.lua.execute("OnUpdate() for i = 1, 10 do here[3] = i / 10 OnUpdate() end")
+        self.assertEqual(self.lua.eval("turns"), 11)
+        self.assertAlmostEqual(self.lua.eval("arrow.r"), 1.0)
+
+    def test_nothing_set_when_nothing_changed(self):
+        self.lua.execute("OnUpdate() turns, moves = 0, 0 for i = 1, 10 do OnUpdate() end")
+        self.assertEqual((self.lua.eval("turns"), self.lua.eval("moves")), (0, 0))
+
+    def test_moves_every_frame(self):
+        self.lua.execute("OnUpdate() moves = 0 for i = 1, 5 do here[1] = 0.5 + i / 1000 OnUpdate() end")
+        self.assertEqual(self.lua.eval("moves"), 5)
+
+    def test_not_while_hidden(self):
+        self.lua.execute("arrow.shown = false for i = 1, 5 do here[3] = i OnUpdate() end")
+        self.assertEqual(self.lua.eval("turns"), 0)
+
 if __name__ == "__main__":
     unittest.main()

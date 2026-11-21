@@ -718,6 +718,15 @@ local function RaisePlayer()
 	if mod.RefreshNativeRingLayout then mod.RefreshNativeRingLayout() end
 end
 
+-- where you are on the world (normalized) and your facing; nil when not known (OpenMap's arrow: S.FollowPlayer)
+local function PlayerWorld()
+	local best, x, y = ns.Safe.PlayerPos()
+	if not (best and S.Rect(best) and x and y) then return end
+	local u, v = ToWorld(best, x, y)
+	return u, v, ns.Safe.Call(GetPlayerFacing)
+end
+S.PlayerSource = PlayerWorld
+
 local ticker = CreateFrame("Frame")
 ticker:Hide()
 local elapsedSum = 0
@@ -749,13 +758,8 @@ ticker:SetScript("OnUpdate", function(_, elapsed)
 	if mx and my and not InCombatLockdown() and not (mod.db.playerArrowOnTop and not ns.MapWorld) then
 		S.SetPlayer(nil)
 	else
-		local best, x, y = ns.Safe.PlayerPos()
-		if best and S.Rect(best) and x and y then
-			local u, v = ToWorld(best, x, y)
-			S.SetPlayer(u, v, ns.Safe.Call(GetPlayerFacing))
-		else
-			S.SetPlayer(nil)
-		end
+		local u, v, facing = PlayerWorld()
+		if u then S.SetPlayer(u, v, facing) else S.SetPlayer(nil) end
 	end
 
 	RaisePlayer()

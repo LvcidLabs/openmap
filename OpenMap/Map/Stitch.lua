@@ -1367,6 +1367,7 @@ function S.BuildNow(parent, artLevel, range, iconLevel)
 	local ps, px = S.playerScale or 1, S.playerBase or 28
 	arrow:SetSize(px * ps, px * ps)
 	arrow:Hide()
+	arrow:GetParent():SetScript("OnUpdate", function() S.FollowPlayer() end)
 
 	-- the sea runs on well past the world art, so a wide (or tall) view shows more ocean,
 	-- not the edge of the paper: its colour (the world's sea colours carried outward, keeping
@@ -2322,6 +2323,20 @@ function S.PlacePlayer()
 	arrow:SetPoint("CENTER", root, "TOPLEFT", player.u * W * s, -player.v * H * s)
 	if player.facing then arrow:SetRotation(player.facing) end
 	arrow:Show()
+end
+-- while our arrow is up, it turns and moves every frame, as Blizzard's does (WorldMap.lua's ticker, a tenth of
+-- a second, says whether it's up: turning on that, it stepped): S.PlayerSource gives where you are, the world's
+-- u, v and your facing (nil: not known). Only what changed is set
+function S.FollowPlayer()
+	if not arrow:IsShown() or not S.PlayerSource then return end
+	local u, v, facing = S.PlayerSource()
+	if not u then return end
+	if u ~= player.u or v ~= player.v then
+		S.SetPlayer(u, v, facing)
+	elseif facing and facing ~= player.facing then
+		player.facing = facing
+		arrow:SetRotation(facing)
+	end
 end
 -- (our arrow up: WorldMap.lua sizes Blizzard's away, so there's one, not two: #229)
 function S.PlayerShown() return arrow ~= nil and arrow:IsShown() end
