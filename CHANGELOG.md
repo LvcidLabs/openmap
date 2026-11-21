@@ -80,6 +80,10 @@
 - **The windowed quest log sits beside the map**: it covered part of the map until the window was laid out
   again; and a window resized by its corner stays on the screen (#327). By gOOvER.
 
+- **The right wing's map in Dire Maul, Scarlet Monastery and Blackrock Spire**: the wing is worked out from
+  the dungeon finder and the area you're in, or the portal you came through, and kept over a /reload; Dungeon
+  Journal is told it too. By puschie286.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

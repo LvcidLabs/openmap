@@ -25,6 +25,7 @@ ns.MapChangelog = {
 		"|cff6e2c0aQuestie's quest icons over a town's icons|r: a quest under a vendor, trainer or flight master's icon was hidden; Questie's quests now go over every icon of OpenMap's (#393).",
 		"|cff6e2c0aThe map opens quicker|r: as it opened, every set of icons was laid out for the whole world and then again for your view; once now (#293, measured by protella: the opening 384 ms to 45).",
 		"|cff6e2c0aThe windowed quest log sits beside the map|r: it covered part of the map until the window was laid out again; and a window resized by its corner stays on the screen (#327). By gOOvER.",
+		"|cff6e2c0aThe right wing's map in Dire Maul, Scarlet Monastery and Blackrock Spire|r: the wing is worked out from the dungeon finder and the area you're in, or the portal you came through, and kept over a /reload; Dungeon Journal is told it too. By puschie286.",
 	} },
 	{ version = "v0.8.11", date = "2026-11-20", heads = { [1] = "Improved", [4] = "Fixed", [15] = "Also", }, items = {
 		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",

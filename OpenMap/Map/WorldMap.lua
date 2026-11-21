@@ -1780,7 +1780,14 @@ end
 function mod:OnEnable()
 	self.instancePinsEvents = self.instancePinsEvents or {}
 	for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA", "ZONE_CHANGED", "ZONE_CHANGED_INDOORS" }) do
-		ns.RegisterEvent(self.instancePinsEvents, event, function() mod:RefreshInstancePins() end)
+		ns.RegisterEvent(self.instancePinsEvents, event, function(_, raised, ...)
+			mod.NoteDungeonWing(raised, ...)
+			mod:RefreshInstancePins()
+		end)
+	end
+	if ns.Client == "Forever" then
+		ns.RegisterEvent(self.instancePinsEvents, "LOADING_SCREEN_ENABLED", mod.SampleDungeonPortal)
+		ns.RegisterEvent(self.instancePinsEvents, "LOADING_SCREEN_DISABLED", function(_, event) mod.NoteDungeonWing(event) end)
 	end
 	ns.RegisterEvent(self.instancePinsEvents, "GLOBAL_MOUSE_UP", function(_, _, button)
 		if button ~= "RightButton" or not mod.instancePinsHidden or mod.db.dungeonMaps ~= false
@@ -1793,6 +1800,7 @@ function mod:OnEnable()
 		end)
 	end)
 	mod:RefreshInstancePins()
+	mod.NoteDungeonWing()
 	ns.RegisterEvent(styleOwner, "INPUT_DEVICE_INTERFACE_TRANSITION", StyleChanged)
 	if PadUI() and not self.db.padMap then
 		self.enabled, self.padWaits = false, true
