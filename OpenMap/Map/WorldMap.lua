@@ -1611,6 +1611,8 @@ local function Setup()
 			ApplyZoom()
 			RaisePlayer()
 		end
+		-- (opened in a fight: the own view at once, not only once it's zoomed or dragged, OwnView.lua)
+		if InCombatLockdown() and mod.OwnViewStart then C_Timer.After(0, function() mod.OwnViewStart() end) end
 		if mod.OnMapShown then mod:OnMapShown() end
 	end)
 	dp.OnShow = function()

@@ -56,5 +56,11 @@ class CombatMapTests(unittest.TestCase):
         self.assertIn("viewSetting = true\n\tmap:OnCanvasScaleChanged()\n\tviewSetting, scaleWaiting = false, false", sv)
 
 
+    def test_opened_in_a_fight_the_own_view_comes_up(self):
+        # (not only once zoomed or dragged: its icons were never moved onto it before that)
+        m = re.search(r'local shown = Ours\("map shown", function\(\)\n(.*?)\n\tend\)', WORLDMAP, re.S)
+        self.assertIsNotNone(m)
+        self.assertIn("if InCombatLockdown() and mod.OwnViewStart then", m.group(1))
+
 if __name__ == "__main__":
     unittest.main()
