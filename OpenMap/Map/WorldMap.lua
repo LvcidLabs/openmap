@@ -152,12 +152,16 @@ local function FromWorld(mapID, u, v)
 end
 
 -- the view: world centre (normalized) and zoom
+local combatView                -- { scale, x, y }: the view in a fight, OpenMap's art moved to it (SetView)
+local function CanvasScale() return combatView and combatView.scale or sc:GetCanvasScale() end
 local function View()
 	local mapID = map:GetMapID()
-	local x, y = sc:GetCurrentScrollX() or 0.5, sc:GetCurrentScrollY() or 0.5
+	local x, y
+	if combatView then x, y = combatView.x, combatView.y
+	else x, y = sc:GetCurrentScrollX() or 0.5, sc:GetCurrentScrollY() or 0.5 end
 	if not ns.Safe.Finite(x, y) then x, y = 0.5, 0.5 end          -- (a scroll left NaN: the map's middle, #261)
 	local u, v = ToWorld(mapID, x, y)
-	local zoom = ZoomFor(mapID, sc:GetCanvasScale())
+	local zoom = ZoomFor(mapID, CanvasScale())
 	if not ns.Safe.Finite(zoom) or zoom <= 0 then zoom = 1 end    -- (the map 0 px across yet)
 	return u, v, zoom
 end
@@ -191,6 +195,36 @@ local waitingView                 -- { mapID, scale, x, y }: a view the canvas r
 local afterCombat = false         -- something of Blizzard's map left as it was in a fight: put right as it ends
 local viewOwner = {}              -- (its event handler's key)
 local function Kept(want, have) return have and math.abs(have - want) > math.max(1e-3, math.abs(want) * 1e-3) end
+local ApplyZoom                   -- (below)
+-- Zooming and panning in a fight: Blizzard's canvas stays as it is (nothing of it written: SetView), and
+-- OpenMap's art is moved to the view instead (S.ViewAt: OpenMap's own frames only), Blizzard's and other
+-- addons' icons on the canvas faded meanwhile, since they'd stay where the canvas has them. As combat
+-- ends the canvas is put at that view and the art back on it (mod.CombatOver)
+local faded = {}                  -- frame -> its alpha: the canvas's other frames, faded while the combat view's up
+local function FadeCanvas(on)
+	if on then
+		for _, f in ipairs({ sc.Child:GetChildren() }) do
+			-- (a protected frame, Blizzard's group members' pin, isn't touched in combat: it's under the art)
+			if not faded[f] and not S.OwnsCanvasFrame(f) and not f:IsProtected() and f:GetAlpha() > 0 then
+				faded[f] = f:GetAlpha()
+				f:SetAlpha(0)
+			end
+		end
+	else
+		for f, a in pairs(faded) do
+			faded[f] = nil
+			if f:GetAlpha() == 0 then f:SetAlpha(a) end
+		end
+	end
+end
+local function CombatViewOff()
+	if not combatView then return end
+	combatView = nil
+	S.ViewAt(nil)
+	FadeCanvas(false)
+end
+mod.CombatViewOff = CombatViewOff
+function mod.CombatViewOn() return combatView ~= nil end
 local function SetView(scale, x, y)
 	-- (never a view that isn't one: NaN or a zero scale, from a size of 0 while the map is laid out, stuck
 	-- the map on a blank view, every later view worked out from it NaN too: #260 #261 #263)
@@ -200,6 +234,11 @@ local function SetView(scale, x, y)
 	-- objective tracker stopped updating: #345 #347 #368. The view waits for combat's end, FlushWaitingView)
 	if InCombatLockdown() then
 		waitingView = { mapID = map:GetMapID(), scale = scale, x = x, y = y }
+		combatView = combatView or {}
+		combatView.scale, combatView.x, combatView.y = scale, x, y
+		S.ViewAt(scale, x, y)
+		FadeCanvas(true)
+		if ApplyZoom then ApplyZoom() end
 		return
 	end
 	local wantScale, wantX, wantY = scale, x, y
@@ -463,7 +502,7 @@ local function Animate(_, elapsed)
 		ShowWorld(a.u - a.sx * pu, a.v - a.sy * pv, zoom)
 		if done then
 			anim = nil
-		elseif waitingView then
+		elseif waitingView and not combatView then
 			-- (refused in combat: the zoom would never arrive, every addon's icons rescaled each frame
 			-- till it's over. It ends here, and where it was going is what waits)
 			anim = nil
@@ -680,6 +719,8 @@ ticker:SetScript("OnUpdate", function(_, elapsed)
 	end
 
 	RaisePlayer()
+	-- (an icon another addon made on the canvas since the combat view came up: faded too)
+	if combatView then FadeCanvas(true) end
 
 	stillFor = Settled() and stillFor + 0.1 or 0
 	if mod.db.autoSwitch and userMoved and stillFor >= SWITCH_AFTER and not InCombatLockdown() and not mod.benching then
@@ -799,10 +840,10 @@ local function ApplyView()
 	if active then viewFrame:Show() end
 end
 
-local function ApplyZoom()
+ApplyZoom = function()
 	if not active then return end
 	local g, t0 = Before(), Clock()
-	S.SetZoom(ZoomFor(map:GetMapID(), sc:GetCanvasScale()) * DetailK(), sc:GetCanvasScale())
+	S.SetZoom(ZoomFor(map:GetMapID(), CanvasScale()) * DetailK(), CanvasScale())
 	After("zoom", g)
 	Clocked("OpenMap's zoom update", t0)
 	ApplyView()
@@ -957,6 +998,7 @@ end
 -- combat over: what was left as Blizzard had it in the fight (its wheel and scaling modes, OpenMap's zoom
 -- levels) put in, then the view asked for in it (SetView), if that map is still the one up
 function mod.CombatOver()
+	CombatViewOff()
 	if afterCombat and map and map:IsShown() and not InCombatLockdown() then
 		afterCombat = false
 		KeepPadCursor(sc.OnCanvasSizeChanged, sc)   -- (the zoom levels again: OnCreateZoomLevels, Attach)
@@ -1178,6 +1220,26 @@ local function PressTrack()
 	if dx * dx + dy * dy > PRESS_SLOP_SQ then press.moved = true end
 end
 local function WasDrag() return press.moved end
+-- a drag in a fight: the combat view carried with the cursor (Blizzard's own pan moves its canvas, which
+-- OpenMap mustn't set up then: no room to pan, and its fields not ours to write)
+local combatDrag                  -- { sx, sy, u, v, zoom }: where the drag began
+local function CombatDragDown(_, button)
+	if not active or button ~= "LeftButton" or not InCombatLockdown() then return end
+	local u, v, zoom = View()
+	local sx, sy = CursorOffset()
+	combatDrag = { sx = sx, sy = sy, u = u, v = v, zoom = zoom }
+	anim = nil
+end
+local function CombatDragTrack()
+	if not combatDrag then return end
+	if not IsMouseButtonDown("LeftButton") or not InCombatLockdown() then combatDrag = nil return end
+	local sx, sy = CursorOffset()
+	local dx, dy = sx - combatDrag.sx, sy - combatDrag.sy
+	if dx * dx + dy * dy > PRESS_SLOP_SQ then press.moved = true end
+	if not press.moved then return end
+	local pu, pv = PerPx(combatDrag.zoom)
+	ShowWorld(combatDrag.u - dx * pu, combatDrag.v - dy * pv, combatDrag.zoom)
+end
 
 local function OnCanvasClick(from, button)
 	-- NeedRoll draws over a world-map host: a click must not select a zone underneath it.
@@ -1229,17 +1291,31 @@ end
 -- the map was grabbed (on it or on one of our icons)
 local function OnGrab()
 	userMoved = true
-	waitingView = nil                 -- (the view is the user's again: not put back where it was as combat ends)
+	if not combatView then waitingView = nil end   -- (the view is the user's again: not put back where it was as combat ends; the combat view's is)
 	if anim and anim.mode == "glide" then anim = nil end   -- a grab stops a glide where it is
 end
 
 local function OnPinMouseDown(_, button)
+	if InCombatLockdown() then
+		PressDown(nil, button)
+		CombatDragDown(nil, button)
+		OnGrab()
+		return
+	end
 	sc:OnMouseDown(button)
 	PressDown(nil, button)
 	OnGrab()
 end
 
 local function OnPinMouseUp(pin, button)
+	if InCombatLockdown() then
+		combatDrag = nil
+		if button == "LeftButton" and not WasDrag() then
+			if Dropping(button) then DropAtCursor() return end
+			if pin.OnClick then pin:OnClick() end
+		end
+		return
+	end
 	local x, y = sc:GetCursorPosition()
 	if button ~= "LeftButton" or not sc:WouldCursorPositionBeClick(button, x, y) or WasDrag() then
 		sc:OnMouseUp(button)
@@ -1318,6 +1394,8 @@ local function Setup()
 	sc:HookScript("OnMouseWheel", OnMouseWheel)
 	sc:HookScript("OnMouseDown", OnGrab)
 	sc:HookScript("OnMouseDown", PressDown)
+	sc:HookScript("OnMouseDown", CombatDragDown)
+	sc:HookScript("OnUpdate", CombatDragTrack)
 	-- Listen directly: Blizzard's canvas click dispatcher only tracks left/right buttons.
 	sc:HookScript("OnMouseUp", function(_, button)
 		if active and button == "MiddleButton" then mod:FindMe(true) end
@@ -1426,12 +1504,14 @@ local function Setup()
 	dp.OnCanvasScaleChanged = Ours("scale changed", ApplyZoom)
 	dp.OnCanvasPanChanged = ApplyView
 	dp.OnMapChanged = function()
+		CombatViewOff()                             -- (its point was on the map before)
 		HookHighlight()                             -- (a highlight pin made since: the toggle reaches it too, #262)
 		ApplyZoom()
 		if mod.OnHostMapChanged then mod.OnHostMapChanged() end
 		if mod.RefreshPortrait then pcall(mod.RefreshPortrait) end   -- (OpenMap's icon only while stitching)
 	end
 	dp.OnHide = function()
+		CombatViewOff()
 		mod.instanceWorldBrowsing = nil
 		mod.instanceMapGeneration = (mod.instanceMapGeneration or 0) + 1
 		live = nil

@@ -1940,6 +1940,45 @@ function S.Layout(mapID)
 	return true
 end
 
+-- In combat (WorldMap.lua's combat view): Blizzard's canvas can't be scaled or scrolled from OpenMap's
+-- code then (a protected pin on it), and its fields mustn't be written (the game's code reads them, #345),
+-- so the art is moved instead: root (and the sea chart, the pins' anchors with it, all OpenMap's own
+-- frames) scaled and placed so the host map's point (x, y, normalized) is at the view's centre at canvas
+-- scale `scale`, whatever Blizzard's canvas is at. nil: back where Layout put it.
+function S.ViewAt(scale, x, y)
+	if not root then return end
+	local canvas = root:GetParent()
+	local chart = S.Chart and S.Chart.Frame()
+	if not scale then
+		root:SetScale(host.k)
+		root:ClearAllPoints()
+		root:SetPoint("TOPLEFT", canvas, "TOPLEFT", -host.l, host.t)
+		if chart then chart:SetScale(host.k) end
+		S.viewAt = nil
+		return
+	end
+	local view = canvas:GetParent()
+	local s0 = canvas:GetScale()
+	local cl, ct, ces = canvas:GetLeft(), canvas:GetTop(), canvas:GetEffectiveScale()
+	local vx, vy, ves = view:GetCenter()
+	ves = view:GetEffectiveScale()
+	if not (cl and ct and vx and s0 and s0 > 0 and ces > 0) then return end
+	-- the view's centre on the canvas (canvas units, y down), and the point wanted there
+	local c0x, c0y = (vx * ves - cl * ces) / ces, (ct * ces - vy * ves) / ces
+	local c1x, c1y = x * canvas:GetWidth(), y * canvas:GetHeight()
+	local m = scale / s0
+	local k = host.k
+	root:SetScale(k * m)
+	root:ClearAllPoints()
+	root:SetPoint("TOPLEFT", canvas, "TOPLEFT", c0x / (k * m) - host.l - c1x / k, -(c0y / (k * m) - host.t - c1y / k))
+	if chart then chart:SetScale(k * m) end
+	S.viewAt = scale
+end
+-- OpenMap's own frames on Blizzard's canvas (the art, the sea chart): left alone by the combat view's fade
+function S.OwnsCanvasFrame(f)
+	return f == root or (S.Chart and f == S.Chart.Frame()) or false
+end
+
 -- a name's lettering, built the first time it shows at all. A name is hundreds of font strings (its halo),
 -- and all of them made in one frame was a hitch on the first zoom out of a session (350 in one step, in
 -- tools/offline-test/perf.py): one name a call, the rest a moment later

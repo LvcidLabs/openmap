@@ -49,6 +49,11 @@
   painted map back over it, as if unexplored. Only the unexplored parts' own shapes are hidden now
   (#166, #156, #163, #247, #279, #370).
 
+- **Zoom and pan in combat again**: since v0.8.11 the map stood still in a fight (it waited for combat's end,
+  so the quest tracker kept working). Now OpenMap moves its own art to where you zoom or drag, touching
+  nothing of the game's map; the game's and other addons' icons on the map fade out meanwhile, and
+  everything is put back in place as combat ends.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved
