@@ -4,9 +4,11 @@
 
 ### Fixed
 
-- OpenMap uses the dungeon finder ID or the area you're in to choose the wing in Dire Maul,
-  Scarlet Monastery and Blackrock Spire. If the game gives no wing, OpenMap can reuse the last
-  confirmed wing for that dungeon after a reload or resurrection.
+- OpenMap checks the dungeon finder ID and area to choose the wing in Dire Maul, Scarlet Monastery
+  and Blackrock Spire. It also checks which portal you walked through in Dire Maul and Scarlet
+  Monastery when the loading screen starts. The last confirmed wing can be reused after a reload
+  or resurrection. Dungeon Journal can use the detected wing for its own map. When its dungeon
+  overlay is disabled, OpenMap shows its own dungeon map.
 
 ## v0.8.11 (2026-11-20)
 

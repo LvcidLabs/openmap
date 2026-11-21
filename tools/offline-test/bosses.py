@@ -63,12 +63,14 @@ class InstanceHereTests(unittest.TestCase):
         worldmap.padRoots = self.lua.table()
         worldmap.IsStitched = self.lua.eval("function() return false end")
         ns.MapStitch = self.lua.eval("{ InstanceMap = function() end, InstanceName = function(inst) return inst[2] end }")
-        path = addon / "Map" / "Dungeons.lua"
-        run(path.read_text(encoding="utf-8"), str(path), ns)
+        for name in ("DungeonJournal.lua", "Dungeons.lua"):
+            path = addon / "Map" / name
+            run(path.read_text(encoding="utf-8"), str(path), ns)
         ns.InitDB(ns)
         self.lua.globals().worldmap = worldmap
         self.lua.execute("""
             local here, lfg, subzone, minimapZone, zone
+            local playerX, playerY, playerZ, playerMap
             lfgNames = {}
             C_LFGInfo = { GetDungeonInfo = function(id) return { name = lfgNames[id] } end }
             C_Map = { GetBestMapForUnit = function() if not here then return 1444 end end,
@@ -78,6 +80,7 @@ class InstanceHereTests(unittest.TestCase):
             function GetSubZoneText() return subzone end
             function GetMinimapZoneText() return minimapZone end
             function GetZoneText() return zone end
+            function UnitPosition() return playerX, playerY, playerZ, playerMap end
 
             -- UIPanelButtonTemplate supplies this font string in the game.
             local create = CreateFrame
@@ -91,6 +94,8 @@ class InstanceHereTests(unittest.TestCase):
             end
 
             NIL_GLOBALS.ForeverDungeonJournal_NS = true
+            NIL_GLOBALS.ForeverDungeonJournalDB = true
+            NIL_GLOBALS.ForeverDungeonJournalWorldMapToggle = true
             local map = CreateFrame("Frame")
             map:Hide()
             map.ScrollContainer = CreateFrame("Frame", nil, map)
@@ -100,6 +105,12 @@ class InstanceHereTests(unittest.TestCase):
 
             function SetLocation(id, lfgID, sub, minimap, zoneText)
                 here, lfg, subzone, minimapZone, zone = id, lfgID, sub, minimap, zoneText
+            end
+            function SamplePortal(x, y, continent)
+                SetLocation()
+                playerX, playerY, playerZ, playerMap = x, y, 0, continent
+                worldmap.SampleDungeonPortal()
+                playerX, playerY, playerZ, playerMap = nil, nil, nil, 0
             end
             function Find(...)
                 SetLocation(...)
@@ -113,6 +124,42 @@ class InstanceHereTests(unittest.TestCase):
                 local view = OpenMapDungeonView
                 local floor = view.floors[view.floor]
                 return floor.name or floor.wing
+            end
+            function CloseMap() map:Hide() end
+            function EnterWestPortal()
+                SamplePortal(-3834.6001, 1250.4000, 1)
+                SetLocation(429)
+                worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+            end
+            function JournalWithMaps(current)
+                local opened, wantsWorld, canToggle
+                local refreshes = 0
+                local journal = {
+                    DB = { ['Dire Maul: East'] = {}, ['Dire Maul: West'] = {} },
+                    DUNGEON_MAPS = { ['Dire Maul: East'] = {}, ['Dire Maul: West'] = {} },
+                    OpenBossPage = function() error('opened a Journal page') end,
+                    CurrentDungeon = current,
+                    IsDungeonMapLocked = function() return false end,
+                    IsWorldMapOverlayAttached = function() return opened ~= nil end,
+                }
+                function journal.RefreshWorldMapOverlay()
+                    refreshes = refreshes + 1
+                    local key = journal.CurrentDungeon()
+                    local enabled = not ForeverDungeonJournalDB or ForeverDungeonJournalDB.worldMapOverlay ~= false
+                    canToggle = enabled and key and journal.DUNGEON_MAPS[key] and not journal.IsDungeonMapLocked(key)
+                    opened = not wantsWorld and canToggle and key or nil
+                end
+                local toggle = {
+                    IsVisible = function() return map:IsShown() and not not canToggle end,
+                    Click = function()
+                        wantsWorld = not wantsWorld
+                        journal.RefreshWorldMapOverlay()
+                    end,
+                }
+                map:HookScript('OnShow', journal.RefreshWorldMapOverlay)
+                map:HookScript('OnHide', function() opened, canToggle = nil, nil end)
+                ForeverDungeonJournal_NS, ForeverDungeonJournalWorldMapToggle = journal, toggle
+                return journal, toggle, function() return opened end, function() return refreshes end
             end
         """)
 
@@ -165,6 +212,95 @@ class InstanceHereTests(unittest.TestCase):
         self.lua.execute('worldmap.char.dungeonWing = { 429, "Scarlet Monastery - Armory" }')
         self.assertEqual(self.lua.eval("Find(429)"), "Dire Maul - East")
 
+    def test_loading_screen_portal_confirms_dire_maul_wing_on_entry(self):
+        # Forever traces at LOADING_SCREEN_ENABLED, before the outdoor position disappeared.
+        for x, y, wing, floor in (
+            (-3834.6001, 1250.4000, "Dire Maul - West", "Capital Gardens"),
+            (-3520.2000, 1074.4000, "Dire Maul - North", "Gordok Commons"),
+        ):
+            with self.subTest(wing=wing):
+                self.lua.execute('worldmap.char.dungeonWing = { 429, "Dire Maul - East" }')
+                self.lua.globals().SamplePortal(x, y, 1)
+                self.assertEqual(self.lua.eval("worldmap.char.dungeonWing[2]"), "Dire Maul - East")
+                self.lua.execute("""
+                    FireEvent("PLAYER_LEAVING_WORLD")
+                    SetLocation(429)
+                    worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+                """)
+                self.assertEqual(self.lua.eval("worldmap.char.dungeonWing[2]"), wing)
+                self.assertEqual(self.lua.eval("Find(429)"), wing)
+                self.assertEqual(self.lua.eval("ShownFloor()"), floor)
+
+    def test_loading_screen_portal_can_wait_for_the_instance_id(self):
+        self.lua.execute("""
+            SamplePortal(2925.18, -820.545, 0)
+            RunTimers(5)
+            SetLocation(0)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+            assert(worldmap.char.dungeonWing == nil, "confirmed before the instance ID was ready")
+            SetLocation(189)
+            worldmap.NoteDungeonWing("LOADING_SCREEN_DISABLED")
+        """)
+        self.assertEqual(self.lua.eval("Find(189)"), "Scarlet Monastery - Cathedral")
+        self.assertEqual(self.lua.eval("ShownFloor()"), "Cathedral")
+
+    def test_loading_screen_can_close_first_but_the_sample_expires(self):
+        enter = self.lua.eval("""function(delay)
+            worldmap.char.dungeonWing = nil
+            SamplePortal(-3520.2, 1074.4, 1)
+            worldmap.NoteDungeonWing("LOADING_SCREEN_DISABLED")
+            RunTimers(delay)
+            SetLocation(429)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+            return worldmap.char.dungeonWing and worldmap.char.dungeonWing[2]
+        end""")
+        self.assertEqual(enter(0), "Dire Maul - North")
+        self.assertIsNone(enter(2.1))
+        self.assertEqual(self.lua.eval("Find(429)"), "Dire Maul - East")
+
+    def test_login_and_reload_discard_a_pending_portal_and_keep_the_saved_wing(self):
+        enter = self.lua.eval("""function(initialLogin, reloading)
+            worldmap.char.dungeonWing = { 429, "Dire Maul - West" }
+            SamplePortal(-3520.2, 1074.4, 1)
+            SetLocation(429)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", initialLogin, reloading)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+            return Find(429)
+        end""")
+        for initial_login, reloading in ((True, False), (False, True)):
+            with self.subTest(initial_login=initial_login, reloading=reloading):
+                self.assertEqual(enter(initial_login, reloading), "Dire Maul - West")
+
+    def test_portal_for_a_different_instance_cannot_leak_into_later_entry(self):
+        self.lua.execute("""
+            SamplePortal(-3520.2, 1074.4, 1)
+            SetLocation(36)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+            worldmap.NoteDungeonWing("LOADING_SCREEN_DISABLED")
+            SetLocation(429)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+        """)
+        self.assertIsNone(self.lua.eval("worldmap.char.dungeonWing"))
+        self.assertEqual(self.lua.eval("Find(429)"), "Dire Maul - East")
+
+    def test_loading_screen_without_a_portal_clears_previous_sample(self):
+        self.lua.execute("""
+            SamplePortal(-3520.2, 1074.4, 1)
+            worldmap.SampleDungeonPortal()  -- A new loading screen with no usable outdoor position.
+            SetLocation(429)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+        """)
+        self.assertIsNone(self.lua.eval("worldmap.char.dungeonWing"))
+        self.assertEqual(self.lua.eval("Find(429)"), "Dire Maul - East")
+
+    def test_live_evidence_still_takes_priority_over_portal(self):
+        self.lua.execute("""
+            SamplePortal(-3520.2, 1074.4, 1)
+            SetLocation(429, 35)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
+        """)
+        self.assertEqual(self.lua.eval("Find(429)"), "Dire Maul - West")
+
     def test_journal_owns_the_map_for_the_resolved_wing(self):
         self.lua.execute("""
             local current = function() return "Dire Maul: West" end
@@ -177,6 +313,105 @@ class InstanceHereTests(unittest.TestCase):
             assert(Find(429, 35) == nil, "OpenMap covered Journal's map")
             assert(ForeverDungeonJournal_NS.CurrentDungeon == current, "replaced Journal's lookup")
             assert(Find(429, 37) == "Dire Maul - North", "Journal has no page for this wing")
+        """)
+
+    def test_portal_wing_opens_journals_map_and_preserves_its_toggle_on_reopen(self):
+        self.lua.execute("""
+            local journal, toggle, shown = JournalWithMaps(function(arg) return nil, arg end)
+            EnterWestPortal()
+            assert(Find(429) == nil, 'OpenMap covered the Journal map')
+            assert(shown() == 'Dire Maul: West', 'Journal could not open the portal-confirmed wing')
+            toggle:Click()
+            assert(shown() == nil and toggle:IsVisible(), 'World Map lost the Dungeon Map return button')
+
+            CloseMap()
+            local key, arg = journal.CurrentDungeon('closed')
+            assert(key == nil and arg == 'closed', 'closed map did not delegate the Journal lookup')
+            assert(Find(429) == nil and shown() == nil and toggle:IsVisible(), 'reopening lost the World Map choice')
+            toggle:Click()
+            assert(shown() == 'Dire Maul: West', 'Dungeon Map did not return to the confirmed wing')
+            assert(Find(429) == nil and shown() == 'Dire Maul: West', 'reopening lost the Journal dungeon map')
+
+            worldmap.db.dungeonInside = false
+            key, arg = journal.CurrentDungeon('game map')
+            assert(key == nil and arg == 'game map', "The game's map did not delegate the Journal lookup")
+            worldmap.db.dungeonInside = true
+            SetLocation(36)
+            key, arg = journal.CurrentDungeon('other instance')
+            assert(key == nil and arg == 'other instance', 'the portal wing leaked into another instance')
+            SetLocation()
+            key, arg = journal.CurrentDungeon('outdoors')
+            assert(key == nil and arg == 'outdoors', 'the portal wing leaked outdoors')
+        """)
+
+    def test_journal_overlay_disabled_uses_openmaps_dungeon_view(self):
+        self.lua.execute("""
+            local _, toggle, shown = JournalWithMaps(function() return 'Dire Maul: East' end)
+            ForeverDungeonJournalDB = { worldMapOverlay = false }
+            EnterWestPortal()
+            assert(Find(429) == 'Dire Maul - West', 'OpenMap did not show the confirmed wing')
+            assert(ShownFloor() == 'Capital Gardens', 'OpenMap opened the wrong floor')
+            assert(shown() == nil and not toggle:IsVisible(), 'Journal showed its disabled overlay')
+
+            worldmap.db.dungeonInside = false
+            assert(Find(429) == nil and shown() == nil, 'OpenMap ignored its own dungeon map setting')
+
+            worldmap.db.dungeonInside = true
+            ForeverDungeonJournalDB.worldMapOverlay = true
+            assert(Find(429) == nil and shown() == 'Dire Maul: West', 'Journal did not regain the dungeon map')
+        """)
+
+    def test_portal_wing_corrects_journals_locked_guess_for_a_different_wing(self):
+        self.lua.execute("""
+            local journal, _, shown = JournalWithMaps(function() return 'Dire Maul: East' end)
+            function journal.IsDungeonMapLocked(key) return key == 'Dire Maul: East' end
+            EnterWestPortal()
+            assert(Find(429) == nil and shown() == 'Dire Maul: West', 'a different wing lock kept Journal on the world map')
+        """)
+
+    def test_journal_refreshes_for_late_confirmation_but_not_on_unchanged_reopens(self):
+        self.lua.execute("""
+            local _, _, shown, refreshes = JournalWithMaps(function() return 'Dire Maul: East' end)
+            SamplePortal(-3834.6001, 1250.4000, 1)
+            assert(Find(429) == nil and shown() == 'Dire Maul: East' and refreshes() == 1)
+
+            worldmap.NoteDungeonWing('PLAYER_ENTERING_WORLD', false, false)
+            assert(shown() == 'Dire Maul: West' and refreshes() == 2, 'open map missed the confirmed wing')
+            worldmap.NoteDungeonWing('LOADING_SCREEN_DISABLED')
+            assert(refreshes() == 2, 'unchanged wing was refreshed again')
+
+            for expected = 3, 4 do
+                assert(Find(429) == nil and shown() == 'Dire Maul: West')
+                assert(refreshes() == expected, 'reopening refreshed the same wing twice')
+            end
+        """)
+
+    def test_saved_wing_preserves_journals_native_wing(self):
+        self.lua.execute("""
+            local _, _, shown = JournalWithMaps(function() return 'Dire Maul: East' end)
+            worldmap.char.dungeonWing = { 429, 'Dire Maul - West' }
+            assert(Find(429) == nil and shown() == 'Dire Maul: East', 'saved wing replaced the native map')
+        """)
+
+    def test_journal_preserves_native_lock_with_saved_wing_and_resolved_lock_with_portal_wing(self):
+        self.lua.execute("""
+            local native, locked = 'Dire Maul: East', 'Dire Maul: East'
+            local journal, _, shown = JournalWithMaps(function() return native end)
+            function journal.IsDungeonMapLocked(key) return key == locked end
+            worldmap.char.dungeonWing = { 429, 'Dire Maul - West' }
+            assert(Find(429) == nil and shown() == nil, 'a saved wing bypassed the native Journal map lock')
+
+            CloseMap()
+            native, locked = nil, 'Dire Maul: West'
+            EnterWestPortal()
+            assert(Find(429) == nil and shown() == nil, 'a portal-confirmed wing bypassed its own Journal map lock')
+        """)
+
+    def test_unconfirmed_default_does_not_become_journals_wing(self):
+        self.lua.execute("""
+            local journal, _, shown = JournalWithMaps(function() end)
+            Find(429)
+            assert(shown() == nil and journal.CurrentDungeon() == nil, 'Journal received a guessed default wing')
         """)
 
     def test_game_map_button_keeps_inside_maps_off(self):
@@ -193,10 +428,10 @@ class InstanceHereTests(unittest.TestCase):
     def test_no_portal_ticker(self):
         self.lua.execute("""
             FireEvent("ZONE_CHANGED_NEW_AREA")
+            SamplePortal(-3520.2, 1074.4, 1)
             FireEvent("PLAYER_LEAVING_WORLD")
-            SetLocation(429, 35)
-            FireEvent("PLAYER_ENTERING_WORLD")
-            worldmap.NoteDungeonWing()
+            SetLocation(429)
+            worldmap.NoteDungeonWing("PLAYER_ENTERING_WORLD", false, false)
             for _, timer in ipairs(TIMERS) do
                 assert(not timer.every, "created a recurring dungeon timer")
             end

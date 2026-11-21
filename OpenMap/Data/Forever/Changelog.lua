@@ -5,7 +5,7 @@ local _, ns = ...
 
 ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", }, items = {
-		"OpenMap uses the dungeon finder ID or the area you're in to choose the wing in Dire Maul, Scarlet Monastery and Blackrock Spire. If the game gives no wing, OpenMap can reuse the last confirmed wing for that dungeon after a reload or resurrection.",
+		"OpenMap checks the dungeon finder ID and area to choose the wing in Dire Maul, Scarlet Monastery and Blackrock Spire. It also checks which portal you walked through in Dire Maul and Scarlet Monastery when the loading screen starts. The last confirmed wing can be reused after a reload or resurrection. Dungeon Journal can use the detected wing for its own map. When its dungeon overlay is disabled, OpenMap shows its own dungeon map.",
 	} },
 	{ version = "v0.8.11", date = "2026-11-20", heads = { [1] = "Improved", [4] = "Fixed", [15] = "Also", }, items = {
 		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",
