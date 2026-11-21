@@ -661,16 +661,15 @@ local function RaisePlayer()
 	local baseStrata = (sc.GetFrameStrata and sc:GetFrameStrata()) or "MEDIUM"
 	local onTop = active and mod.db.playerArrowOnTop
 	local strata = onTop and (STRATA_ABOVE[baseStrata] or baseStrata) or baseStrata
-	local level = onTop and 9990 or math.min(sc:GetFrameLevel() + PLAYER_ABOVE, 9500)
+	local level = math.min(sc:GetFrameLevel() + PLAYER_ABOVE, 9500)
 	for pin in map:EnumeratePinsByTemplate("GroupMembersPinTemplate") do
 		if not Locked(pin) then
-			if pin.SetFrameStrata and pin:GetFrameStrata() ~= strata then pcall(pin.SetFrameStrata, pin, strata) end
 			if pin:GetFrameLevel() ~= level then pin:SetFrameLevel(level) end
 			Blips(pin)
 			LayerGroupBlips(pin)
 		end
 	end
-	S.RaiseArrow(level + 1, strata)
+	S.RaiseArrow(onTop and 9990 or (level + 1), strata)
 	if mod.RefreshNativeRingLayout then mod.RefreshNativeRingLayout() end
 end
 
@@ -1460,10 +1459,6 @@ local function Setup()
 	dp.OnMapChanged = function()
 		HookHighlight()                             -- (a highlight pin made since: the toggle reaches it too, #262)
 		ApplyZoom()
-		if active then
-			RaisePlayer()
-			C_Timer.After(0, function() if active and map:IsShown() then RaisePlayer() end end)
-		end
 		if mod.OnHostMapChanged then mod.OnHostMapChanged() end
 		if mod.RefreshPortrait then pcall(mod.RefreshPortrait) end   -- (OpenMap's icon only while stitching)
 	end
@@ -2007,8 +2002,8 @@ function mod:Options()
 			desc = ns.L["In dungeons, raids and battlegrounds, temporarily hide OpenMap's friends, guild, transport and world quest markers. Party and raid members and other addons' maps and markers stay visible. Your marker settings are kept."] },
 		playerArrow = { type = "toggle", name = ns.L["Your arrow"], order = 33, get = get, set = set, disabled = off,
 			desc = ns.L["Your own arrow on the world map. Off, you find your way old-school, by the land around you; your party still shows, and so does the minimap."] },
-		playerArrowOnTop = { type = "toggle", name = ns.L["Your arrow on top"], order = 33.1, get = get, set = set, disabled = off,
-			desc = ns.L["Draw your player arrow in a higher strata so other addons' map icons cannot cover it."] },
+		playerArrowOnTop = { type = "toggle", name = ns.L["Your arrow over everything"], order = 33.1, get = get, set = set, disabled = off,
+			desc = ns.L["Draw your own arrow above every other addon's icons and pins on the map."] },
 	}
 	if mod.ExtraOptions then mod:ExtraOptions(opts, get, set, off) end
 	if mod.NavOptions then mod:NavOptions(opts, get, set, off) end
