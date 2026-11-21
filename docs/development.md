@@ -53,6 +53,7 @@ AI coding agents: read [AGENTS.md](../AGENTS.md) too.
    python -P tools/offline-test/version.py  # a newer OpenMap out: which versions heard count, told once a session; Pins.lua's "V1"
    python -P tools/offline-test/combatmap.py  # the map in a fight: your arrow OpenMap's own, a view Blizzard reset put back as combat ends
    python -P tools/offline-test/warm.py     # keep-warm: the files held while the map is closed (Stitch.lua, Extras.lua)
+   python -P tools/offline-test/window.py   # the window: the quest log's spacer and the clamp, laid out in order (Window.lua)
    python -P tools/offline-test/bosses.py   # boss pins' data: each on one of its dungeon's floors, on the picture
    python -P tools/offline-test/perf.py     # a zoom out's work: regions drawn, anchored, touched and made per step, against budgets (docs/performance.md)
    python -P tools/offline-test/questie.py  # Questie's icons found as a LibStub library (to 12.7) and a module (12.8)

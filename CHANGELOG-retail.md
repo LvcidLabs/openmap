@@ -58,6 +58,9 @@
 - **The map opens quicker**: as it opened, every set of icons was laid out for the whole world and then
   again for your view; once now (#293, measured by protella: the opening 384 ms to 45).
 
+- **The windowed quest log sits beside the map**: it covered part of the map until the window was laid out
+  again; and a window resized by its corner stays on the screen (#327). By gOOvER.
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved
