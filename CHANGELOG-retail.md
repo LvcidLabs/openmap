@@ -1,8 +1,15 @@
 # OpenMap changelog
 
-## Unreleased
+## v0.8.12 (2026-11-21)
 
 ### Improved
+
+- **The map works in a fight**: since v0.8.11 the map stood still in combat (the game's map can't be moved
+  by an addon then without breaking the quest tracker, #345). In a fight OpenMap's map now moves onto frames
+  of its own, over the game's, which is left as it is: zoom, drag, click and resize it as usual, with your
+  arrow, your party and raid, your quests and their areas, the name of the place under the cursor, Questie's
+  and other addons' map icons, and Ctrl-click's waypoint. As the fight ends it all goes back on the game's
+  map, where you left it (#386, #389). (New files: restart the game after updating, a /reload isn't enough.)
 
 - **German reads better**: missing German texts filled in and others reworded, in the game's own terms.
   By gOOvER.
@@ -22,13 +29,14 @@
 - **Your arrow, bigger if you like**: Options' "Arrow size" (100% as before) and "Your arrow over
   everything", which lifts OpenMap's arrow over every icon on the map (#329). By gOOvER.
 
-- **Zoom, drag and click the map in a fight**: since v0.8.11 the map stood still in combat (the game's map
-  can't be moved from an addon then without breaking the quest tracker). In a fight OpenMap's map now moves
-  onto frames of its own, over the game's, with its icons, your arrow, your party, your quests and
-  Questie's and other addons' map icons; the game's map is left as it is under it, and everything goes back
-  on it as the fight ends.
-
 ### Fixed
+
+- **No stutter when the map opens**: since v0.8.11 every set of icons was laid out twice as the map opened,
+  for the whole world and then for your view; once now, as in v0.8.10 (#293, measured by protella: the
+  opening 384 ms to 45).
+
+- **A resized window keeps its view**: since v0.8.11 dragging the window's corner zoomed the map out to the
+  whole continent; the place you were looking at stays put now, at the same scale.
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view
   all read where you are the same careful way, so a hidden position in combat or in a restricted instance
@@ -51,12 +59,6 @@
   painted map back over it, as if unexplored. Only the unexplored parts' own shapes are hidden now
   (#166, #156, #163, #247, #279, #370).
 
-- **Your arrow stays on the map in combat**: the game's own arrow can't be lifted over OpenMap's map in a
-  fight and slipped under it; OpenMap draws its own there now.
-
-- **After a fight the map is where you left it**: the quest log opened from the tracker in combat left the
-  map zoomed out on its whole zone until it was opened again; OpenMap's view comes back as combat ends.
-
 - **Appear Offline keeps your place to yourself**: with Battle.net's Appear Offline on, OpenMap sends your
   friends and guild nothing (not your place, not even a hello), and tells them to stop showing where you
   were (#395).
@@ -64,8 +66,8 @@
 - **Questie's quest icons over a town's icons**: a quest under a vendor, trainer or flight master's icon
   was hidden; Questie's quests now go over every icon of OpenMap's (#393).
 
-- **The map opens quicker**: as it opened, every set of icons was laid out for the whole world and then
-  again for your view; once now (#293, measured by protella: the opening 384 ms to 45).
+- **No "newer OpenMap" notice from test builds**: a test build or a beta no longer tells others it's a newer
+  version; only releases do.
 
 - **The windowed quest log sits beside the map**: it covered part of the map until the window was laid out
   again; and a window resized by its corner stays on the screen (#327). By gOOvER.
