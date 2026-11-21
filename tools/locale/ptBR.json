@@ -566,5 +566,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "sua posição lida com segurança, o mapa de masmorra maximizado, o mapa do Cárcere e o alemão",
  "Right-click zooms out": "Clique direito afasta o zoom",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Um clique direito no mapa sai para a zona ou o continente ao redor. Desligado, o clique direito fica para o mapa e outros addons (os objetivos do Questie); a saída pelo menu continua funcionando.",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "os blocos das zonas pré-renderizados em português do Brasil, menos trabalho com o mapa fechado ou em movimento, e a arte pronta antes de ele abrir"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "os blocos das zonas pré-renderizados em português do Brasil, menos trabalho com o mapa fechado ou em movimento, e a arte pronta antes de ele abrir",
+ "Arrow size": "Tamanho da seta",
+ "Your own arrow on the world map at this size.": "Sua própria seta no mapa-múndi neste tamanho.",
+ "Your arrow over everything": "Sua seta acima de tudo",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "Desenha sua própria seta acima dos ícones e marcadores de qualquer outro addon no mapa."
 }

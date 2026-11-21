@@ -566,5 +566,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "安全讀取你的位置、最大化的地城地圖、監獄的地圖，以及德文",
  "Right-click zooms out": "右鍵縮小",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "在地圖上按右鍵會退到周圍的區域或大陸。關閉後，右鍵交給地圖和其他插件（Questie 的任務目標）；透過選單退出仍然可用。",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "以巴西葡萄牙語預先算繪的區域圖塊、地圖關閉或移動時更少的運算，以及開啟前就已準備好的地圖圖像"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "以巴西葡萄牙語預先算繪的區域圖塊、地圖關閉或移動時更少的運算，以及開啟前就已準備好的地圖圖像",
+ "Arrow size": "箭頭大小",
+ "Your own arrow on the world map at this size.": "世界地圖上你自己的箭頭依此大小顯示。",
+ "Your arrow over everything": "箭頭置於最上層",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "將你自己的箭頭繪製在地圖上所有其他插件的圖示和標記之上。"
 }

@@ -570,5 +570,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "sicheres Auslesen Eurer Position, die maximierte Dungeonkarte, die Karte des Verlieses und Deutsch",
  "Right-click zooms out": "Rechtsklick zoomt heraus",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Ein Rechtsklick auf die Karte geht eine Stufe hinaus zur umgebenden Zone oder zum Kontinent. Aus: Der Rechtsklick bleibt der Karte und anderen Addons (Questies Questziele); der Weg hinaus über das Menü funktioniert weiterhin.",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "die vorgerenderten Zonenkacheln auf brasilianischem Portugiesisch, weniger Arbeit bei geschlossener oder bewegter Karte und ihre Grafik bereit, bevor sie sich öffnet"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "die vorgerenderten Zonenkacheln auf brasilianischem Portugiesisch, weniger Arbeit bei geschlossener oder bewegter Karte und ihre Grafik bereit, bevor sie sich öffnet",
+ "Arrow size": "Pfeilgröße",
+ "Your own arrow on the world map at this size.": "Euer eigener Pfeil auf der Weltkarte in dieser Größe.",
+ "Your arrow over everything": "Euer Pfeil über allem",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "Zeichnet Euren eigenen Pfeil über allen Symbolen und Markierungen anderer Addons auf der Karte."
 }

@@ -566,5 +566,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "안전한 위치 읽기, 최대화된 던전 지도, 스톰윈드 지하감옥 지도, 독일어",
  "Right-click zooms out": "오른쪽 클릭으로 축소",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "지도를 오른쪽 클릭하면 주변 지역이나 대륙으로 한 단계 나갑니다. 끄면 오른쪽 클릭은 지도와 다른 애드온(Questie의 목표)에 맡겨지며, 메뉴로 나가는 방법은 그대로 작동합니다.",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "브라질 포르투갈어로 미리 렌더링한 지역 타일, 지도를 닫았거나 움직일 때 줄어든 작업, 그리고 열기 전에 준비되는 지도 그림"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "브라질 포르투갈어로 미리 렌더링한 지역 타일, 지도를 닫았거나 움직일 때 줄어든 작업, 그리고 열기 전에 준비되는 지도 그림",
+ "Arrow size": "화살표 크기",
+ "Your own arrow on the world map at this size.": "세계 지도에 표시되는 내 화살표의 크기입니다.",
+ "Your arrow over everything": "내 화살표를 항상 맨 위에 표시",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "지도의 다른 모든 애드온 아이콘과 핀 위에 내 화살표를 그립니다."
 }

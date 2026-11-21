@@ -566,5 +566,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "безопасное чтение вашего положения, развёрнутая карта подземелья, карта Тюрьмы и немецкий язык",
  "Right-click zooms out": "Правый щелчок отдаляет",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Правый щелчок по карте выходит на окружающую зону или континент. Если выключено, правый щелчок остаётся карте и другим модификациям (целям Questie); выход через меню по-прежнему работает.",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "заранее отрисованные тайлы зон на бразильском португальском, меньше работы, пока карта закрыта или движется, и её изображение, готовое ещё до открытия"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "заранее отрисованные тайлы зон на бразильском португальском, меньше работы, пока карта закрыта или движется, и её изображение, готовое ещё до открытия",
+ "Arrow size": "Размер стрелки",
+ "Your own arrow on the world map at this size.": "Ваша стрелка на карте мира в этом размере.",
+ "Your arrow over everything": "Ваша стрелка поверх всего",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "Отображает вашу стрелку поверх значков и меток любых других аддонов на карте."
 }

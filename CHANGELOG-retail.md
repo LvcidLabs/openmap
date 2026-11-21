@@ -19,6 +19,9 @@
 - **The game's map-pin button works on the stitched map**: armed, a click on the map drops your pin there,
   as on the game's own map (#324). By gOOvER.
 
+- **Your arrow, bigger if you like**: Options' "Arrow size" (100% as before) and "Your arrow over
+  everything", which lifts OpenMap's arrow over every icon on the map (#329). By gOOvER.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view

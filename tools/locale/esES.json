@@ -566,5 +566,9 @@
  "your position read safely, the maximized dungeon map, the Stockade's map, and German": "tu posición leída con seguridad, el mapa de mazmorra maximizado, el mapa de Las Mazmorras y el alemán",
  "Right-click zooms out": "Clic derecho aleja el zoom",
  "Right-click on the map steps out to the zone or continent around it. Off, right-click is left to the map and other addons (Questie's objectives); the menu's way out still works.": "Un clic derecho en el mapa sale a la zona o el continente que lo rodea. Desactivado, el clic derecho queda para el mapa y otros accesorios (los objetivos de Questie); la salida desde el menú sigue funcionando.",
- "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "las teselas de las zonas prerrenderizadas en portugués de Brasil, menos trabajo con el mapa cerrado o en movimiento, y su arte lista antes de abrirlo"
+ "the zones' tiles baked in Brazilian Portuguese, less work while the map is closed or moving, and its art ready before it opens": "las teselas de las zonas prerrenderizadas en portugués de Brasil, menos trabajo con el mapa cerrado o en movimiento, y su arte lista antes de abrirlo",
+ "Arrow size": "Tamaño de la flecha",
+ "Your own arrow on the world map at this size.": "Tu propia flecha en el mapa del mundo a este tamaño.",
+ "Your arrow over everything": "Tu flecha por encima de todo",
+ "Draw your own arrow above every other addon's icons and pins on the map.": "Dibuja tu propia flecha por encima de los iconos y marcadores de cualquier otro addon en el mapa."
 }

@@ -56,6 +56,7 @@ python -P tools/offline-test/version.py
 python -P tools/offline-test/combatmap.py
 python -P tools/offline-test/warm.py
 python -P tools/offline-test/window.py
+python -P tools/offline-test/arrow.py
 python -P tools/offline-test/questie.py
 python -P tools/offline-test/quests.py
 python -P tools/offline-test/bosses.py
