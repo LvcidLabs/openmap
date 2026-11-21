@@ -51,7 +51,7 @@ AI coding agents: read [AGENTS.md](../AGENTS.md) too.
    python -P tools/offline-test/friends.py  # friends and guild on the map: what Friends.lua hears and sends
    python -P tools/offline-test/padfriends.py  # the controller view: friends and guild set up with it, A on an icon with nothing to press
    python -P tools/offline-test/version.py  # a newer OpenMap out: which versions heard count, told once a session; Pins.lua's "V1"
-   python -P tools/offline-test/combatview.py  # zoom and pan in a fight: nothing of Blizzard's map written, OpenMap's art moved to the view (S.ViewAt)
+   python -P tools/offline-test/combatmap.py  # the map in a fight: your arrow OpenMap's own, a view Blizzard reset put back as combat ends
    python -P tools/offline-test/bosses.py   # boss pins' data: each on one of its dungeon's floors, on the picture
    python -P tools/offline-test/perf.py     # a zoom out's work: regions drawn, anchored, touched and made per step, against budgets (docs/performance.md)
    python -P tools/offline-test/questie.py  # Questie's icons found as a LibStub library (to 12.7) and a module (12.8)
