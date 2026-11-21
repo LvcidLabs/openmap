@@ -614,6 +614,14 @@ end
 local playerBlipSizes = setmetatable({}, { __mode = "k" })
 local function ScalePlayerBlip(pin)
 	if not pin.SetPinSize or Locked(pin) or InCombatLockdown() then return end   -- (nothing of Blizzard's set in a fight)
+	-- (OpenMap's own arrow, in a fight and off the map underneath, the size of Blizzard's on screen: its size for
+	-- the player, before the arrow-size setting, which both take; they differed as combat came and went)
+	do
+		local dp = pin.dataProvider
+		local base = dp and dp.GetUnitPinSizesTable and dp:GetUnitPinSizesTable()
+		base = base and tonumber(base.player)
+		if base and base > 0 and S.SetPlayerBase then S.SetPlayerBase(base) end
+	end
 	if active and BlipOff("player") then
 		playerBlipSizes[pin] = nil
 		return

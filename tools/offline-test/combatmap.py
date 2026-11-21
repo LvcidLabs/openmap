@@ -99,5 +99,31 @@ class CombatEndTests(unittest.TestCase):
         v = self.lua.eval("view")
         self.assertEqual((v.scale, v.x, v.y), (1, 0.5, 0.5))
 
+
+class ArrowSizeTests(unittest.TestCase):
+    """OpenMap's arrow (in a fight) the size of Blizzard's on screen (out of it): Blizzard's size for the player
+    times the arrow-size setting, both on the map's view at scale 1"""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        stitch = (Path(__file__).resolve().parents[2] / "OpenMap" / "Map" / "Stitch.lua").read_text(encoding="utf-8")
+        chunks = [re.search(r"\nfunction %s\(.*?\nend\n" % n, stitch, re.S).group(0) for n in (r"S\.SetPlayerScale", r"S\.SetPlayerBase")]
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            S = {}
+            arrow = { SetSize = function(self, w, h) self.w, self.h = w, h end }
+        """ + "".join(chunks))
+
+    def test_same_size_as_blizzards(self):
+        # (Blizzard's: its size for the player, 36, times the setting, 1.5, on screen)
+        self.lua.execute("S.SetPlayerBase(36) S.SetPlayerScale(1.5)")
+        self.assertEqual(self.lua.eval("arrow.w"), 36 * 1.5)
+        self.lua.execute("S.SetPlayerScale(1)")
+        self.assertEqual(self.lua.eval("arrow.w"), 36)
+
+    def test_28_before_blizzards_is_known(self):
+        self.lua.execute("S.playerScale = 1 S.SetPlayerScale(2)")
+        self.assertEqual(self.lua.eval("arrow.w"), 56)
+
 if __name__ == "__main__":
     unittest.main()

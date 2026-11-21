@@ -91,9 +91,12 @@ class ArrowTests(unittest.TestCase):
         }
         ns.MapStitch = S
         ''')
-        # Verify Stitch.lua actually uses 28 * ps and 28 * k (not 42)
-        self.assertIn("arrow:SetSize(28 * ps, 28 * ps)", stitch_src)
-        self.assertIn("arrow:SetSize(28 * k, 28 * k)", stitch_src)
+        # Verify Stitch.lua keeps 28 px as 100% (not 42), or Blizzard's own size for the player once known,
+        # so OpenMap's arrow and Blizzard's are the same on screen in and out of combat
+        self.assertIn("local ps, px = S.playerScale or 1, S.playerBase or 28", stitch_src)
+        self.assertIn("arrow:SetSize(px * ps, px * ps)", stitch_src)
+        self.assertIn("local px = S.playerBase or 28", stitch_src)
+        self.assertIn("arrow:SetSize(px * k, px * k)", stitch_src)
         self.assertNotIn("42 * ps", stitch_src)
         self.assertNotIn("42 * k", stitch_src)
 
