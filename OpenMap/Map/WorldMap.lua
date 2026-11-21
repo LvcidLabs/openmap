@@ -704,9 +704,12 @@ ticker:SetScript("OnUpdate", function(_, elapsed)
 	end
 	local mapID = map:GetMapID()
 
-	-- the player, when the map underneath can't show them
+	-- the player, when the map underneath can't show them; and in a fight, always OpenMap's own arrow: Blizzard's
+	-- (its group members pin) is protected then, so it can't be lifted over the art again as Blizzard reuses it
+	-- (it went under the art and the arrow was gone), and it stays where the canvas has it while the combat
+	-- view moves the art (CombatViewOff). OpenMap's hangs in the art and is lifted with S.RaiseArrow
 	local _, mx, my = ns.Safe.PlayerPos(mapID)
-	if mx and my then
+	if mx and my and not InCombatLockdown() and not combatView then
 		S.SetPlayer(nil)
 	else
 		local best, x, y = ns.Safe.PlayerPos()

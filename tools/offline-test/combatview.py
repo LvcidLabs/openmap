@@ -61,6 +61,26 @@ class CombatBranchTests(unittest.TestCase):
             self.assertNotRegex(fight.group(1), r"\bsc\s*[.:]", name)
 
 
+class ArrowInCombatTests(unittest.TestCase):
+    """In a fight your arrow is OpenMap's own, placed in the art: Blizzard's (its group members pin) is
+    protected then, can't be lifted over the art again as Blizzard reuses it, and stays where the canvas has
+    it while the combat view moves the art (the arrow went missing in combat)"""
+
+    def test_openmaps_arrow_in_combat_and_in_the_combat_view(self):
+        m = re.search(r"local _, mx, my = ns\.Safe\.PlayerPos\(mapID\)\n\tif (.*?) then\n\t\tS\.SetPlayer\(nil\)", WORLDMAP)
+        self.assertIsNotNone(m, "the ticker's arrow choice")
+        self.assertIn("not InCombatLockdown()", m.group(1))
+        self.assertIn("not combatView", m.group(1))
+
+    def test_arrow_placed_on_the_art_at_the_views_scale(self):
+        # (on root's corner, which S.ViewAt moves, at the scale ApplyZoom gives: the combat view's in a fight)
+        body = chunk(STITCH, "S.PlacePlayer")
+        self.assertIn('arrow:SetPoint("CENTER", root, "TOPLEFT"', body)
+        self.assertIn("scaleNow", body)
+        apply = re.search(r"\nApplyZoom = function\(\)\n(.*?)\nend\n", WORLDMAP, re.S).group(1)
+        self.assertIn("CanvasScale()", apply)
+
+
 class ViewAtTests(unittest.TestCase):
     """S.ViewAt: the host map's point (x, y) at the view's centre at canvas scale `scale`"""
 
