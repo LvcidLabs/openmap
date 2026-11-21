@@ -59,6 +59,7 @@ class CtrlClickTests(unittest.TestCase):
             function Stitchable() return true end
             function FitZoom() return 2 end
             function GlideTo() glided = glided + 1 end
+            ns, tinsert = {}, table.insert
         """)
         chunk = SOURCE[SOURCE.index('local function Dropping('):SOURCE.index('-- our icons: a press')]
         self.lua.execute(chunk + '\n_G.OnCanvasClick = OnCanvasClick\n')
@@ -76,6 +77,18 @@ class CtrlClickTests(unittest.TestCase):
 
     def test_plain_click_still_zooms_when_turned_off(self):
         self.check("mod.db.ctrlClickPin = false assert(OnCanvasClick(true, 'LeftButton') == true) assert(glided == 1)")
+
+    def test_right_click_zooms_out_by_default(self):
+        self.check("assert(OnCanvasClick(true, 'RightButton') == true) assert(glided == 1)")
+
+    def test_right_click_passes_on_when_turned_off(self):
+        # (#117: Questie's objectives take right-clicks)
+        self.check("mod.db.rightClickOut = false "
+                   "assert(OnCanvasClick(true, 'RightButton') == false, 'the right-click was kept from other addons') "
+                   "assert(glided == 0)")
+
+    def test_controller_b_still_steps_out_when_turned_off(self):
+        self.check("mod.db.rightClickOut = false assert(OnCanvasClick(nil, 'RightButton') == true) assert(glided == 1)")
 
 
 if __name__ == '__main__':

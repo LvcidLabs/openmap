@@ -4,10 +4,12 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [4] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [6] = "Fixed", }, items = {
 		"|cff6e2c0aShow places to explore|r (the map's menu and Options, off until turned on): for each zone's Explore achievement, the places you haven't explored yet, each with a soft gold outline of the ground that explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and the achievement's progress. Further out, each zone shows how many places it has left.",
 		"|cff6e2c0aUnexplored land darkens as one, the same at every zoom|r (Unexplored areas: Darken): in a zone you've been to, the unexplored parts were darker where the game's map pieces overlap, a different shade once the minimap's detail came in, and could jump between the two as you zoomed. Each piece's share of the darkening is now worked out ahead of time so that, whichever pieces you've explored, the rest come to one even shade, drawn over the map and the minimap alike (#317). By wealdly.",
 		"|cff6e2c0aGerman reads better|r: missing German texts filled in and others reworded, in the game's own terms. By gOOvER.",
+		"|cff6e2c0aRight-click can be left to other addons|r: Options' \"Right-click zooms out\" (on, as before) turned off leaves right-click on the map to the map and other addons, such as Questie's objectives (#117).",
+		"|cff6e2c0aColour matching says what it costs|r: below 100% the ready-made zone tiles aren't used, and its description now says so (#29).",
 		"|cff6e2c0aYour position read safely everywhere|r: the map, dungeon entrances, flight routes and the controller view all read where you are the same careful way, so a hidden position in combat or in a restricted instance can't raise a Lua error. By gOOvER.",
 		"|cff6e2c0aA dungeon's map fills the screen when maximized|r: going from the quest log (L) to the maximized map (M) inside a dungeon left its map small in the middle (#297). By gOOvER.",
 		"|cff6e2c0aThe Stockade's entrance opens its map|r: clicking it found neither the game's dungeon map nor its Dungeon Journal page (#289). By gOOvER.",

@@ -1193,6 +1193,9 @@ local function OnCanvasClick(from, button)
 	-- (Ctrl-click with "Ctrl-click drops a pin" off is other addons', Map Pin Enhanced's, and Blizzard's
 	-- own waypoint: passed on, not a zoom that ends the click here (#19))
 	if from and button == "LeftButton" and IsControlKeyDown() and mod.db.ctrlClickPin == false then return false end
+	-- (right-click with "Right-click zooms out" off is the map's and other addons', Questie's objectives:
+	-- passed on, #117. The controller's B, `from` nil, still steps out)
+	if from and button == "RightButton" and mod.db.rightClickOut == false then return false end
 	if from and button == "LeftButton" and WasDrag() then return true end
 	local u, v = mod.CursorWorld()
 	local _, _, zoom = View()
@@ -1906,7 +1909,7 @@ function mod:Options()
 			desc = ns.L["Brightness of the entire OpenMap map, including explored areas and the sea. Player and quest icons stay bright. 100% restores the original brightness."] },
 		colorMatch = { type = "range", name = ns.L["Colour matching"], order = 21, min = 0, max = 1, step = 0.05, isPercent = true,
 			get = get, set = set, disabled = off,
-			desc = ns.L["How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours."] },
+			desc = ns.L["How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming."] },
 		desaturate = { type = "range", name = ns.L["Take colour out"], order = 22, min = 0, max = 0.6, step = 0.05, isPercent = true,
 			get = get, set = set, disabled = off },
 		chart = { type = "toggle", name = ns.L["Responsive ocean & border"], order = 23.6, get = get, set = set, disabled = off,

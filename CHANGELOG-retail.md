@@ -7,6 +7,9 @@
 - **German reads better**: missing German texts filled in and others reworded, in the game's own terms.
   By gOOvER.
 
+- **Right-click can be left to other addons**: Options' "Right-click zooms out" (on, as before) turned off
+  leaves right-click on the map to the map and other addons, such as Questie's objectives (#117).
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view
