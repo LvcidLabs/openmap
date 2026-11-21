@@ -1128,6 +1128,13 @@ local function OnMouseWheel(_, delta)
 	ZoomAtCursor(delta > 0 and ZOOM_STEP or 1 / ZOOM_STEP)
 end
 
+local syncingPin, pendingPinDisarm = false, false
+
+local function TrackingPinsDisabled()
+	local rule = Enum and Enum.GameRule and Enum.GameRule.WorldMapTrackingPinDisabled
+	return rule ~= nil and C_GameRules ~= nil and C_GameRules.IsGameRuleActive ~= nil and C_GameRules.IsGameRuleActive(rule) and true or false
+end
+
 local function BlizzardPinButton()
 	for _, f in ipairs(map and map.overlayFrames or {}) do
 		if f.SetActive and f.ActiveTexture then return f end
@@ -1135,8 +1142,25 @@ local function BlizzardPinButton()
 end
 
 local function BlizzardPinArmed()
+	if TrackingPinsDisabled() then return false end
 	local btn = BlizzardPinButton()
 	return btn and ((btn.IsActive and btn:IsActive()) or (btn.ActiveTexture and btn.ActiveTexture:IsShown())) and true or false
+end
+
+local function DisarmBlizzardPin()
+	local btn = BlizzardPinButton()
+	if not (btn and btn.SetActive and BlizzardPinArmed()) then
+		pendingPinDisarm = false
+		return
+	end
+	if InCombatLockdown and InCombatLockdown() then
+		pendingPinDisarm = true
+		return
+	end
+	pendingPinDisarm = false
+	syncingPin = true
+	btn:SetActive(false)
+	syncingPin = false
 end
 
 -- a left click drops a pin under the cursor when the menu's pin button or Blizzard's map-pin
@@ -1148,8 +1172,7 @@ end
 
 local function DropAtCursor()
 	if mod.SetPinMode then mod.SetPinMode(false) end
-	local btn = BlizzardPinButton()
-	if btn and btn.SetActive and BlizzardPinArmed() then btn:SetActive(false) end
+	DisarmBlizzardPin()
 	mod.DropWaypoint(mod.CursorWorld())     -- (not the click position Blizzard passes: that's clamped to this map's rectangle)
 end
 
@@ -1408,13 +1431,16 @@ local function Setup()
 			if active and ((mod.PinMode and mod.PinMode()) or BlizzardPinArmed()) then return "MAP_PIN_CURSOR" end
 		end, 1000)
 	end
-	local syncingPin = false
+	function mod.SyncBlizzardPin(on)
+		if syncingPin or on then return end
+		DisarmBlizzardPin()
+	end
 	local function HookBlizzardPin()
 		local btn = BlizzardPinButton()
 		if not btn or btn.omPinHooked then return end
 		btn.omPinHooked = true
 		hooksecurefunc(btn, "SetActive", function(_, on)
-			if syncingPin or not active or not mod.SetPinMode then return end
+			if syncingPin or TrackingPinsDisabled() or not active or not mod.SetPinMode then return end
 			syncingPin = true
 			mod.SetPinMode(on and true or false)
 			syncingPin = false
@@ -1422,17 +1448,9 @@ local function Setup()
 	end
 	HookBlizzardPin()
 	if map.RefreshOverlayFrames then hooksecurefunc(map, "RefreshOverlayFrames", HookBlizzardPin) end
-	if mod.SetPinMode then
-		hooksecurefunc(mod, "SetPinMode", function(on)
-			if syncingPin or on then return end
-			local btn = BlizzardPinButton()
-			if btn and btn.SetActive and BlizzardPinArmed() then
-				syncingPin = true
-				btn:SetActive(false)
-				syncingPin = false
-			end
-		end)
-	end
+	ns.RegisterEvent({}, "PLAYER_REGEN_ENABLED", function()
+		if pendingPinDisarm then DisarmBlizzardPin() end
+	end)
 	HookHighlight()
 	-- a quest's details, Back: the map stays where you're looking (most likely at the quest's place,
 	-- to pick another nearby). Blizzard puts back the map it was on when they opened, and a map Blizzard
