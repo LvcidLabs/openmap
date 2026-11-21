@@ -158,10 +158,16 @@ local function Collect(frame, list)
 	list[#list + 1] = frame
 	for _, child in ipairs({ frame:GetChildren() }) do Collect(child, list) end
 end
-local function Lift(tops, step)
+-- (read before the frames are moved onto the view: the game resets a frame's level, and its children's with
+-- it, when it's given another parent, so levels read after S.Rehost were already moved: the art and the icons
+-- both ended at the top, the art over the icons)
+local function Note(tops)
 	local list = {}
 	for _, top in ipairs(tops) do Collect(top, list) end
 	for _, f in ipairs(list) do if levels[f] == nil then levels[f] = f:GetFrameLevel() end end
+	return list
+end
+local function Lift(list, step)
 	for _, f in ipairs(list) do
 		f:SetFrameLevel(math.min(9900, levels[f] + step))
 		lifted[#lifted + 1] = f
@@ -249,12 +255,13 @@ function mod.OwnViewStart()
 	own.u, own.v = input.View()
 	local _, _, zoom = input.View()
 	own.zoom = zoom
-	S.Rehost(canvas)
 	local root, pinRoot, chart = S.Roots()
-	local step = LEVEL + 2 - root:GetFrameLevel()
 	local tops = { root, pinRoot }
 	if chart then table.insert(tops, 1, chart) end
-	Lift(tops, step)
+	local list = Note(tops)
+	local step = LEVEL + 2 - levels[root]
+	S.Rehost(canvas)
+	Lift(list, step)
 	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)
 	-- OpenMap's own frames on the map's view that sit over the art (the coordinates, the brightness shade):
 	-- over this view too, in their order (they're under it otherwise: the coordinates went in a fight)
@@ -283,11 +290,65 @@ function mod.OwnViewStop(sync)
 	-- (combat over: the view on Blizzard's canvas, then the art back on it, in the same frame: nothing jumps)
 	if sync and not InCombatLockdown() and mod.SetViewNow then mod.SetViewNow(scale, x, y) end
 	GiveBackIcons()
-	Lower()
 	S.Rehost(nil)
+	Lower()                       -- (after the move back: the game resets the levels of a frame given another parent)
 	if view then view:Hide() end
 	sc.Child:SetAlpha(1)
 	if mod.RefreshQuests then pcall(mod.RefreshQuests, mod) end
+end
+
+-- /openmap combatcheck: where the own view's frames are, printed and saved (OpenMapDB: worldmap, combatcheck)
+-- for a report: each one's parents, shown and visible, its alpha on screen, strata and level, place and scale
+local function Describe(label, f)
+	if not f then return label .. ": none" end
+	local chain, p = {}, f
+	for _ = 1, 6 do
+		if not p then break end
+		chain[#chain + 1] = (p.GetDebugName and p:GetDebugName()) or (p.GetName and p:GetName()) or tostring(p)
+		p = p.GetParent and p:GetParent() or nil
+	end
+	local x, y
+	if f.GetCenter then x, y = f:GetCenter() end
+	local w, h = f.GetWidth and f:GetWidth() or 0, f.GetHeight and f:GetHeight() or 0
+	local frame = f.GetFrameLevel and f or (f.GetParent and f:GetParent())
+	return ("%s: shown %s visible %s alpha %.2f eff %.2f strata %s level %s at %s,%s size %.0fx%.0f scale %.3f eff %.3f | %s"):format(
+		label, tostring(f:IsShown()), tostring(f:IsVisible()), f:GetAlpha() or -1,
+		f.GetEffectiveAlpha and f:GetEffectiveAlpha() or -1,
+		frame and frame.GetFrameStrata and frame:GetFrameStrata() or "?", frame and frame.GetFrameLevel and frame:GetFrameLevel() or "?",
+		x and ("%.0f"):format(x) or "nil", y and ("%.0f"):format(y) or "nil", w, h,
+		f.GetScale and f:GetScale() or -1, f.GetEffectiveScale and f:GetEffectiveScale() or -1, table.concat(chain, " < "))
+end
+function mod:CombatCheck()
+	local lines = {}
+	local function add(line) lines[#lines + 1] = line end
+	add(("combat %s, own view %s, map shown %s, stitched %s"):format(tostring(InCombatLockdown()), tostring(own and own.on),
+		tostring(map and map:IsShown()), tostring(mod.IsStitched and mod.IsStitched())))
+	if own then
+		add(("own: scale %s x %s y %s u %s v %s zoom %s"):format(tostring(own.scale), tostring(own.x), tostring(own.y),
+			tostring(own.u), tostring(own.v), tostring(own.zoom)))
+	end
+	local root, pinRoot, chart = S.Roots()
+	add(Describe("view", view))
+	add(Describe("canvas", canvas))
+	add(Describe("Blizzard canvas", sc and sc.Child))
+	add(Describe("art (root)", root))
+	add(Describe("icons (pinRoot)", pinRoot))
+	add(Describe("chart", chart))
+	add(Describe("addons' icons layer", iconLayer))
+	local arrowFrame, pins, arrowTex
+	if S.DiagFrames then arrowFrame, pins, arrowTex = S.DiagFrames(6) end
+	add(Describe("arrow frame", arrowFrame))
+	add(Describe("arrow", arrowTex))
+	for i, e in ipairs(pins or {}) do add(Describe("pin " .. i .. " (" .. tostring(e[1]) .. ")", e[2])) end
+	local n = 0
+	for icon in pairs(moved) do
+		n = n + 1
+		if n <= 4 then add(Describe("addon icon " .. n, icon)) end
+	end
+	add(("addons' icons moved: %d, known: %d"):format(n, (function() local c = 0 for _ in pairs(at) do c = c + 1 end return c end)()))
+	mod.db.combatcheck = { at = date and date("%Y-%m-%d %H:%M:%S") or "", lines = lines }
+	for _, line in ipairs(lines) do ns:Print(line) end
+	ns:Print("Saved for a report: /reload, then it's in OpenMapDB (worldmap, combatcheck).")
 end
 
 function mod:SetupOwnView(worldMap)

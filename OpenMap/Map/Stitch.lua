@@ -1959,6 +1959,17 @@ function S.Rehost(canvas)
 	pinRoot:SetAllPoints(over)
 	S.rehosted = canvas and true or false
 end
+-- for /openmap combatcheck (OwnView.lua): your arrow's frame and up to `n` icons, { set key, pin } each
+function S.DiagFrames(n)
+	local out = {}
+	for key, set in pairs(sets) do
+		for _, pin in ipairs(set.pins) do
+			if #out >= n then break end
+			if pin.IsShown and pin:IsShown() then out[#out + 1] = { key, pin } end
+		end
+	end
+	return arrow and arrow:GetParent(), out, arrow
+end
 -- OpenMap's frames the own view moves, and the art's base level: root, pinRoot, the chart's frame
 function S.Roots() return root, pinRoot, S.Chart and S.Chart.Frame() or nil end
 

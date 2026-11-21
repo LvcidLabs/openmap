@@ -56,6 +56,8 @@ def frames_stub():
             if self.parent then for i, c in ipairs(self.parent.children) do if c == self then table.remove(self.parent.children, i) break end end end
             self.parent = p
             if p then p.children[#p.children + 1] = self end
+            -- (as the game: a frame given another parent goes one level over it, its children with it)
+            if p then self:SetFrameLevel(p.level + 1) end
         end
         function f:GetChildren() return unpack(self.children) end
         function f:GetFrameLevel() return self.level end
