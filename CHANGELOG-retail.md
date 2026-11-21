@@ -16,6 +16,9 @@
   (the files held from the last opening were another place's, or none). The part of the view still
   fading in as you closed the map is held too. By cscoder69.
 
+- **The game's map-pin button works on the stitched map**: armed, a click on the map drops your pin there,
+  as on the game's own map (#324). By gOOvER.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view

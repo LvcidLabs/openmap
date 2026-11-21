@@ -4,10 +4,11 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [4] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", [5] = "Fixed", }, items = {
 		"|cff6e2c0aGerman reads better|r: missing German texts filled in and others reworded, in the game's own terms. By gOOvER.",
 		"|cff6e2c0aRight-click can be left to other addons|r: Options' \"Right-click zooms out\" (on, as before) turned off leaves right-click on the map to the map and other addons, such as Questie's objectives (#117).",
 		"|cff6e2c0aThe map's art ready before it opens|r: the art round you is read in while the map is closed, a few files a frame and out of combat, once the map is built after a login or a /reload and again when you reach a new zone. At a session's first opening, and after travelling, it used to come in over a moment (the files held from the last opening were another place's, or none). The part of the view still fading in as you closed the map is held too. By cscoder69.",
+		"|cff6e2c0aThe game's map-pin button works on the stitched map|r: armed, a click on the map drops your pin there, as on the game's own map (#324). By gOOvER.",
 		"|cff6e2c0aYour position read safely everywhere|r: the map, dungeon entrances, flight routes and the controller view all read where you are the same careful way, so a hidden position in combat or in a restricted instance can't raise a Lua error. By gOOvER.",
 		"|cff6e2c0aA dungeon's map fills the screen when maximized|r: going from the quest log (L) to the maximized map (M) inside a dungeon left its map small in the middle (#297). By gOOvER.",
 		"|cff6e2c0aThe Stockade's entrance opens its map|r: clicking it found neither the game's dungeon map nor its Dungeon Journal page (#289). By gOOvER.",

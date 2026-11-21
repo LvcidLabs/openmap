@@ -1136,15 +1136,50 @@ local function OnMouseWheel(_, delta)
 	ZoomAtCursor(delta > 0 and ZOOM_STEP or 1 / ZOOM_STEP)
 end
 
--- a left click drops a pin under the cursor when the menu's pin button is on, or with Ctrl (unless
--- that's turned off: ctrlClickPin)
+-- Blizzard's map-pin button (#324), in one table: WorldMap's Setup is at Lua's 60 upvalues
+local pinBtn = { syncing = false, pending = false }
+function pinBtn.RuleOff()
+	local rule = Enum and Enum.GameRule and Enum.GameRule.WorldMapTrackingPinDisabled
+	return rule ~= nil and C_GameRules ~= nil and C_GameRules.IsGameRuleActive ~= nil and C_GameRules.IsGameRuleActive(rule) and true or false
+end
+function pinBtn.Find()
+	for _, f in ipairs(map and map.overlayFrames or {}) do
+		if f.SetActive and f.ActiveTexture then return f end
+	end
+end
+function pinBtn.Armed()
+	if pinBtn.RuleOff() then return false end
+	local btn = pinBtn.Find()
+	return btn and ((btn.IsActive and btn:IsActive()) or (btn.ActiveTexture and btn.ActiveTexture:IsShown())) and true or false
+end
+-- (armed, and not only waiting for combat's end to be put down)
+function pinBtn.ArmedNow() return pinBtn.Armed() and not pinBtn.pending end
+function pinBtn.Disarm()
+	local btn = pinBtn.Find()
+	if not (btn and btn.SetActive and pinBtn.Armed()) then
+		pinBtn.pending = false
+		return
+	end
+	if InCombatLockdown and InCombatLockdown() then
+		pinBtn.pending = true
+		return
+	end
+	pinBtn.pending = false
+	pinBtn.syncing = true
+	btn:SetActive(false)
+	pinBtn.syncing = false
+end
+
+-- a left click drops a pin under the cursor when the menu's pin button or Blizzard's map-pin
+-- button is on, or with Ctrl (unless that's turned off: ctrlClickPin)
 local function Dropping(button)
 	return active and button == "LeftButton" and mod.DropWaypoint
-		and ((IsControlKeyDown() and mod.db.ctrlClickPin ~= false) or (mod.PinMode and mod.PinMode()))
+		and ((IsControlKeyDown() and mod.db.ctrlClickPin ~= false) or (mod.PinMode and mod.PinMode()) or pinBtn.ArmedNow())
 end
 
 local function DropAtCursor()
 	if mod.SetPinMode then mod.SetPinMode(false) end
+	pinBtn.Disarm()
 	mod.DropWaypoint(mod.CursorWorld())     -- (not the click position Blizzard passes: that's clamped to this map's rectangle)
 end
 
@@ -1408,10 +1443,34 @@ local function Setup()
 	if map.AddGlobalPinMouseActionHandler and MapCanvasMixin and MapCanvasMixin.MouseAction then
 		map:AddGlobalPinMouseActionHandler(OnBlizzardPinAction, 1000)
 	end
-	-- Blizzard's pin cursor while the menu's pin button is on
+	-- Blizzard's pin cursor while the menu's pin button or Blizzard's map-pin button is on
 	if map.AddCursorHandler then
-		map:AddCursorHandler(function() if active and mod.PinMode and mod.PinMode() then return "MAP_PIN_CURSOR" end end, 1000)
+		map:AddCursorHandler(function()
+			if active and ((mod.PinMode and mod.PinMode()) or pinBtn.ArmedNow()) then return "MAP_PIN_CURSOR" end
+		end, 1000)
 	end
+	function mod.SyncBlizzardPin(on)
+		if pinBtn.syncing or on then return end
+		pinBtn.Disarm()
+	end
+	local hookedPinBtn                -- (Blizzard's map-pin button, once hooked: here, Setup is at Lua's 60 upvalues)
+	local function HookBlizzardPin()
+		local btn = pinBtn.Find()
+		-- (kept here, not as a field on Blizzard's button: a field OpenMap writes there is read as tainted)
+		if not btn or btn == hookedPinBtn then return end
+		hookedPinBtn = btn
+		hooksecurefunc(btn, "SetActive", function(_, on)
+			if pinBtn.syncing or pinBtn.RuleOff() or not active or not mod.SetPinMode then return end
+			pinBtn.syncing = true
+			mod.SetPinMode(on and true or false)
+			pinBtn.syncing = false
+		end)
+	end
+	HookBlizzardPin()
+	if map.RefreshOverlayFrames then hooksecurefunc(map, "RefreshOverlayFrames", HookBlizzardPin) end
+	ns.RegisterEvent({}, "PLAYER_REGEN_ENABLED", function()
+		if pinBtn.pending then pinBtn.Disarm() end
+	end)
 	HookHighlight()
 	-- a quest's details, Back: the map stays where you're looking (most likely at the quest's place,
 	-- to pick another nearby). Blizzard puts back the map it was on when they opened, and a map Blizzard

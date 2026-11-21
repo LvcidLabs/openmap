@@ -61,8 +61,8 @@ class CtrlClickTests(unittest.TestCase):
             function GlideTo() glided = glided + 1 end
             ns, tinsert = {}, table.insert
         """)
-        chunk = SOURCE[SOURCE.index('local function Dropping('):SOURCE.index('-- our icons: a press')]
-        self.lua.execute(chunk + '\n_G.OnCanvasClick = OnCanvasClick\n')
+        chunk = SOURCE[SOURCE.index("-- Blizzard's map-pin button (#324)"):SOURCE.index('-- our icons: a press')]
+        self.lua.execute(chunk + '\n_G.OnCanvasClick = OnCanvasClick\n_G.DisarmBlizzardPin = pinBtn.Disarm\n')
 
     def check(self, code):
         self.lua.execute(code)
@@ -89,6 +89,48 @@ class CtrlClickTests(unittest.TestCase):
 
     def test_controller_b_still_steps_out_when_turned_off(self):
         self.check("mod.db.rightClickOut = false assert(OnCanvasClick(nil, 'RightButton') == true) assert(glided == 1)")
+    def test_blizzard_pin_button_drops_and_disarms(self):
+        self.check("""
+            local armed = true
+            local pinBtn = {
+                ActiveTexture = { IsShown = function() return armed end },
+                SetActive = function(_, on) armed = on and true or false end,
+            }
+            map = { overlayFrames = { pinBtn } }
+            assert(OnCanvasClick(true, 'LeftButton') == true)
+            assert(dropped == 1 and glided == 0 and armed == false)
+        """)
+
+    def test_blizzard_pin_button_defers_disarm_in_combat(self):
+        self.check("""
+            local combat = true
+            function InCombatLockdown() return combat end
+            local armed, setCalls = true, 0
+            local pinBtn = {
+                ActiveTexture = { IsShown = function() return armed end },
+                SetActive = function(_, on) setCalls = setCalls + 1; armed = on and true or false end,
+            }
+            map = { overlayFrames = { pinBtn } }
+            assert(OnCanvasClick(true, 'LeftButton') == true)
+            assert(dropped == 1 and setCalls == 0 and armed == true)
+            combat = false
+            DisarmBlizzardPin()
+            assert(setCalls == 1 and armed == false)
+        """)
+
+    def test_blizzard_pin_button_respects_game_rule(self):
+        self.check("""
+            Enum = { GameRule = { WorldMapTrackingPinDisabled = 42 } }
+            C_GameRules = { IsGameRuleActive = function(r) return r == 42 end }
+            local armed = true
+            local pinBtn = {
+                ActiveTexture = { IsShown = function() return armed end },
+                SetActive = function(_, on) armed = on and true or false end,
+            }
+            map = { overlayFrames = { pinBtn } }
+            assert(OnCanvasClick(true, 'LeftButton') == true)
+            assert(dropped == 0 and glided == 1 and armed == true)
+        """)
 
 
 if __name__ == '__main__':
