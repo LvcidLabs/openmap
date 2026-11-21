@@ -52,6 +52,7 @@ ns.MapStitch = S
 
 local WORLD = 947
 S.WORLD = WORLD
+S.PLAYER_ATLAS = "UI-WorldMapArrow"   -- your arrow: Blizzard's map arrow's art (its GroupMembersPin's)
 
 local CONT_FADE = { 1.3, 2.2 }  -- zoom where each layer starts / finishes fading in
 local CONT_IN, WORLD_OUT = { 1.3, 1.7 }, { 1.7, 2.2 }   -- (the continents come in fully, then the world art's land under them goes)
@@ -1356,7 +1357,13 @@ function S.BuildNow(parent, artLevel, range, iconLevel)
 	if pinRoot.SetClipsChildren then pinRoot:SetClipsChildren(true) end
 	-- (on a frame of its own, so it can be lifted over every icon: S.RaiseArrow)
 	arrow = CreateFrame("Frame", nil, pinRoot):CreateTexture(nil, "OVERLAY", nil, 7)
-	arrow:SetTexture("Interface\\Minimap\\MinimapArrow")
+	-- (Blizzard's own arrow's art, at its size: one arrow in and out of a fight. The minimap's, on a client
+	-- without it, has a wide clear edge round a smaller arrow: at the same size it was a third as big)
+	if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(S.PLAYER_ATLAS) then
+		arrow:SetAtlas(S.PLAYER_ATLAS)
+	else
+		arrow:SetTexture("Interface\\Minimap\\MinimapArrow")
+	end
 	local ps, px = S.playerScale or 1, S.playerBase or 28
 	arrow:SetSize(px * ps, px * ps)
 	arrow:Hide()

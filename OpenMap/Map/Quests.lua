@@ -315,8 +315,9 @@ function mod:RefreshQuests()
 		local zone = map and map.GetMapID and map:GetMapID()
 		list = zone and S.Rect(zone) and { zone } or NONE
 	end
-	-- the map underneath: Blizzard draws its quests (a continent, only the super-tracked one)
-	local host = mod.HostMap()
+	-- the map underneath: Blizzard draws its quests (a continent, only the super-tracked one). Not under the
+	-- controller view, nor the own view in a fight: its pins are there unseen, so its quests are OpenMap's too
+	local host = not pad and mod.HostMap() or nil
 	local hostInfo = host and C_Map.GetMapInfo(host)
 	local continent = hostInfo and hostInfo.mapType == Enum.UIMapType.Continent
 	local tracked = C_SuperTrack and C_SuperTrack.GetSuperTrackedQuestID and C_SuperTrack.GetSuperTrackedQuestID()

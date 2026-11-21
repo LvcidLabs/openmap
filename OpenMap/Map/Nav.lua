@@ -612,15 +612,17 @@ local function DrawOwnGroup(stockPin, host, members)
 			f:ClearUnits()
 		end
 		for _, unit in ipairs(members) do
+			-- (never you: your arrow is OpenMap's own in a fight)
+			local you = Safe.Call(UnitIsUnit, unit, "player")
 			local sub = not inRaid or Safe.Call(UnitInSubgroup, unit)
-			local size = sub and party or raidSize
+			local size = not you and (sub and party or raidSize)
 			if size then
 				local c = GroupLook(unit).color                -- (its class colour, as OpenMap's own dots)
 				local r, gr, b = c[1], c[2], c[3]
 				local atlas = (inRaid and sub) and "WhiteDotCircle-RaidBlips" or "WhiteCircle-RaidBlips"
 				g.dots:AddUnit(unit, atlas, size / scale, size / scale, r, gr, b, 1, 7, false)
 			end
-			g.rings:AddUnit(unit, RING_TEXTURE, ring, ring, 1, 1, 1, 1, 7, false)
+			if not you then g.rings:AddUnit(unit, RING_TEXTURE, ring, ring, 1, 1, 1, 1, 7, false) end
 		end
 		g.rings:FinalizeUnits()
 		g.dots:FinalizeUnits()

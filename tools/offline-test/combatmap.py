@@ -121,6 +121,28 @@ class ArrowSizeTests(unittest.TestCase):
         self.lua.execute("S.SetPlayerScale(1)")
         self.assertEqual(self.lua.eval("arrow.w"), 36)
 
+    def test_same_on_screen_size_at_every_zoom(self):
+        # Blizzard's arrow: its size over the canvas's scale (SynchronizePinSizes), on the canvas at that scale. Ours:
+        # its size on the icons' root, which is on the map's view, never scaled, in and out of a fight (S.Rehost
+        # puts it on the own view's parent, the view, not on the scaled canvas)
+        self.lua.execute("S.SetPlayerBase(27) S.SetPlayerScale(1.85)")
+        for scale in (0.25, 1, 3.7):
+            blizzards = (27 * 1.85 / scale) * scale
+            self.assertAlmostEqual(self.lua.eval("arrow.w"), blizzards)
+        root = Path(__file__).resolve().parents[2] / "OpenMap" / "Map"
+        rehost = re.search(r"\nfunction S\.Rehost\(canvas\)\n.*?\nend\n",(root / "Stitch.lua").read_text(encoding="utf-8"), re.S).group(0)
+        self.assertIn("local over = canvas and canvas:GetParent()", rehost)
+        own = (root / "OwnView.lua").read_text(encoding="utf-8")
+        self.assertIn("view:SetAllPoints(sc)", own)
+        self.assertNotIn("view:SetScale", own)
+
+    def test_same_art_as_blizzards(self):
+        # (the minimap's arrow has a wide clear edge: at the same size it was a third as big, test19)
+        root = Path(__file__).resolve().parents[2] / "OpenMap" / "Map"
+        stitch = (root / "Stitch.lua").read_text(encoding="utf-8")
+        self.assertIn('S.PLAYER_ATLAS = "UI-WorldMapArrow"', stitch)
+        self.assertIn("arrow:SetAtlas(S.PLAYER_ATLAS)", stitch)
+
     def test_28_before_blizzards_is_known(self):
         self.lua.execute("S.playerScale = 1 S.SetPlayerScale(2)")
         self.assertEqual(self.lua.eval("arrow.w"), 56)

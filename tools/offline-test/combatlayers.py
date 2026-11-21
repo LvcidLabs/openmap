@@ -34,6 +34,7 @@ LAYERS = {
     "your arrow (OpenMap's own in a fight)": ("WorldMap.lua", "not InCombatLockdown() and not (mod.db.playerArrowOnTop"),
     "your party and raid (the game's dots on the view)": ("Nav.lua", "hasNativeRings = TryOwnGroup(stockPin, host, members)"),
     "your quests (OpenMap's icons)": ("Quests.lua", "(mod.OwnViewOn and mod.OwnViewOn())"),
+    "the quests of the zone Blizzard's map is on (its pins are under the view)": ("Quests.lua", "local host = not pad and mod.HostMap() or nil"),
     "a quest's area (hovered or focused)": ("PadView.lua", "ShowAreaOn(area.own, own, root"),
     "other addons' HereBeDragons icons (Questie's ...)": ("OwnView.lua", "PlaceIcons()"),
     "the place name under the cursor": ("Extras.lua", "(mod.OwnViewHover and mod.OwnViewHover())"),
@@ -145,6 +146,13 @@ class OwnGroupTests(unittest.TestCase):
         self.assertEqual((d.unit, d.asset, d.w), ("party1", "WhiteCircle-RaidBlips", 11 * 1.5 / 2))
         self.assertAlmostEqual(d.r, 0.25)
         self.assertEqual(rings.units[2].w, 16 * 1.5 / 2)
+
+    def test_never_you(self):
+        # (your arrow is OpenMap's own in a fight: no dot of the game's for you on the view, should you be passed in)
+        self.lua.eval("TryOwnGroup(stockPin, 1429, { 'player', 'party1' })")
+        dots, rings = self.lua.eval("made[1]"), self.lua.eval("made[2]")
+        self.assertEqual([dots.units[i].unit for i in range(1, len(dots.units) + 1)], ["party1"])
+        self.assertEqual([rings.units[i].unit for i in range(1, len(rings.units) + 1)], ["party1"])
 
     def test_raid_dots(self):
         self.lua.execute("raid = true")
