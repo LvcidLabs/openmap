@@ -95,6 +95,7 @@ Map\Debug.lua
 Map\Bench.lua
 Map\Gamepad.lua
 Map\PadView.lua
+Map\OwnView.lua
 Map\Report.lua
 Map\Nav.lua
 Map\Combat.lua

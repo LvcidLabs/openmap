@@ -22,6 +22,12 @@
 - **Your arrow, bigger if you like**: Options' "Arrow size" (100% as before) and "Your arrow over
   everything", which lifts OpenMap's arrow over every icon on the map (#329). By gOOvER.
 
+- **Zoom, drag and click the map in a fight**: since v0.8.11 the map stood still in combat (the game's map
+  can't be moved from an addon then without breaking the quest tracker). In a fight OpenMap's map now moves
+  onto frames of its own, over the game's, with its icons, your arrow, your party, your quests and
+  Questie's and other addons' map icons; the game's map is left as it is under it, and everything goes back
+  on it as the fight ends.
+
 ### Fixed
 
 - **Your position read safely everywhere**: the map, dungeon entrances, flight routes and the controller view

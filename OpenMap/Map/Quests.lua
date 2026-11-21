@@ -40,7 +40,8 @@ local reading                   -- the zones being read: { list, at, found, seen
 local lastRead                  -- the last reading, for /openmap status: { zones, ms, frames, worst }
 
 -- the controller view is the map now (Blizzard's under it, unseen)
-local function PadView() return mod.PadViewOn and mod.PadViewOn() end
+-- (and the own view in a fight, OwnView.lua: Blizzard's quest pins under it, unseen)
+local function PadView() return (mod.PadViewOn and mod.PadViewOn()) or (mod.OwnViewOn and mod.OwnViewOn()) end
 
 -- the maps the quests are read from: the stitched zones and cities (a city's quests are its zone's
 -- too, at the same place: one icon, SAME)

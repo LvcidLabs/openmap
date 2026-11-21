@@ -4,7 +4,7 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [9] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [10] = "Fixed", }, items = {
 		"|cff6e2c0aShow places to explore|r (the map's menu and Options, off until turned on): for each zone's Explore achievement, the places you haven't explored yet, each with a soft gold outline of the ground that explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and the achievement's progress. Further out, each zone shows how many places it has left.",
 		"|cff6e2c0aUnexplored land darkens as one, the same at every zoom|r (Unexplored areas: Darken): in a zone you've been to, the unexplored parts were darker where the game's map pieces overlap, a different shade once the minimap's detail came in, and could jump between the two as you zoomed. Each piece's share of the darkening is now worked out ahead of time so that, whichever pieces you've explored, the rest come to one even shade, drawn over the map and the minimap alike (#317). By wealdly.",
 		"|cff6e2c0aGerman reads better|r: missing German texts filled in and others reworded, in the game's own terms. By gOOvER.",
@@ -13,6 +13,7 @@ ns.MapChangelog = {
 		"|cff6e2c0aThe map's art ready before it opens|r: the art round you is read in while the map is closed, a few files a frame and out of combat, once the map is built after a login or a /reload and again when you reach a new zone. At a session's first opening, and after travelling, it used to come in over a moment (the files held from the last opening were another place's, or none). The part of the view still fading in as you closed the map is held too. By cscoder69.",
 		"|cff6e2c0aThe game's map-pin button works on the stitched map|r: armed, a click on the map drops your pin there, as on the game's own map (#324). By gOOvER.",
 		"|cff6e2c0aYour arrow, bigger if you like|r: Options' \"Arrow size\" (100% as before) and \"Your arrow over everything\", which lifts OpenMap's arrow over every icon on the map (#329). By gOOvER.",
+		"|cff6e2c0aZoom, drag and click the map in a fight|r: since v0.8.11 the map stood still in combat (the game's map can't be moved from an addon then without breaking the quest tracker). In a fight OpenMap's map now moves onto frames of its own, over the game's, with its icons, your arrow, your party, your quests and Questie's and other addons' map icons; the game's map is left as it is under it, and everything goes back on it as the fight ends.",
 		"|cff6e2c0aYour position read safely everywhere|r: the map, dungeon entrances, flight routes and the controller view all read where you are the same careful way, so a hidden position in combat or in a restricted instance can't raise a Lua error. By gOOvER.",
 		"|cff6e2c0aA dungeon's map fills the screen when maximized|r: going from the quest log (L) to the maximized map (M) inside a dungeon left its map small in the middle (#297). By gOOvER.",
 		"|cff6e2c0aThe Stockade's entrance opens its map|r: clicking it found neither the game's dungeon map nor its Dungeon Journal page (#289). By gOOvER.",

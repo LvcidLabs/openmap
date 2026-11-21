@@ -1941,6 +1941,27 @@ function S.Layout(mapID)
 	return true
 end
 
+-- The own view in a fight (OwnView.lua): the art (root), the sea chart and OpenMap's icon layer (pinRoot) on
+-- frames of OpenMap's own (`canvas`, and its view for the icons), placed as on Blizzard's canvas; nil: back on
+-- Blizzard's. Only OpenMap's frames are moved: Blizzard's canvas is left as it is
+function S.Rehost(canvas)
+	if not root then return end
+	local home = S.chartHost[1]
+	local to = canvas or home
+	root:SetParent(to)
+	root:ClearAllPoints()
+	root:SetPoint("TOPLEFT", to, "TOPLEFT", -host.l, host.t)
+	local chart = S.Chart and S.Chart.Frame()
+	if chart then chart:SetParent(to) chart:ClearAllPoints() chart:SetAllPoints(to) end
+	local over = canvas and canvas:GetParent() or home:GetParent() or home
+	pinRoot:SetParent(over)
+	pinRoot:ClearAllPoints()
+	pinRoot:SetAllPoints(over)
+	S.rehosted = canvas and true or false
+end
+-- OpenMap's frames the own view moves, and the art's base level: root, pinRoot, the chart's frame
+function S.Roots() return root, pinRoot, S.Chart and S.Chart.Frame() or nil end
+
 -- a name's lettering, built the first time it shows at all. A name is hundreds of font strings (its halo),
 -- and all of them made in one frame was a hitch on the first zoom out of a session (350 in one step, in
 -- tools/offline-test/perf.py): one name a call, the rest a moment later

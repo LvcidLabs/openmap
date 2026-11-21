@@ -30,10 +30,12 @@ class CombatMapTests(unittest.TestCase):
         hook = re.search(r'hooksecurefunc\(sc, "ResetZoom", function\(self\)\n(.*?)\n\tend\)', WORLDMAP, re.S)
         self.assertIsNotNone(hook, "the ResetZoom hook")
         body = hook.group(1)
-        # (in combat: noted, nothing of Blizzard's written)
-        fight = re.search(r"if InCombatLockdown\(\) then (.*?) return end", body)
+        # (in combat: into the own view where it can come up, OwnView.lua, else noted for combat's end;
+        # nothing of Blizzard's written either way)
+        fight = re.search(r"if InCombatLockdown\(\) then\n(.*?)\n\t\t\treturn\n\t\tend", body, re.S)
         self.assertIsNotNone(fight)
-        self.assertEqual(fight.group(1).strip(), "resetDue = true")
+        self.assertIn("mod.OwnViewStart()", fight.group(1))
+        self.assertIn("resetDue = true", fight.group(1))
         self.assertIn("mod.ResetDue()", function("mod.CombatOver"))
 
     def test_nothing_of_blizzards_map_set_in_combat(self):

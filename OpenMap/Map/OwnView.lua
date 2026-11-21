@@ -1,0 +1,273 @@
+--------------------------------------------------------------------------------
+-- The own view: the map in a fight on frames of OpenMap's own (drafts: own-frame-map).
+--
+-- Out of combat OpenMap's art is on Blizzard's map canvas, and OpenMap scrolls and scales that canvas
+-- (WorldMap.lua's SetView). In a fight nothing of Blizzard's map may be set from OpenMap's code: its
+-- canvas holds a protected pin, and a field OpenMap writes there is read by the game's own code, which
+-- then blocks the quest log's protected calls (#345 #347 #368). So in a fight the art (Stitch.lua's root),
+-- the sea chart and OpenMap's icons (pinRoot) are moved onto a view of OpenMap's own, over Blizzard's
+-- canvas, which OpenMap scrolls and scales itself, as a scroll frame would: the host map's point (x, y)
+-- at the view's centre at canvas scale `scale` (WorldMap.lua's own: View, SetView, ApplyZoom read it).
+-- The view takes the wheel, drags and clicks; HereBeDragons' icons (Questie's, other addons') are put on
+-- it at their world point; your quests are OpenMap's own icons (Quests.lua, as on the controller view).
+-- Blizzard's canvas, left as it is under it, is only made see-through meanwhile (its alpha).
+-- As combat ends (mod.CombatOver) the view is put on Blizzard's canvas and everything goes back.
+--------------------------------------------------------------------------------
+
+local _, ns = ...
+local S = ns.MapStitch
+local mod = ns:GetModule("worldmap")
+
+local LEVEL = 9200              -- the view's frame level: over Blizzard's canvas and its icons (OpenMap lifts
+                                --  its own arrow to 9500, a dungeon's map is up to 9840)
+local ICONS_OVER = 12           -- HereBeDragons' icons, this many levels over OpenMap's (#393)
+local QUESTIE_FROM = 2.5        -- the zoom Questie's icons come in at (a continent's worth of quests is too many)
+local SCAN_EVERY = 0.25         -- seconds between looks at which icons the addons have
+local QUESTIE_LIB = "HereBeDragonsQuestie-Pins-2.0"
+
+local map, sc, view, canvas, iconLayer, input
+local own                       -- WorldMap.lua's mod.own: { on, scale, x, y, u, v, zoom }
+local levels = {}               -- OpenMap's frame -> its level on Blizzard's canvas (given back as the view ends)
+local moved = {}                -- an addon's icon -> its parent before (given back as the view ends)
+local drag                      -- { sx, sy, u, v, zoom, moved }: a drag under way
+local scanAt = 0
+
+-- every copy of the pins library loaded: name -> library (as the controller view's, PadView.lua)
+local function PinLibs()
+	local out = {}
+	local q = mod.QuestieModule and mod.QuestieModule()   -- (Questie 12.8 and later: Extras.lua)
+	if q then out[mod.QUESTIE_MODULE] = q end
+	if not LibStub then return out end
+	if LibStub.IterateLibraries then
+		for name, lib in LibStub:IterateLibraries() do
+			if type(name) == "string" and type(lib) == "table"
+				and (name:match("^HereBeDragons.*%-Pins%-2%.0$") or name == "HereBeDragons-Pins-ZGV") then
+				out[name] = lib
+			end
+		end
+	else
+		out[QUESTIE_LIB] = LibStub(QUESTIE_LIB, true)
+	end
+	return out
+end
+mod.OwnPinLibs = PinLibs
+
+-- an icon's place in the world (normalized), from the library's data
+local function IconWorld(icon, data)
+	local uiMapID = data.uiMapID
+	if uiMapID and icon.UiMapID == uiMapID and type(icon.x) == "number" and type(icon.y) == "number" then
+		local l, r, t, b = S.Rect(uiMapID)
+		if l then return l + icon.x / 100 * (r - l), t + icon.y / 100 * (b - t) end
+	end
+	-- (the library's x, y are the game's world Y, X: Extras.lua)
+	if type(data.instanceID) == "number" and type(data.x) == "number" and type(data.y) == "number" and S.FromYards then
+		return S.FromYards(data.instanceID, data.y, data.x)
+	end
+end
+
+-- which icons the addons have, and where: icon -> { u, v, Questie's, its show flag } (looked at every
+-- SCAN_EVERY: placing them, every frame of a zoom, reads only this)
+local at = {}
+local function ScanIcons()
+	wipe(at)
+	for name, lib in pairs(PinLibs()) do
+		local pins = lib.worldmapPins
+		local questie = name == QUESTIE_LIB or name == mod.QUESTIE_MODULE
+		if type(pins) == "table" then
+			for icon, data in pairs(pins) do
+				if type(icon) == "table" and type(data) == "table" and icon.SetPoint and not (questie and icon.type == "line") then
+					local ok, wu, wv = pcall(IconWorld, icon, data)
+					if ok and wu and wv then at[icon] = { wu, wv, questie, tonumber(data.worldMapShowFlag) or 0 } end
+				end
+			end
+		end
+	end
+end
+mod.OwnScanIcons = ScanIcons
+
+-- the addons' icons in view put on the view, at their world point; the rest hidden there
+local function PlaceIcons()
+	if not iconLayer or not own.on then return end
+	local u, v, zoom = own.u, own.v, own.zoom
+	if not (u and zoom) then return end
+	local pu, pv = input.PerPx(zoom)
+	local hw, hh = view:GetWidth() / 2 + 16, view:GetHeight() / 2 + 16
+	local profile = _G.Questie and Questie.db and Questie.db.profile
+	local questieOn = zoom >= QUESTIE_FROM and not (profile and profile.enabled == false)
+	local seen = {}
+	for icon, a in pairs(at) do
+		local x, y = (a[1] - u) / pu, (a[2] - v) / pv
+		local on
+		if a[3] then on = questieOn else on = zoom >= QUESTIE_FROM or a[4] >= 2 end
+		if on and x > -hw and x < hw and y > -hh and y < hh then
+			-- (its pin as it is now: the library may have put it on another since, in the fight)
+			if icon:GetParent() ~= iconLayer then
+				moved[icon] = icon:GetParent() or false
+				icon:SetParent(iconLayer)
+			end
+			icon:ClearAllPoints()
+			icon:SetPoint("CENTER", iconLayer, "CENTER", x, -y)
+			icon:Show()
+			seen[icon] = true
+		end
+	end
+	for icon in pairs(moved) do
+		if not seen[icon] and icon:GetParent() == iconLayer then icon:Hide() end
+	end
+end
+mod.OwnPlaceIcons = PlaceIcons
+
+-- the icons given back: to the pin they were on, centred on it as the library has them; hidden otherwise
+local function GiveBackIcons()
+	for icon, parent in pairs(moved) do
+		if icon:GetParent() == iconLayer then
+			icon:ClearAllPoints()
+			if parent then
+				icon:SetParent(parent)
+				icon:SetPoint("CENTER", parent, "CENTER")
+				if parent.IsShown and parent:IsShown() then icon:Show() else icon:Hide() end
+			else
+				icon:Hide()
+			end
+		end
+	end
+	wipe(moved)
+	wipe(at)
+end
+
+-- the canvas where the view is: the host map's (x, y) at the view's centre at `scale`, as a scroll frame does
+function mod.OwnViewPlace()
+	if not own.on or not canvas then return end
+	local w, h = sc.Child:GetWidth(), sc.Child:GetHeight()       -- (read only: the canvas's size is Blizzard's)
+	if not (w and h and w > 0 and h > 0 and own.scale and own.scale > 0) then return end
+	if canvas:GetWidth() ~= w or canvas:GetHeight() ~= h then canvas:SetSize(w, h) end
+	canvas:SetScale(own.scale)
+	canvas:ClearAllPoints()
+	canvas:SetPoint("TOPLEFT", view, "TOPLEFT", view:GetWidth() / 2 / own.scale - own.x * w,
+		-(view:GetHeight() / 2 / own.scale - own.y * h))
+	PlaceIcons()
+end
+
+-- OpenMap's frames moved up to the view's levels (and given their own back), keeping their order: every
+-- frame under them, each by the same step (a frame's level isn't moved with its parent's)
+local function Lift(frame, step)
+	if not frame then return end
+	levels[frame] = levels[frame] or frame:GetFrameLevel()
+	frame:SetFrameLevel(math.min(9900, levels[frame] + step))
+	for _, child in ipairs({ frame:GetChildren() }) do Lift(child, step) end
+end
+local function Lower()
+	for frame, level in pairs(levels) do frame:SetFrameLevel(level) end
+	wipe(levels)
+end
+
+local function Build()
+	if view then return true end
+	view = CreateFrame("Frame", nil, sc)
+	view:SetAllPoints(sc)
+	view:SetFrameLevel(LEVEL)
+	if view.SetClipsChildren then view:SetClipsChildren(true) end
+	view:Hide()
+	canvas = CreateFrame("Frame", nil, view)
+	canvas:SetFrameLevel(LEVEL + 1)
+	iconLayer = CreateFrame("Frame", nil, view)
+	iconLayer:SetAllPoints(view)
+	-- the mouse: the map's own zoom, drag and clicks, on this view (Blizzard's canvas handlers not called)
+	view:EnableMouse(true)
+	view:EnableMouseWheel(true)
+	view:SetScript("OnMouseWheel", function(_, delta) input.Wheel(nil, delta) end)
+	view:SetScript("OnMouseDown", function(_, button)
+		input.PressDown(nil, button)
+		mod.OwnDragStart(button)
+		input.Grab()
+	end)
+	view:SetScript("OnMouseUp", function(_, button)
+		local dragged = mod.OwnDragStop()
+		if button == "MiddleButton" then if mod.FindMe then mod:FindMe(true) end return end
+		if not dragged then input.Click(button) end
+	end)
+	view:SetScript("OnUpdate", function(_, elapsed)
+		mod.OwnDragTrack()
+		scanAt = scanAt + elapsed
+		if scanAt >= SCAN_EVERY then scanAt = 0 ScanIcons() PlaceIcons() end
+	end)
+	return true
+end
+
+-- a drag on the view (or on one of OpenMap's icons in a fight): the view carried with the cursor
+function mod.OwnDragStart(button)
+	if not own.on or button ~= "LeftButton" then return end
+	local u, v, zoom = input.View()
+	local sx, sy = input.CursorOffset()
+	drag = { sx = sx, sy = sy, u = u, v = v, zoom = zoom, moved = false }
+end
+function mod.OwnDragTrack()
+	if not drag then return end
+	if not IsMouseButtonDown("LeftButton") or not own.on then return end
+	local sx, sy = input.CursorOffset()
+	local dx, dy = sx - drag.sx, sy - drag.sy
+	if not drag.moved and dx * dx + dy * dy <= 20 then return end   -- (Blizzard's click distance, squared)
+	drag.moved = true
+	local pu, pv = input.PerPx(drag.zoom)
+	if mod.ShowNow then mod.ShowNow(drag.u - dx * pu, drag.v - dy * pv, drag.zoom) end
+end
+-- the drag over: whether it moved (a press that didn't is a click)
+function mod.OwnDragStop()
+	local d = drag
+	drag = nil
+	return d and d.moved or false
+end
+
+function mod.OwnViewOn() return own and own.on or false end
+
+-- up, at the view Blizzard's canvas has now (nothing moves on screen): true if it's up
+function mod.OwnViewStart()
+	if not (map and sc and S.IsBuilt and S.IsBuilt()) then return false end
+	if own.on then return true end
+	if not (mod.IsStitched and mod.IsStitched()) or not map:IsShown() or not InCombatLockdown() then return false end
+	if mod.PadViewOn and mod.PadViewOn() then return false end
+	if not Build() then return false end
+	local mapID = map:GetMapID()
+	local scale = sc:GetCanvasScale()
+	local x, y = sc:GetCurrentScrollX(), sc:GetCurrentScrollY()
+	if not (mapID and scale and scale > 0 and ns.Safe.Finite(scale, x, y)) then return false end
+	own.on, own.scale, own.x, own.y = true, scale, x, y
+	own.u, own.v = input.View()
+	local _, _, zoom = input.View()
+	own.zoom = zoom
+	S.Rehost(canvas)
+	local root, pinRoot, chart = S.Roots()
+	local step = LEVEL + 2 - root:GetFrameLevel()
+	Lift(chart, step)
+	Lift(root, step)
+	Lift(pinRoot, step)
+	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)
+	sc.Child:SetAlpha(0)          -- (Blizzard's canvas and its icons, under the view: unseen; nothing of it written)
+	view:Show()
+	ScanIcons()
+	mod.OwnViewPlace()
+	if mod.RefreshQuests then pcall(mod.RefreshQuests, mod) end   -- (your quests as OpenMap's icons: Quests.lua)
+	return true
+end
+
+-- down: `sync` (combat over) has WorldMap.lua put the view on Blizzard's canvas before the art goes back
+function mod.OwnViewStop(sync)
+	if not own or not own.on then return end
+	local scale, x, y = own.scale, own.x, own.y
+	own.on = false
+	drag = nil
+	-- (combat over: the view on Blizzard's canvas, then the art back on it, in the same frame: nothing jumps)
+	if sync and not InCombatLockdown() and mod.SetViewNow then mod.SetViewNow(scale, x, y) end
+	GiveBackIcons()
+	Lower()
+	S.Rehost(nil)
+	if view then view:Hide() end
+	sc.Child:SetAlpha(1)
+	if mod.RefreshQuests then pcall(mod.RefreshQuests, mod) end
+end
+
+function mod:SetupOwnView(worldMap)
+	map, sc = worldMap, worldMap.ScrollContainer
+	own = mod.own
+	input = mod.OwnInput()
+end
