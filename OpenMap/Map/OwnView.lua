@@ -29,6 +29,7 @@ local map, sc, view, canvas, iconLayer, input
 local own                       -- WorldMap.lua's mod.own: { on, scale, x, y, u, v, zoom }
 local levels = {}               -- OpenMap's frame -> its level on Blizzard's canvas (given back as the view ends)
 local moved = {}                -- an addon's icon -> its parent before (given back as the view ends)
+local levelOf = {}              -- an addon's icon -> { level, fixed }: its own before (given back too)
 local drag                      -- { sx, sy, u, v, zoom, moved }: a drag under way
 local scanAt = 0
 
@@ -102,8 +103,16 @@ local function PlaceIcons()
 		if on and x > -hw and x < hw and y > -hh and y < hh then
 			-- (its pin as it is now: the library may have put it on another since, in the fight)
 			if icon:GetParent() ~= iconLayer then
+				local was = levelOf[icon] or { level = icon:GetFrameLevel(),
+					fixed = icon.HasFixedFrameLevel and icon:HasFixedFrameLevel() or false }
+				levelOf[icon] = was
 				moved[icon] = icon:GetParent() or false
 				icon:SetParent(iconLayer)
+				-- (Questie fixes its icons' levels, from 2015 up: a fixed level stays put whatever the parent's,
+				-- under the view's art. Over the layer here, in Questie's own order; given back as the view ends)
+				if icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(false) end
+				icon:SetFrameLevel(math.min(9950, iconLayer:GetFrameLevel() + 1 + math.max(0, math.min(30, was.level - 2015))))
+				if was.fixed and icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(true) end
 			end
 			icon:ClearAllPoints()
 			icon:SetPoint("CENTER", iconLayer, "CENTER", x, -y)
@@ -122,8 +131,14 @@ local function GiveBackIcons()
 	for icon, parent in pairs(moved) do
 		if icon:GetParent() == iconLayer then
 			icon:ClearAllPoints()
+			local was = levelOf[icon]
 			if parent then
 				icon:SetParent(parent)
+				if was then
+					if icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(false) end
+					icon:SetFrameLevel(was.level)
+					if was.fixed and icon.SetFixedFrameLevel then icon:SetFixedFrameLevel(true) end
+				end
 				icon:SetPoint("CENTER", parent, "CENTER")
 				if parent.IsShown and parent:IsShown() then icon:Show() else icon:Hide() end
 			else
@@ -133,6 +148,7 @@ local function GiveBackIcons()
 	end
 	wipe(moved)
 	wipe(at)
+	wipe(levelOf)
 end
 
 -- the canvas where the view is: the host map's (x, y) at the view's centre at `scale`, as a scroll frame does
@@ -153,6 +169,7 @@ end
 -- children with it when its level changes, so a level read after its parent moved was counted twice (every
 -- frame ended at the top, the art over the icons: no icons in a fight)
 local lifted = {}               -- the frames in the order they were lifted (parents first)
+local LiftNew                   -- (below)
 local function Collect(frame, list)
 	if not frame then return end
 	list[#list + 1] = frame
@@ -173,12 +190,28 @@ local function Lift(list, step)
 		lifted[#lifted + 1] = f
 	end
 end
+-- frames OpenMap made since the view came up, at the art's own levels (the close-up's, a shade's ...): under
+-- the view, unseen: lifted as the rest were (one made at its parent's level already is over the view)
+local liftStep, liftTops
+LiftNew = function()
+	if not liftStep then return end
+	local list = {}
+	for _, top in ipairs(liftTops) do Collect(top, list) end
+	for _, f in ipairs(list) do
+		if levels[f] == nil and f:GetFrameLevel() < LEVEL then
+			levels[f] = f:GetFrameLevel()
+			f:SetFrameLevel(math.min(9900, levels[f] + liftStep))
+			lifted[#lifted + 1] = f
+		end
+	end
+end
 local function Lower()
 	for _, f in ipairs(lifted) do
 		if levels[f] then f:SetFrameLevel(levels[f]) end
 	end
 	wipe(lifted)
 	wipe(levels)
+	liftStep, liftTops = nil, nil
 end
 
 local function Build()
@@ -209,7 +242,7 @@ local function Build()
 	view:SetScript("OnUpdate", function(_, elapsed)
 		mod.OwnDragTrack()
 		scanAt = scanAt + elapsed
-		if scanAt >= SCAN_EVERY then scanAt = 0 ScanIcons() PlaceIcons() end
+		if scanAt >= SCAN_EVERY then scanAt = 0 ScanIcons() PlaceIcons() LiftNew() end
 	end)
 	return true
 end
@@ -260,6 +293,7 @@ function mod.OwnViewStart()
 	if chart then table.insert(tops, 1, chart) end
 	local list = Note(tops)
 	local step = LEVEL + 2 - levels[root]
+	liftStep, liftTops = step, tops
 	S.Rehost(canvas)
 	Lift(list, step)
 	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)

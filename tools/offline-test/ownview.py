@@ -77,6 +77,8 @@ def frames_stub():
         function f:IsShown() return self.shown end
         function f:SetAlpha(a) self.alpha = a end
         function f:GetAlpha() return self.alpha end
+        function f:SetFixedFrameLevel(on) self.fixed = on end
+        function f:HasFixedFrameLevel() return self.fixed or false end
         function f:EnableMouse() end
         function f:EnableMouseWheel() end
         function f:SetClipsChildren() end
@@ -191,6 +193,15 @@ class OwnViewTests(unittest.TestCase):
         self.assertFalse(self.lua.eval("under(set, sc.Child)"))
         self.assertEqual(self.lua.eval("icons.alpha"), 1)
 
+    def test_frames_made_later_at_the_arts_levels_are_lifted(self):
+        # (the close-up's, a shade's: made in the fight at the art's own levels, under the view)
+        self.lua.eval("mod.OwnViewStart")()
+        self.lua.execute("late = Frame(layer) late.level = 2125")
+        self.lua.execute("for _, f in ipairs(frames) do if f.OnUpdate then f.OnUpdate(f, 1) end end")
+        self.assertEqual(self.lua.eval("late.level - layer.level"), 5)
+        self.lua.execute("fight = false mod.OwnViewStop(false)")
+        self.assertEqual(self.lua.eval("late.level"), 2125)
+
     def test_combat_over_puts_the_view_on_blizzards_canvas_first(self):
         self.lua.execute("""
             calls = {}
@@ -242,6 +253,7 @@ class IconMirrorTests(unittest.TestCase):
             -- a pins library with two icons: one on a pin of Blizzard's canvas, one at the map's edge (off the view)
             pin = Frame(sc.Child)
             near = Frame(pin) near.UiMapID, near.x, near.y = 1429, 50, 50
+            near.level, near.fixed = 2101, true      -- (Questie's: a fixed level, from 2015 up)
             far = Frame(nil) far.UiMapID, far.x, far.y = 1429, 0, 0
             lib = { worldmapPins = { [near] = { uiMapID = 1429 }, [far] = { uiMapID = 1429 } } }
             LibStub = { IterateLibraries = function() return pairs({ ["HereBeDragons-Pins-2.0"] = lib }) end }
@@ -259,6 +271,18 @@ class IconMirrorTests(unittest.TestCase):
     def test_out_of_view_not_put_on_it(self):
         # (far: 0.4, 0.4 in the world, 800 view px off at zoom 8: past the view's half-width, 400)
         self.assertEqual(self.lua.eval("far.parent"), None)
+
+    def test_over_the_layer_though_its_level_is_fixed(self):
+        # (test15: Questie's icons kept their fixed 2101, under the view's art)
+        layer = self.lua.eval("near.parent")
+        self.assertGreater(self.lua.eval("near.level"), layer.level)
+        self.assertGreater(self.lua.eval("near.level"), 9000)
+        self.assertTrue(self.lua.eval("near.fixed"))
+
+    def test_its_own_level_given_back(self):
+        self.lua.execute("fight = false mod.OwnViewStop(false)")
+        self.assertEqual(self.lua.eval("near.level"), 2101)
+        self.assertTrue(self.lua.eval("near.fixed"))
 
     def test_given_back_to_their_pin(self):
         self.lua.execute("fight = false mod.OwnViewStop(false)")
