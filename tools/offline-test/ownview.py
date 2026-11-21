@@ -59,7 +59,9 @@ def frames_stub():
         end
         function f:GetChildren() return unpack(self.children) end
         function f:GetFrameLevel() return self.level end
-        function f:SetFrameLevel(l) self.level = l end
+        -- (as the game: a frame's children move with it when its level changes)
+        local function shift(fr, d) for _, c in ipairs(fr.children) do c.level = c.level + d shift(c, d) end end
+        function f:SetFrameLevel(l) local d = l - self.level self.level = l shift(self, d) end
         function f:SetScale(s) self.scale = s end
         function f:GetScale() return self.scale end
         function f:ClearAllPoints() self.point = nil end
@@ -173,6 +175,19 @@ class OwnViewTests(unittest.TestCase):
                           self.lua.eval("set.level")), (2100, 2120, 2190, 2193))
         self.assertEqual(self.lua.eval("sc.Child.alpha"), 1)
         self.assertIsNone(self.lua.eval("rehosted"))
+
+    def test_icons_over_the_art_and_not_under_the_see_through_canvas(self):
+        # (no icons in a fight, test11: every level counted twice put the art at the top, over the icons)
+        self.lua.eval("mod.OwnViewStart")()
+        self.assertGreater(self.lua.eval("set.level"), self.lua.eval("layer.level"))
+        self.assertLess(self.lua.eval("set.level"), 9900)
+        # (OpenMap's icon layer on the view, not under Blizzard's canvas, which is made see-through)
+        self.lua.execute("""
+            function under(f, anc) while f do if f == anc then return true end f = f.parent end return false end
+        """)
+        self.assertFalse(self.lua.eval("under(icons, sc.Child)"))
+        self.assertFalse(self.lua.eval("under(set, sc.Child)"))
+        self.assertEqual(self.lua.eval("icons.alpha"), 1)
 
     def test_combat_over_puts_the_view_on_blizzards_canvas_first(self):
         self.lua.execute("""

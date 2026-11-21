@@ -148,16 +148,30 @@ function mod.OwnViewPlace()
 	PlaceIcons()
 end
 
--- OpenMap's frames moved up to the view's levels (and given their own back), keeping their order: every
--- frame under them, each by the same step (a frame's level isn't moved with its parent's)
-local function Lift(frame, step)
+-- OpenMap's frames moved up to the view's levels (and given their own back), keeping their order. Every
+-- frame's level is read first, then each set from it, parents before children: the game moves a frame's
+-- children with it when its level changes, so a level read after its parent moved was counted twice (every
+-- frame ended at the top, the art over the icons: no icons in a fight)
+local lifted = {}               -- the frames in the order they were lifted (parents first)
+local function Collect(frame, list)
 	if not frame then return end
-	levels[frame] = levels[frame] or frame:GetFrameLevel()
-	frame:SetFrameLevel(math.min(9900, levels[frame] + step))
-	for _, child in ipairs({ frame:GetChildren() }) do Lift(child, step) end
+	list[#list + 1] = frame
+	for _, child in ipairs({ frame:GetChildren() }) do Collect(child, list) end
+end
+local function Lift(tops, step)
+	local list = {}
+	for _, top in ipairs(tops) do Collect(top, list) end
+	for _, f in ipairs(list) do if levels[f] == nil then levels[f] = f:GetFrameLevel() end end
+	for _, f in ipairs(list) do
+		f:SetFrameLevel(math.min(9900, levels[f] + step))
+		lifted[#lifted + 1] = f
+	end
 end
 local function Lower()
-	for frame, level in pairs(levels) do frame:SetFrameLevel(level) end
+	for _, f in ipairs(lifted) do
+		if levels[f] then f:SetFrameLevel(levels[f]) end
+	end
+	wipe(lifted)
 	wipe(levels)
 end
 
@@ -238,9 +252,9 @@ function mod.OwnViewStart()
 	S.Rehost(canvas)
 	local root, pinRoot, chart = S.Roots()
 	local step = LEVEL + 2 - root:GetFrameLevel()
-	Lift(chart, step)
-	Lift(root, step)
-	Lift(pinRoot, step)
+	local tops = { root, pinRoot }
+	if chart then table.insert(tops, 1, chart) end
+	Lift(tops, step)
 	iconLayer:SetFrameLevel(pinRoot:GetFrameLevel() + ICONS_OVER)
 	sc.Child:SetAlpha(0)          -- (Blizzard's canvas and its icons, under the view: unseen; nothing of it written)
 	view:Show()
