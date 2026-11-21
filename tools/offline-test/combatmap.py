@@ -62,5 +62,42 @@ class CombatMapTests(unittest.TestCase):
         self.assertIsNotNone(m)
         self.assertIn("if InCombatLockdown() and mod.OwnViewStart then", m.group(1))
 
+
+class CombatEndTests(unittest.TestCase):
+    """the combat view's view kept as combat ends, through what follows it in mod.CombatOver: OpenMap's zoom
+    levels put in (Blizzard resets its view, OpenMap's reset follows) and a reset noted in the fight (the zoom
+    jumped as the fight ended, test16)"""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        over = function("mod.CombatOver")
+        flush = function("mod.FlushWaitingView")
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            fight, active, anim, afterCombat, resetDue, waitingView = false, true, nil, true, false, nil
+            function InCombatLockdown() return fight end
+            view = { scale = 1, x = 0.5, y = 0.5 }
+            function SetView(scale, x, y) view = { scale = scale, x = x, y = y } end
+            own = { on = true, scale = 3, x = 0.2, y = 0.7 }
+            map = { GetMapID = function() return 1429 end, IsShown = function() return true end }
+            mod = {}
+            -- (as OwnView.lua: the view on Blizzard's canvas, then the art back)
+            function mod.OwnViewStop() own.on = false SetView(3, 0.2, 0.7) end
+            -- (Blizzard's reset as the zoom levels come in, OpenMap's reset following it: "When reopening the map")
+            sc = { OnCanvasSizeChanged = function() SetView(1, 0.5, 0.5) end }
+            function KeepPadCursor(fn, ...) return fn(...) end
+            function mod.ResetDue() end
+        """ + flush + over)
+
+    def test_the_view_kept(self):
+        self.lua.execute("mod.CombatOver()")
+        v = self.lua.eval("view")
+        self.assertEqual((v.scale, v.x, v.y), (3, 0.2, 0.7))
+
+    def test_without_the_own_view_as_before(self):
+        self.lua.execute("own.on = false afterCombat = false mod.CombatOver()")
+        v = self.lua.eval("view")
+        self.assertEqual((v.scale, v.x, v.y), (1, 0.5, 0.5))
+
 if __name__ == "__main__":
     unittest.main()

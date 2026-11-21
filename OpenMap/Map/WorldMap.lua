@@ -1016,7 +1016,11 @@ end
 -- combat over: what was left as Blizzard had it in the fight (its wheel and scaling modes, OpenMap's zoom
 -- levels) put in, then the view asked for in it (SetView), if that map is still the one up
 function mod.CombatOver()
+	-- (the own view's view, kept to the end: OpenMap's zoom levels and room to pan, put in below, have Blizzard
+	-- reset its view and OpenMap's reset follows, "When reopening the map": the zoom jumped as the fight ended)
+	local keep
 	if own.on then
+		keep = { mapID = map:GetMapID(), scale = own.scale, x = own.x, y = own.y }
 		if mod.OwnViewStop then mod.OwnViewStop(true) end   -- (its view put on Blizzard's canvas: SetViewNow)
 		resetDue, waitingView = false, nil
 	end
@@ -1025,6 +1029,7 @@ function mod.CombatOver()
 		KeepPadCursor(sc.OnCanvasSizeChanged, sc)   -- (the zoom levels again: OnCreateZoomLevels, Attach)
 	end
 	if mod.ResetDue then mod.ResetDue() end
+	if keep then waitingView, anim = keep, nil end
 	mod.FlushWaitingView()
 end
 function mod.FlushWaitingView()
