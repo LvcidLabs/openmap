@@ -1079,8 +1079,11 @@ local function ResetView(self)
 	anim = nil
 	if live and map:IsShown() then beforeReset = { live[1], live[2], live[3], at = GetTime() } end
 	local u, v, zoom
-	if resize and live and map:IsShown() then
-		u, v, zoom = View()
+	if resize and resize.u and map:IsShown() then
+		-- (the view as the drag left it, read before Blizzard's reset ran: this runs after it, a hook, and the
+		-- view now is its whole map's (the window went out to a continent's on every resize). At the same
+		-- scale: the zoom for it in the window's new size)
+		u, v, zoom = resize.u, resize.v, ZoomFor(self.mapID, resize.scale)
 	elseif live and map:IsShown() and (math.abs(sc:GetWidth() - live[4]) > 0.5 or math.abs(sc:GetHeight() - live[5]) > 0.5) then
 		u, v, zoom = live[1], live[2], live[3]
 	elseif not live and mod.SavedView then          -- (no view drawn yet: the map is opening)
@@ -1105,10 +1108,17 @@ end
 -- map is kept where it is on screen, under the window's edge that stays put, and the view's centre
 -- and extents follow what's now in the window (the close-up art filling in as it grows); the drop
 -- lays it out at that same scale (ResetView), so nothing jumps
+-- (where the drag has the view, and at what scale: kept as it goes, for the drop's ResetView)
+local function NoteResize()
+	if not resize or own.on then return end
+	resize.u, resize.v = View()
+	resize.scale = sc:GetCanvasScale()
+end
 function mod.BeginResize()
 	resize = nil
 	if not active or not map:IsShown() or not sc:GetLeft() then return end
 	resize = { left = sc:GetLeft(), scroll = sc:GetHorizontalScroll() }
+	NoteResize()
 end
 function mod.FollowResize()
 	if not resize or not active or not map:IsShown() or InCombatLockdown() then return end
@@ -1121,8 +1131,17 @@ function mod.FollowResize()
 	sc:MarkAreaTriggersDirty()
 	sc:MarkViewRectDirty()
 	ApplyView()
+	NoteResize()
 end
 function mod.EndResize() resize = nil end
+-- the window resized in a fight (OwnView.lua, the view's size changed): the own view keeps its centre and its
+-- scale (the window shows more or less round it, as out of a fight), its art and icons laid out for the new size
+function mod.OwnViewResized()
+	if not own.on or not active then return end
+	own.zoom = ZoomFor(map:GetMapID(), own.scale)
+	if mod.OwnViewPlace then mod.OwnViewPlace() end
+	if ApplyZoom then ApplyZoom() end
+end
 
 -- pan anywhere on the world, not just this map. Zoomed right out the world is centred;
 -- zooming in, the view gains room to go past its edges (EDGE_SLACK, in by CENTRE_UNTIL), so

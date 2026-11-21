@@ -251,6 +251,9 @@ local function Build()
 		if button == "MiddleButton" then if mod.FindMe then mod:FindMe(true) end return end
 		if not dragged then input.Click(button) end
 	end)
+	-- (the window resized in a fight: the art, OpenMap's icons and your arrow laid out for it, not only the
+	-- addons' icons, which PlaceIcons puts by the view's size)
+	view:SetScript("OnSizeChanged", function() if mod.OwnViewResized then mod.OwnViewResized() end end)
 	view:SetScript("OnUpdate", function(_, elapsed)
 		mod.OwnDragTrack()
 		scanAt = scanAt + elapsed

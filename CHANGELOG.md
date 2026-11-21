@@ -97,9 +97,6 @@
 - **Coordinates clear of the border full screen**: the labels sat under Blizzard's border at the map's
   bottom edge when the map was maximized (#399).
 
-- **The quest log's details fit the window**: a window resized shorter than Blizzard's own let the quest
-  details beside it run out below; with the quest log shown it's no shorter than that now (#402).
-
 ## v0.8.11 (2026-11-20)
 
 ### Improved

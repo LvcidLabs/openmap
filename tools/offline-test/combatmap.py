@@ -191,5 +191,65 @@ class ArrowFollowTests(unittest.TestCase):
         self.lua.execute("arrow.shown = false for i = 1, 5 do here[3] = i OnUpdate() end")
         self.assertEqual(self.lua.eval("turns"), 0)
 
+
+class ResizeTests(unittest.TestCase):
+    """the window's corner dragged keeps the view: its centre and its scale (the window shows more or less round it).
+    Out of a fight the drop's ResetView ran after Blizzard's reset (a hook, #345) and read the view then, its whole
+    map's: the map went out to a continent on every resize (test20). In one, the own view is laid out again for the
+    window's new size, not only the addons' icons on it"""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        reset = re.search(r"\nlocal function ResetView\(self\)\n.*?\nend\n", WORLDMAP, re.S).group(0)
+        note = re.search(r"\nlocal function NoteResize\(\)\n.*?\nend\n", WORLDMAP, re.S).group(0)
+        resized = function("mod.OwnViewResized")
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            own, active, anim, userMoved = { on = false }, true, nil, false
+            fitPx = 1
+            function ZoomFor(mapID, scale) return scale / fitPx end
+            canvasScale = 2
+            sc = { GetCanvasScale = function() return canvasScale end, GetWidth = function() return 800 end,
+                GetHeight = function() return 600 end }
+            map = { IsShown = function() return true end, GetMapID = function() return 1414 end }
+            view = { 0.3, 0.4, 2 }
+            function View() return view[1], view[2], view[3] end
+            function Clamp(x, a, b) return math.max(a, math.min(b, x)) end
+            function LeastZoom() return 0.5 end
+            function MaxZoomAt() return 100 end
+            function GetTime() return 0 end
+            shown = nil
+            function ShowWorld(u, v, zoom) shown = { u, v, zoom } end
+            function SetView() shown = "whole map" end
+            S = { ArtSize = function() return 1000, 700 end }
+            mod = {}
+            live = { 0.3, 0.4, 2, 800, 600 }
+            placed, zoomed = 0, 0
+            function mod.OwnViewPlace() placed = placed + 1 end
+            function ApplyZoom() zoomed = zoomed + 1 end
+        """ + note + reset + resized + "\n_G.NoteResize, _G.ResetView = NoteResize, ResetView\n")
+
+    def test_the_drop_keeps_the_view(self):
+        # (the drag noted the view; the drop: the window bigger, Blizzard's reset to its whole map, then ResetView)
+        self.lua.execute("""
+            resize = {} NoteResize()
+            fitPx = 1.5 view = { 0.5, 0.5, 0.4 } canvasScale = 0.6
+            ResetView({ mapID = 1414, GetWidth = function() return 1200 end, GetHeight = function() return 900 end })
+        """)
+        shown = self.lua.eval("shown")
+        self.assertEqual((shown[1], shown[2]), (0.3, 0.4))            # its centre
+        self.assertAlmostEqual(shown[3] * 1.5, 2)                     # its scale: the zoom for scale 2 in the new size
+
+    def test_in_a_fight_laid_out_again_at_the_same_centre_and_scale(self):
+        self.lua.execute("own = { on = true, scale = 3, x = 0.2, y = 0.7, zoom = 3 } fitPx = 2 mod.OwnViewResized()")
+        own = self.lua.eval("own")
+        self.assertEqual((own.scale, own.x, own.y), (3, 0.2, 0.7))
+        self.assertEqual(own.zoom, 1.5)
+        self.assertEqual((self.lua.eval("placed"), self.lua.eval("zoomed")), (1, 1))
+
+    def test_the_own_view_follows_its_size(self):
+        own = (Path(__file__).resolve().parents[2] / "OpenMap" / "Map" / "OwnView.lua").read_text(encoding="utf-8")
+        self.assertIn('view:SetScript("OnSizeChanged", function() if mod.OwnViewResized then mod.OwnViewResized() end end)', own)
+
 if __name__ == "__main__":
     unittest.main()

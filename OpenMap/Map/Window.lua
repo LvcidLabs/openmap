@@ -26,12 +26,6 @@ local TOP_OFF = 0                -- px of the window's top that may go above the
 local map, handle, grip         -- (grip: both corners' grips)
 local FillScreen, SetupQuestLog, TurnArrows
 local blizzardSize              -- the windowed map's own size, for a reset
--- the window's least height: with the quest log beside it, Blizzard's own windowed height (its quest
--- details are laid out for that, and ran out below a shorter window, #402); else MIN_H
-local function MinHeight()
-	if map and map.QuestLog and map.QuestLog:IsShown() and blizzardSize then return math.max(MIN_H, blizzardSize[2]) end
-	return MIN_H
-end
 local ours = false              -- OpenMap is moving / sizing the window itself (not to be undone)
 local sizing = false            -- a grip is being dragged: the drag sizes the window, nothing puts it back
 local moveAny = false           -- Move Any owns position and scale, OpenMap owns viewport dimensions
@@ -287,7 +281,8 @@ local function Grip(corner)
 		if not ns.Safe.Finite(s) or s <= 0 then return end   -- (no scale yet: a drag by it would be infinite)
 		local dx = (x - start.x) / s
 		local w = math.max(MIN_W, start.w + (left and -dx or dx))
-		local h = math.max(MinHeight(), start.h - (y - start.y) / s)
+		-- (no taller least height with the quest log shown, #402: its details scroll)
+		local h = math.max(MIN_H, start.h - (y - start.y) / s)
 		ours = true
 		if not moveAny then
 			Clamp(w, h)
