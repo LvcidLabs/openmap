@@ -200,6 +200,8 @@ end
 local waitingView                 -- { mapID, scale, x, y }: a view the canvas refused in combat
 local resetDue = false           -- Blizzard reset its view in a fight: OpenMap's put up as it ends (mod.ResetDue)
 local afterCombat = false         -- something of Blizzard's map left as it was in a fight: put right as it ends
+local afterFight                  -- the view a fight ended on: { u, v, zoom, at = GetTime() } (mod.CombatOver)
+local AFTER_FIGHT = 2             -- seconds after it that the game's resets keep it (its map laid out again then)
 local viewOwner = {}              -- (its event handler's key)
 -- Blizzard's own scale changes (its reset as the map opens, to the whole world) are laid out a frame later,
 -- unless OpenMap's view follows first (SetView, from the reset's hook): each layout of the icon sets hid
@@ -1046,6 +1048,7 @@ function mod.CombatOver()
 	local keep
 	if own.on then
 		keep = { mapID = map:GetMapID(), scale = own.scale, x = own.x, y = own.y }
+		afterFight = { own.u, own.v, own.zoom, at = GetTime() }   -- (kept through the game's resets just after: ResetView)
 		if mod.OwnViewStop then mod.OwnViewStop(true) end   -- (its view put on Blizzard's canvas: SetViewNow)
 		resetDue, waitingView = false, nil
 	end
@@ -1073,17 +1076,20 @@ end
 -- map as it is on screen (the drag shows more or less of it, at the same scale). Another
 -- map put up while it's open (the quest log's, the dropdown's) shows whole, as Blizzard's does
 local beforeReset                 -- the view on screen when Blizzard last put up a map: { u, v, zoom, at = GetTime() }
-local resize                      -- the window's corner being dragged: { left, scroll } (FollowResize)
+local resize                      -- the window's corner being dragged: { u, v, scale }, its view as it began
 local function ResetView(self)
 	userMoved = false
 	anim = nil
 	if live and map:IsShown() then beforeReset = { live[1], live[2], live[3], at = GetTime() } end
 	local u, v, zoom
-	if resize and resize.u and map:IsShown() then
-		-- (the view as the drag left it, read before Blizzard's reset ran: this runs after it, a hook, and the
-		-- view now is its whole map's (the window went out to a continent's on every resize). At the same
-		-- scale: the zoom for it in the window's new size)
+	if resize and map:IsShown() then
+		-- (the drag's view, noted as it began: this runs after the game's reset, a hook, and the view now is its
+		-- whole map's. At the same scale: the zoom for it in the window's new size)
 		u, v, zoom = resize.u, resize.v, ZoomFor(self.mapID, resize.scale)
+	elseif afterFight and GetTime() - afterFight.at <= AFTER_FIGHT and map:IsShown() then
+		-- (a fight just over: the view it ended on, whatever the game resets as it lays its map out again then:
+		-- its quest log's update held over the fight, the window laid out again ... the map went out as it ended)
+		u, v, zoom = afterFight[1], afterFight[2], afterFight[3]
 	elseif live and map:IsShown() and (math.abs(sc:GetWidth() - live[4]) > 0.5 or math.abs(sc:GetHeight() - live[5]) > 0.5) then
 		u, v, zoom = live[1], live[2], live[3]
 	elseif not live and mod.SavedView then          -- (no view drawn yet: the map is opening)
@@ -1103,37 +1109,38 @@ local function ResetView(self)
 	SetView(math.min(self:GetWidth() / aw, self:GetHeight() / ah), 0.5, 0.5)
 end
 
--- the window's corner dragged (Window.lua): Blizzard isn't told the view's size changed until the
--- drop (laying the map out again takes every addon's icons with it), so each frame of the drag the
--- map is kept where it is on screen, under the window's edge that stays put, and the view's centre
--- and extents follow what's now in the window (the close-up art filling in as it grows); the drop
--- lays it out at that same scale (ResetView), so nothing jumps
--- (where the drag has the view, and at what scale: kept as it goes, for the drop's ResetView)
-local function NoteResize()
-	if not resize or own.on then return end
-	resize.u, resize.v = View()
-	resize.scale = sc:GetCanvasScale()
-end
+-- the window's corner dragged (Window.lua): the view keeps its centre and its scale all through the drag, the
+-- window showing more or less round it (as the own view does in a fight). Both are noted once, as the drag
+-- starts, and put back at every change of size, in one place: the game lays its map out again as the window's
+-- size changes (its reset to the whole map, its room to pan worked out for the new size), and a view read back
+-- from the map after that was its whole map's, or a scroll clamped for the new size: the map went out to a
+-- continent, then jumped about as the drag went on (test20, test21)
 function mod.BeginResize()
 	resize = nil
-	if not active or not map:IsShown() or not sc:GetLeft() then return end
-	resize = { left = sc:GetLeft(), scroll = sc:GetHorizontalScroll() }
-	NoteResize()
+	if not active or not map:IsShown() or not sc:GetLeft() or own.on then return end
+	local u, v = View()
+	resize = { u = u, v = v, scale = sc:GetCanvasScale() }
 end
 function mod.FollowResize()
 	if not resize or not active or not map:IsShown() or InCombatLockdown() then return end
-	local left = sc:GetLeft()
-	if not left then return end
-	sc:SetHorizontalScroll(resize.scroll + (left - resize.left) / sc:GetCanvasScale())
+	local mapID = map:GetMapID()
+	-- (the game's reset changed the scale: the view put back whole, at the scale the drag began at)
+	if Kept(resize.scale, sc:GetCanvasScale()) then return ShowWorld(resize.u, resize.v, ZoomFor(mapID, resize.scale)) end
+	-- (else only the scroll: the scale is the same, so the icons needn't be laid out again each frame)
+	local x, y = FromWorld(mapID, resize.u, resize.v)
 	sc:CalculateScrollExtents()
-	local x, y = sc:GetNormalizedHorizontalScroll(), sc:GetNormalizedVerticalScroll()
+	x = Clamp(x, sc.scrollXExtentsMin, sc.scrollXExtentsMax)
+	y = Clamp(y, sc.scrollYExtentsMin, sc.scrollYExtentsMax)
 	sc.currentScrollX, sc.targetScrollX, sc.currentScrollY, sc.targetScrollY = x, x, y, y
+	sc:SetNormalizedHorizontalScroll(x)
+	sc:SetNormalizedVerticalScroll(y)
 	sc:MarkAreaTriggersDirty()
 	sc:MarkViewRectDirty()
 	ApplyView()
-	NoteResize()
 end
 function mod.EndResize() resize = nil end
+-- (each change of the map's size in a drag, the game's own layout of it included: the drag's view put back)
+function mod.ResizeStep() if resize then mod.FollowResize() end end
 -- the window resized in a fight (OwnView.lua, the view's size changed): the own view keeps its centre and its
 -- scale (the window shows more or less round it, as out of a fight), its art and icons laid out for the new size
 function mod.OwnViewResized()
@@ -1492,6 +1499,7 @@ local function Setup()
 		local x0, x1, y0, y1 = extents(self, self:GetCanvasScale())
 		if x0 then self.scrollXExtentsMin, self.scrollXExtentsMax, self.scrollYExtentsMin, self.scrollYExtentsMax = x0, x1, y0, y1 end
 	end)
+	sc:HookScript("OnSizeChanged", mod.ResizeStep)
 	sc:HookScript("OnMouseWheel", OnMouseWheel)
 	sc:HookScript("OnMouseDown", OnGrab)
 	sc:HookScript("OnMouseDown", PressDown)

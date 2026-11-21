@@ -75,6 +75,7 @@ class CombatEndTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute("""
             fight, active, anim, afterCombat, resetDue, waitingView = false, true, nil, true, false, nil
+            function GetTime() return 0 end
             function InCombatLockdown() return fight end
             view = { scale = 1, x = 0.5, y = 0.5 }
             function SetView(scale, x, y) view = { scale = scale, x = x, y = y } end
@@ -193,63 +194,167 @@ class ArrowFollowTests(unittest.TestCase):
 
 
 class ResizeTests(unittest.TestCase):
-    """the window's corner dragged keeps the view: its centre and its scale (the window shows more or less round it).
-    Out of a fight the drop's ResetView ran after Blizzard's reset (a hook, #345) and read the view then, its whole
-    map's: the map went out to a continent on every resize (test20). In one, the own view is laid out again for the
-    window's new size, not only the addons' icons on it"""
+    """the window's corner dragged keeps the view, its centre and its scale, at every step of the drag. Replayed
+    here against a stand-in for the game's scroll container: each change of size has the game lay its map out
+    again (its reset to the whole map, then OpenMap's hook on it; its room to pan worked out for the new size;
+    the map's size-change scripts), before or after the drag's own step, as the game may order them. In a fight
+    the own view is laid out again for the window's new size"""
 
     def setUp(self):
         from lupa.lua51 import LuaRuntime
+        names = ("mod.BeginResize", "mod.FollowResize", "mod.ResizeStep", "mod.OwnViewResized")
+        chunks = [function(n) for n in names]
         reset = re.search(r"\nlocal function ResetView\(self\)\n.*?\nend\n", WORLDMAP, re.S).group(0)
-        note = re.search(r"\nlocal function NoteResize\(\)\n.*?\nend\n", WORLDMAP, re.S).group(0)
-        resized = function("mod.OwnViewResized")
+        kept = re.search(r"\nlocal function Kept\(want, have\).*?\n", WORLDMAP).group(0)
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute("""
-            own, active, anim, userMoved = { on = false }, true, nil, false
-            fitPx = 1
-            function ZoomFor(mapID, scale) return scale / fitPx end
-            canvasScale = 2
-            sc = { GetCanvasScale = function() return canvasScale end, GetWidth = function() return 800 end,
-                GetHeight = function() return 600 end }
-            map = { IsShown = function() return true end, GetMapID = function() return 1414 end }
-            view = { 0.3, 0.4, 2 }
-            function View() return view[1], view[2], view[3] end
-            function Clamp(x, a, b) return math.max(a, math.min(b, x)) end
-            function LeastZoom() return 0.5 end
-            function MaxZoomAt() return 100 end
+            own, active, anim, userMoved, live = { on = false }, true, nil, false, nil
+            fight = false
+            function InCombatLockdown() return fight end
             function GetTime() return 0 end
-            shown = nil
-            function ShowWorld(u, v, zoom) shown = { u, v, zoom } end
-            function SetView() shown = "whole map" end
-            S = { ArtSize = function() return 1000, 700 end }
+            function Clamp(x, a, b) return math.max(a, math.min(b, x)) end
+            W = 1000                                  -- (the map, the host: world = map coordinates here)
+            -- the game's scroll container: its view w x h px, the canvas's scale, its scroll (the view's centre,
+            -- normalized on the map) and its room to pan
+            sc = { w = 800, h = 600, scale = 2, x = 0.45, y = 0.55 }
+            function sc:GetWidth() return self.w end
+            function sc:GetHeight() return self.h end
+            function sc:GetLeft() return 0 end
+            function sc:GetCanvasScale() return self.scale end
+            function sc:CalculateScrollExtents()
+                local hx, hy = self.w / 2 / self.scale / W, self.h / 2 / self.scale / W
+                self.scrollXExtentsMin, self.scrollXExtentsMax = math.min(hx, 0.5), math.max(1 - hx, 0.5)
+                self.scrollYExtentsMin, self.scrollYExtentsMax = math.min(hy, 0.5), math.max(1 - hy, 0.5)
+            end
+            function sc:SetNormalizedHorizontalScroll(x) self.x = x end
+            function sc:SetNormalizedVerticalScroll(y) self.y = y end
+            function sc:MarkAreaTriggersDirty() end
+            function sc:MarkViewRectDirty() end
+            map = { IsShown = function() return true end, GetMapID = function() return 1 end }
+            local function FitPx() return math.min(sc.w / W, sc.h / W) end
+            function ZoomFor(mapID, scale) return scale / FitPx() end
+            function ScaleFor(mapID, zoom) return zoom * FitPx() end
+            function FromWorld(mapID, u, v) return u, v end
+            function View() return sc.x, sc.y, ZoomFor(1, sc.scale) end
+            function SetView(scale, x, y)
+                sc.scale = scale
+                sc:CalculateScrollExtents()
+                sc.x = Clamp(x, sc.scrollXExtentsMin, sc.scrollXExtentsMax)
+                sc.y = Clamp(y, sc.scrollYExtentsMin, sc.scrollYExtentsMax)
+            end
+            function ShowWorld(u, v, zoom) SetView(ScaleFor(1, zoom), u, v) end
+            function ApplyView() end
+            function LeastZoom() return 0.1 end
+            function MaxZoomAt() return 100 end
+            S = { ArtSize = function() return W, W end }
             mod = {}
-            live = { 0.3, 0.4, 2, 800, 600 }
             placed, zoomed = 0, 0
             function mod.OwnViewPlace() placed = placed + 1 end
             function ApplyZoom() zoomed = zoomed + 1 end
-        """ + note + reset + resized + "\n_G.NoteResize, _G.ResetView = NoteResize, ResetView\n")
-
-    def test_the_drop_keeps_the_view(self):
-        # (the drag noted the view; the drop: the window bigger, Blizzard's reset to its whole map, then ResetView)
-        self.lua.execute("""
-            resize = {} NoteResize()
-            fitPx = 1.5 view = { 0.5, 0.5, 0.4 } canvasScale = 0.6
-            ResetView({ mapID = 1414, GetWidth = function() return 1200 end, GetHeight = function() return 900 end })
+        """ + kept + "".join(chunks) + reset + """
+            -- the game's own layout of its map at a change of size: its reset to the whole map (OpenMap's hook on
+            -- it after), its room to pan for the new size (the scroll clamped to it), the size-change scripts
+            function GameLayout()
+                sc.scale = math.min(sc.w / W, sc.h / W)
+                sc.x, sc.y = 0.5, 0.5
+                ResetView({ mapID = 1, GetWidth = function() return sc.w end, GetHeight = function() return sc.h end })
+                sc:CalculateScrollExtents()
+                sc.x = Clamp(sc.x, sc.scrollXExtentsMin, sc.scrollXExtentsMax)
+                sc.y = Clamp(sc.y, sc.scrollYExtentsMin, sc.scrollYExtentsMax)
+                mod.ResizeStep()
+            end
+            -- only its room to pan worked out again (no reset), then the size-change scripts
+            function GameExtents()
+                sc:CalculateScrollExtents()
+                sc.x = Clamp(sc.x, sc.scrollXExtentsMin, sc.scrollXExtentsMax)
+                sc.y = Clamp(sc.y, sc.scrollYExtentsMin, sc.scrollYExtentsMax)
+                mod.ResizeStep()
+            end
         """)
-        shown = self.lua.eval("shown")
-        self.assertEqual((shown[1], shown[2]), (0.3, 0.4))            # its centre
-        self.assertAlmostEqual(shown[3] * 1.5, 2)                     # its scale: the zoom for scale 2 in the new size
+
+    def drag(self, order):
+        self.lua.execute("mod.BeginResize()")
+        u0, v0, s0 = self.lua.eval("sc.x"), self.lua.eval("sc.y"), self.lua.eval("sc.scale")
+        for i in range(1, 41):
+            # (wider and taller, then narrower and shorter than it began)
+            w, h = 800 + 25 * (i if i <= 20 else 40 - i * 1.6), 600 + 15 * (i if i <= 20 else 40 - i * 1.7)
+            self.lua.execute("sc.w, sc.h = %f, %f" % (w, h))
+            step = order[i % len(order)]
+            self.lua.execute({"layout": "GameLayout()", "extents": "GameExtents()", "ours": "mod.FollowResize()",
+                              "layout+ours": "GameLayout() mod.FollowResize()",
+                              "ours+layout": "mod.FollowResize() GameLayout()"}[step])
+            self.assertAlmostEqual(self.lua.eval("sc.x"), u0, 9, "step %d (%s): the centre moved" % (i, step))
+            self.assertAlmostEqual(self.lua.eval("sc.y"), v0, 9, "step %d (%s): the centre moved" % (i, step))
+            self.assertAlmostEqual(self.lua.eval("sc.scale"), s0, 9, "step %d (%s): the scale changed" % (i, step))
+        # (the drop: the game lays it out once more, then the drag ends)
+        self.lua.execute("GameLayout()")
+        self.assertAlmostEqual(self.lua.eval("sc.x"), u0, 9)
+        self.assertAlmostEqual(self.lua.eval("sc.scale"), s0, 9)
+
+    def test_a_drag_keeps_the_centre_and_scale_the_game_first(self):
+        self.drag(["layout+ours", "extents", "ours", "layout"])
+
+    def test_a_drag_keeps_the_centre_and_scale_ours_first(self):
+        self.drag(["ours+layout", "ours", "extents", "ours+layout"])
 
     def test_in_a_fight_laid_out_again_at_the_same_centre_and_scale(self):
-        self.lua.execute("own = { on = true, scale = 3, x = 0.2, y = 0.7, zoom = 3 } fitPx = 2 mod.OwnViewResized()")
+        self.lua.execute("own = { on = true, scale = 3, x = 0.2, y = 0.7, zoom = 3 } sc.w, sc.h = 1000, 800 mod.OwnViewResized()")
         own = self.lua.eval("own")
         self.assertEqual((own.scale, own.x, own.y), (3, 0.2, 0.7))
-        self.assertEqual(own.zoom, 1.5)
+        self.assertAlmostEqual(own.zoom, 3 / 0.8)
         self.assertEqual((self.lua.eval("placed"), self.lua.eval("zoomed")), (1, 1))
 
     def test_the_own_view_follows_its_size(self):
         own = (Path(__file__).resolve().parents[2] / "OpenMap" / "Map" / "OwnView.lua").read_text(encoding="utf-8")
         self.assertIn('view:SetScript("OnSizeChanged", function() if mod.OwnViewResized then mod.OwnViewResized() end end)', own)
+        self.assertIn('sc:HookScript("OnSizeChanged", mod.ResizeStep)', WORLDMAP)
+
+
+class AfterFightTests(unittest.TestCase):
+    """a fight over, the map keeps the view it ended on through what the game does to its map just after (its
+    quest log's update held over the fight, the window laid out again: each a reset to its whole map, which
+    OpenMap's hook on it turned into the whole map: the map went out as the fight ended, test21)"""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        over = function("mod.CombatOver")
+        flush = function("mod.FlushWaitingView")
+        reset = re.search(r"\nlocal function ResetView\(self\)\n.*?\nend\n", WORLDMAP, re.S).group(0)
+        top = re.search(r"\nlocal afterFight .*?\nlocal AFTER_FIGHT = [^\n]*\n", WORLDMAP, re.S).group(0)
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            now = 100
+            function GetTime() return now end
+            fight, active, anim, afterCombat, resetDue, waitingView, userMoved, live, resize = false, true, nil, false, false, nil, false, nil, nil
+            function InCombatLockdown() return fight end
+            view = { scale = 1, x = 0.5, y = 0.5 }
+            function SetView(scale, x, y) view = { scale = scale, x = x, y = y } end
+            function ShowWorld(u, v, zoom) view = { u = u, v = v, zoom = zoom } end
+            function View() return 0.5, 0.5, 1 end
+            function Clamp(x, a, b) return math.max(a, math.min(b, x)) end
+            function LeastZoom() return 0.5 end
+            function MaxZoomAt() return 100 end
+            function ZoomFor(m, s) return s end
+            own = { on = true, scale = 3, x = 0.2, y = 0.7, u = 0.41, v = 0.52, zoom = 6.5 }
+            map = { GetMapID = function() return 1429 end, IsShown = function() return true end }
+            sc = { GetWidth = function() return 800 end, GetHeight = function() return 600 end }
+            S = { ArtSize = function() return 1000, 700 end }
+            mod = {}
+            function mod.OwnViewStop() own.on = false end
+            function KeepPadCursor(fn, ...) return fn(...) end
+            function mod.ResetDue() end
+        """ + top + flush + over + reset + "\n_G.ResetView = ResetView\n")
+        self.self_ = "{ mapID = 1429, GetWidth = function() return 800 end, GetHeight = function() return 600 end }"
+
+    def test_the_games_reset_just_after_keeps_the_fights_view(self):
+        self.lua.execute("mod.CombatOver() now = now + 0.5 ResetView(%s)" % self.self_)
+        v = self.lua.eval("view")
+        self.assertEqual((v.u, v.v, v.zoom), (0.41, 0.52, 6.5))
+
+    def test_later_a_reset_is_the_games_again(self):
+        self.lua.execute("mod.CombatOver() now = now + 10 ResetView(%s)" % self.self_)
+        self.assertEqual(self.lua.eval("view").u, None)       # (the whole map: SetView)
+
 
 if __name__ == "__main__":
     unittest.main()
