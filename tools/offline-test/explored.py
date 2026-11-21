@@ -268,5 +268,76 @@ class DimTilesTests(unittest.TestCase):
         self.assertEqual((t[11].fw, t[11].fh), (256 * 2, 256 * 3))
 
 
+class HideShapesTests(unittest.TestCase):
+    """Hidden up close (Stitch.lua's Shade.Hide.BuildIn, "hide"): the zone's blank art only through each
+    unexplored piece's own shape, inside the hidden rectangles. A rectangle alone also covered the land
+    around the shape, painted by the zone's art and shown zoomed out, so up close it got the painted map
+    over the minimap's detail as if unexplored (#166, #156, #163, #247, #279, #370)"""
+
+    def setUp(self):
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            Shade = { Hide = { mode = "hide" } }
+            NONE = {}
+            gradeNow = { 0, 0 }
+            ns = {}
+            function Pow2(n) local p = 1 while p < n do p = p * 2 end return p end
+            list = {
+                { files = { 11, 12 }, x = 10, y = 20, w = 300, h = 200, piece = { unexplored = true } },
+                { files = { 21 }, x = 600, y = 50, w = 100, h = 100, piece = { unexplored = false } },
+            }
+            function ForEachPiece(mapID, fn)
+                for _, e in ipairs(list) do fn(e.files, e.x, e.y, e.w, e.h, 0, e.piece) end
+            end
+            function ZoneMask() return nil end
+            function Feather() return { feather = true } end
+            function Record(r, x, y, w, h) r.at = { x, y, w, h } end
+            made = {}
+            frame = {}
+            function frame:CreateMaskTexture()
+                local m = { mask = true }
+                function m:SetTexture(file) self.file = file end
+                return m
+            end
+            function frame:CreateTexture()
+                local t = { masks = {} }
+                function t:SetTexture(file) self.file = file end
+                function t:SetTexCoord(...) self.coord = { ... } end
+                function t:AddMaskTexture(m) self.masks[#self.masks + 1] = m end
+                function t:SetDesaturation() end
+                function t:SetVertexColor() end
+                made[#made + 1] = t
+                return t
+            end
+        """)
+        self.lua.execute(chunk("Shade.Hide.Shapes"))
+        self.lua.execute(chunk("Shade.Hide.BuildIn"))
+        # (the zone's art in 256 px tiles, 4 across; hidden: one rectangle reaching well past the piece)
+        self.lua.execute("""
+            p = { left = 0, top = 0, sx = 1, sy = 1, layer = { tileWidth = 256, tileHeight = 256, layerWidth = 1024 } }
+            files = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }
+            Shade.Hide.BuildIn(frame, p, files, 1433, { { 0, 0, 512, 400 } }, 1, "hide")
+        """)
+
+    def made(self):
+        return list(self.lua.eval("made").values())
+
+    def test_only_inside_the_unexplored_pieces(self):
+        # (the piece is 10..310 x 20..220: nothing drawn outside it, though the rectangle is 0..512 x 0..400)
+        self.assertGreater(len(self.made()), 0)
+        for t in self.made():
+            x, y, w, h = t.at[1], t.at[2], t.at[3], t.at[4]
+            self.assertTrue(x >= 10 and y >= 20 and x + w <= 310 and y + h <= 220, (x, y, w, h))
+
+    def test_each_through_its_pieces_shape(self):
+        for t in self.made():
+            files = [m.file for m in t.masks.values() if m.file]
+            self.assertEqual(len(files), 1)
+            self.assertIn(files[0], (11, 12))
+
+    def test_covers_the_whole_piece(self):
+        self.assertEqual(sum(t.at[3] * t.at[4] for t in self.made()), 300 * 200)
+
+
 if __name__ == "__main__":
     unittest.main()

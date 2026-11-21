@@ -98,6 +98,15 @@ class VersionTests(unittest.TestCase):
         self.lua.execute("mod.db.updateNotice = true")
         self.assertEqual(tuple(self.lua.eval("{ mod.VersionFields() }").values()), ("v0.8.11", "Forever"))
 
+    def test_a_test_build_never_advertises_itself(self):
+        # (a version that isn't out yet: never sent, and never believed if another copy sends it)
+        for v in ("v0.8.12-test", "v0.8.12-test4", "v0.9.0-beta", "dev"):
+            self.lua.execute("ns.version = '%s'" % v)
+            self.assertIsNone(self.lua.eval("mod.VersionFields()"), v)
+        self.lua.execute("ns.version = 'v0.8.11'")
+        self.hear("v0.8.12-test")
+        self.assertEqual(self.printed(), [])
+
 
 # Pins.lua with every frame a stand-in that takes any call (its list and card aren't what's tested)
 PINS_STUB = r"""
