@@ -44,6 +44,7 @@ jobs:
       - run: python -P tools/offline-test/version.py
       - run: python -P tools/offline-test/combatmap.py
       - run: python -P tools/offline-test/ownview.py
+      - run: python -P tools/offline-test/waypoint.py
       - run: python -P tools/offline-test/warm.py
       - run: python -P tools/offline-test/bosses.py
       - run: python -P tools/offline-test/questie.py

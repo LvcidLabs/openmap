@@ -209,6 +209,35 @@ local function HideBlizzardPin()
 	end
 end
 
+-- Blizzard's own waypoint set on the stitched map (its Ctrl-click with "Ctrl-click drops a pin" off, #19, or
+-- another addon's): put where the cursor is, on the zone there, and followed. Blizzard places it on the map
+-- underneath, often a continent's, at the cursor clamped to that map's rectangle: on a continent's map the
+-- game has no route to it, so it was set but never followed (no arrow, no distance). Only the waypoint, through
+-- the game's own calls: nothing of Blizzard's map is touched
+local zoning = false
+function mod.ZoneWaypoint()
+	if zoning or not (mod.IsStitched and mod.IsStitched()) or not map or not map:IsShown() then return end
+	local mapID, x, y = BlizzardPin()
+	if not mapID or not x then return end
+	local info = C_Map.GetMapInfo(mapID)
+	local zoneType = Enum and Enum.UIMapType and Enum.UIMapType.Zone or 3
+	if info and info.mapType and info.mapType >= zoneType then return end      -- (a zone's, or finer: as it is)
+	local u, v
+	if sc and sc:IsMouseOver() and mod.CursorWorld then u, v = mod.CursorWorld() end   -- (where the click was)
+	if not u and mod.ToWorld and S.Rect(mapID) then u, v = mod.ToWorld(mapID, x, y) end
+	if not u then return end
+	local chain = S.ChainAt(u, v)
+	local zone = chain and chain[#chain]
+	if not zone or zone == S.WORLD or zone == mapID then return end
+	if C_Map.CanSetUserWaypointOnMap and not C_Map.CanSetUserWaypointOnMap(zone) then return end
+	local zx, zy = mod.FromWorld(zone, u, v)
+	if not (zx and zy and zx >= 0 and zx <= 1 and zy >= 0 and zy <= 1 and UiMapPoint) then return end
+	zoning = true
+	local ok = pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(zone, zx, zy))
+	if ok and C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true) end
+	zoning = false
+end
+
 -- the waypoint now: map, x, y, and whether it's our own (not Blizzard's)
 function mod.WaypointPoint()
 	local mapID, x, y = BlizzardPin()
@@ -732,7 +761,7 @@ function mod:SetupNav(worldMap)
 	if type(map.OnCanvasScaleChanged) == "function" then
 		hooksecurefunc(map, "OnCanvasScaleChanged", mod.RefreshNativeRingLayout)
 	end
-	ns.RegisterEvent(mod, "USER_WAYPOINT_UPDATED", RefreshWaypoint)
+	ns.RegisterEvent(mod, "USER_WAYPOINT_UPDATED", function() mod.ZoneWaypoint() RefreshWaypoint() end)
 	ns.RegisterEvent(mod, "SUPER_TRACKING_CHANGED", RefreshWaypoint)
 	-- Blizzard's pin comes back each time its provider redraws (the waypoint set, the map changed)
 	-- (found by a method only it has: asking each provider its pin template errors on some, the

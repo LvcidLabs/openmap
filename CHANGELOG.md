@@ -90,6 +90,10 @@
   the dungeon finder and the area you're in, or the portal you came through, and kept over a /reload; Dungeon
   Journal is told it too. By puschie286.
 
+- **Ctrl-click left to the game is followed**: with "Ctrl-click drops a pin" off, the game's own waypoint was
+  set on the map underneath (often the continent's), where the game has no route to it, so it was never
+  followed; it's put on the zone under the cursor now, at the cursor, and followed (#19).
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

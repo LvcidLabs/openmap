@@ -70,6 +70,10 @@
 - **The windowed quest log sits beside the map**: it covered part of the map until the window was laid out
   again; and a window resized by its corner stays on the screen (#327). By gOOvER.
 
+- **Ctrl-click left to the game is followed**: with "Ctrl-click drops a pin" off, the game's own waypoint was
+  set on the map underneath (often the continent's), where the game has no route to it, so it was never
+  followed; it's put on the zone under the cursor now, at the cursor, and followed (#19).
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

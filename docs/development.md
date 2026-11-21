@@ -53,6 +53,7 @@ AI coding agents: read [AGENTS.md](../AGENTS.md) too.
    python -P tools/offline-test/version.py  # a newer OpenMap out: which versions heard count, told once a session; Pins.lua's "V1"
    python -P tools/offline-test/combatmap.py  # the map in a fight: your arrow OpenMap's own, a view Blizzard reset put back as combat ends
    python -P tools/offline-test/ownview.py  # the map in a fight on OpenMap's own frames: nothing of Blizzard's written, the view's maths, addons' icons across and back
+   python -P tools/offline-test/waypoint.py # Blizzard's own waypoint on the stitched map: on the zone under the cursor, followed (#19)
    python -P tools/offline-test/warm.py     # keep-warm: the files held while the map is closed (Stitch.lua, Extras.lua)
    python -P tools/offline-test/window.py   # the window: the quest log's spacer and the clamp, laid out in order (Window.lua)
    python -P tools/offline-test/arrow.py    # your arrow: its size and "Your arrow over everything" (Stitch.lua, WorldMap.lua)
