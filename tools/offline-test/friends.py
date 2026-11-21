@@ -737,5 +737,41 @@ class FriendsTests(unittest.TestCase):
         self.run_(2)
         self.assertEqual(self.lua.eval("#pins"), 1)
 
+    # -- Battle.net's Appear Offline (#395): your friends are told you're offline, so OpenMap tells them nothing
+
+    def appear_offline(self, on):
+        self.lua.execute("""
+            appearOff = %s
+            BNGetInfo = function() return nil, "Me#1", 77 end
+            C_BattleNet = C_BattleNet or {}
+            C_BattleNet.GetAccountInfoByID = function(id) if id == 77 then return { appearOffline = appearOff } end end
+        """ % ("true" if on else "false"))
+
+    def test_appearing_offline_sends_no_place(self):
+        self.appear_offline(True)
+        self.lua.execute("mod.db.friendsShare = true mod.RefreshFriends()")
+        self.lua.execute("Fire('CHAT_MSG_ADDON', 'OpenMapLoc', 'H2', 'WHISPER', 'Pal')")
+        self.run_(30)
+        self.assertEqual(self.lua.eval("Sent('GUILD', 'L1')"), 0)
+        self.assertEqual(self.lua.eval("Sent('WHISPER', 'L1')"), 0)
+        self.assertEqual(self.lua.eval("Sent('WHISPER', 'H1')"), 0)   # (not even a hello: it says you're on)
+
+    def test_going_offline_says_goodbye_and_stops(self):
+        self.appear_offline(False)
+        self.lua.execute("mod.db.friendsShare = true mod.RefreshFriends()")
+        self.run_(2)
+        self.assertEqual(self.lua.eval("Sent('GUILD', 'L1')"), 1)
+        self.lua.execute("appearOff = true")
+        self.lua.execute("here = { 1429, 0.8, 0.5 }")
+        self.run_(30)
+        self.assertEqual(self.lua.eval("Sent('GUILD', 'L1')"), 1)        # (no more places)
+        self.assertEqual(self.lua.eval("Sent('GUILD', 'L0')"), 1)        # (and the goodbye, so it stops showing)
+
+    def test_online_as_before(self):
+        self.appear_offline(False)
+        self.lua.execute("mod.db.friendsShare = true mod.RefreshFriends()")
+        self.run_(2)
+        self.assertEqual(self.lua.eval("Sent('GUILD', 'L1')"), 1)
+
 if __name__ == "__main__":
     unittest.main()

@@ -191,6 +191,10 @@ local waitingView                 -- { mapID, scale, x, y }: a view the canvas r
 local resetDue = false           -- Blizzard reset its view in a fight: OpenMap's put up as it ends (mod.ResetDue)
 local afterCombat = false         -- something of Blizzard's map left as it was in a fight: put right as it ends
 local viewOwner = {}              -- (its event handler's key)
+-- Blizzard's own scale changes (its reset as the map opens, to the whole world) are laid out a frame later,
+-- unless OpenMap's view follows first (SetView, from the reset's hook): each layout of the icon sets hid
+-- and showed them all again, and the opening did it twice (#293: "scale changed" 328 ms to 0)
+local viewSetting, scaleWaiting = false, false
 local function Kept(want, have) return have and math.abs(have - want) > math.max(1e-3, math.abs(want) * 1e-3) end
 local function SetView(scale, x, y)
 	-- (never a view that isn't one: NaN or a zero scale, from a size of 0 while the map is laid out, stuck
@@ -216,7 +220,9 @@ local function SetView(scale, x, y)
 	waitingView = refused and { mapID = map:GetMapID(), scale = wantScale, x = wantX, y = wantY } or nil
 	local start = openStart and debugprofilestop and debugprofilestop()
 	local g, t0 = Before(), Clock()
+	viewSetting = true
 	map:OnCanvasScaleChanged()
+	viewSetting, scaleWaiting = false, false
 	After("pins (all addons)", g)
 	Clocked("every addon's pins rescaled", t0)
 	if start then Part("icons rescaled (all addons)", debugprofilestop() - start) end
@@ -1436,7 +1442,14 @@ local function Setup()
 	end
 
 	local dp = CreateFromMixins(MapCanvasDataProviderMixin)
-	dp.OnCanvasScaleChanged = Ours("scale changed", ApplyZoom)
+	dp.OnCanvasScaleChanged = Ours("scale changed", function()
+		if viewSetting or InCombatLockdown() or not active then return ApplyZoom() end
+		if scaleWaiting then return end
+		scaleWaiting = true
+		C_Timer.After(0, function()
+			if scaleWaiting then scaleWaiting = false ApplyZoom() end   -- (no view of OpenMap's followed it)
+		end)
+	end)
 	dp.OnCanvasPanChanged = ApplyView
 	dp.OnMapChanged = function()
 		HookHighlight()                             -- (a highlight pin made since: the toggle reaches it too, #262)

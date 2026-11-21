@@ -3,7 +3,8 @@
 In combat nothing of Blizzard's map is written from OpenMap's code (#345 #347 #368), so the map stays as it is
 then. Two things follow from that and are checked here: your arrow is OpenMap's own in a fight (Blizzard's,
 protected then, can't be lifted over the art again and went under it), and a view Blizzard reset in a fight
-(the quest log opened from the tracker: the whole map) is put back to OpenMap's as combat ends.
+(the quest log opened from the tracker: the whole map) is put back to OpenMap's as combat ends. And Blizzard's
+own scale changes wait a frame for OpenMap's view out of combat, so an opening lays the icons out once (#293).
 """
 from pathlib import Path
 import re
@@ -41,6 +42,16 @@ class CombatMapTests(unittest.TestCase):
         branch = re.search(r"\tif InCombatLockdown\(\) then\n(.*?)\n\t\treturn\n\tend", m.group(1), re.S).group(1)
         for line in branch.splitlines():
             self.assertNotRegex(line.split("--")[0], r"\bsc\s*[.:\[]", line)
+
+    def test_blizzards_scale_change_laid_out_once(self):
+        # (#293: its reset as the map opens laid the icon sets out for the whole world, then for OpenMap's view
+        # again: Blizzard's own change waits a frame for OpenMap's; in combat, or before the map is up, at once)
+        m = re.search(r'dp\.OnCanvasScaleChanged = Ours\("scale changed", function\(\)\n(.*?)\n\tend\)', WORLDMAP, re.S)
+        self.assertIsNotNone(m)
+        self.assertIn("if viewSetting or InCombatLockdown() or not active then return ApplyZoom() end", m.group(1))
+        self.assertIn("C_Timer.After(0", m.group(1))
+        sv = re.search(r"\nlocal function SetView\(scale, x, y\)\n(.*?)\nend\n", WORLDMAP, re.S).group(1)
+        self.assertIn("viewSetting = true\n\tmap:OnCanvasScaleChanged()\n\tviewSetting, scaleWaiting = false, false", sv)
 
 
 if __name__ == "__main__":

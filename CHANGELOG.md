@@ -61,6 +61,16 @@
 - **After a fight the map is where you left it**: the quest log opened from the tracker in combat left the
   map zoomed out on its whole zone until it was opened again; OpenMap's view comes back as combat ends.
 
+- **Appear Offline keeps your place to yourself**: with Battle.net's Appear Offline on, OpenMap sends your
+  friends and guild nothing (not your place, not even a hello), and tells them to stop showing where you
+  were (#395).
+
+- **Questie's quest icons over a town's icons**: a quest under a vendor, trainer or flight master's icon
+  was hidden; Questie's quests now go over every icon of OpenMap's (#393).
+
+- **The map opens quicker**: as it opened, every set of icons was laid out for the whole world and then
+  again for your view; once now (#293, measured by protella: the opening 384 ms to 45).
+
 ## v0.8.11 (2026-11-20)
 
 ### Improved

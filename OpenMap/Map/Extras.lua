@@ -382,6 +382,7 @@ end
 local SHOW_CURRENT = 0                  -- HBD_PINS_WORLDMAP_SHOW_CURRENT: only on its own map
 local SHOW_CONTINENT = 2                -- HBD_PINS_WORLDMAP_SHOW_CONTINENT: on its continent's map too
 local QUESTIE_BASE = 2015               -- the fixed frame level Questie's map icons and lines start from
+local ICONS_ABOVE = 5                  -- OpenMap's icon sets' levels over S.iconLevel, at the most (S.PinSet)
 
 -- Questie fixes its icons' frame levels from QUESTIE_BASE up (it expects Blizzard's map canvas
 -- near 2000), which is under the stitched map's upper art layers: lift them above the art,
@@ -391,7 +392,9 @@ local QUESTIE_BASE = 2015               -- the fixed frame level Questie's map i
 -- (questie: Questie's own order kept, from QUESTIE_BASE; another copy's icon just over the art)
 local function Lift(icon, questie)
 	local top = S.artTop
-	if questie and not icon.isManualIcon and S.iconLevel then top = S.iconLevel end
+	-- (over every set of OpenMap's icons, which go to 5 levels over S.iconLevel: a quest under a town's
+	-- vendor or flight master was hidden, #393)
+	if questie and not icon.isManualIcon and S.iconLevel then top = S.iconLevel + ICONS_ABOVE end
 	if not top or not icon.GetFrameLevel or not icon.SetFixedFrameLevel then return end
 	local level = icon:GetFrameLevel()
 	if level > top then return end
