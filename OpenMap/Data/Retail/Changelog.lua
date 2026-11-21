@@ -24,6 +24,8 @@ ns.MapChangelog = {
 		"|cff6e2c0aThe map opens quicker|r: as it opened, every set of icons was laid out for the whole world and then again for your view; once now (#293, measured by protella: the opening 384 ms to 45).",
 		"|cff6e2c0aThe windowed quest log sits beside the map|r: it covered part of the map until the window was laid out again; and a window resized by its corner stays on the screen (#327). By gOOvER.",
 		"|cff6e2c0aCtrl-click left to the game is followed|r: with \"Ctrl-click drops a pin\" off, the game's own waypoint was set on the map underneath (often the continent's), where the game has no route to it, so it was never followed; it's put on the zone under the cursor now, at the cursor, and followed (#19).",
+		"|cff6e2c0aCoordinates clear of the border full screen|r: the labels sat under Blizzard's border at the map's bottom edge when the map was maximized (#399).",
+		"|cff6e2c0aThe quest log's details fit the window|r: a window resized shorter than Blizzard's own let the quest details beside it run out below; with the quest log shown it's no shorter than that now (#402).",
 	} },
 	{ version = "v0.8.11", date = "2026-11-20", heads = { [1] = "Improved", [3] = "Fixed", }, items = {
 		"|cff6e2c0aTold when a newer OpenMap is out|r: when a friend, guild member or group member has a newer release, a line in chat says so, once a session (\"OpenMap X is out (you have Y). Update through CurseForge.\"). Your version rides only on messages OpenMap already sends them (the hello to friends who use it, your first shared place to your guild, a pin share to your group); older copies pass over it. Options' \"Say when OpenMap has an update\" turns it off, and then your version isn't sent either.",

@@ -193,8 +193,11 @@ local function PlaceCoords()
 			x = math.max(x, right - fl + 6)
 		end
 	end
+	-- (full screen, Blizzard's border runs along the map's bottom edge, over its last few pixels: the labels
+	-- above it, #399)
+	local y = (map.IsMaximized and map:IsMaximized()) and 26 or 8
 	bar:ClearAllPoints()
-	bar:SetPoint("BOTTOMRIGHT", sc, "BOTTOMRIGHT", -x, 8)
+	bar:SetPoint("BOTTOMRIGHT", sc, "BOTTOMRIGHT", -x, y)
 end
 mod.PlaceCoords = PlaceCoords
 

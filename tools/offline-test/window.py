@@ -163,5 +163,33 @@ class WindowTests(unittest.TestCase):
         self.assertTrue(drag_calls.endswith("Spacer,Refit"))
 
 
+
+class MinHeightTests(unittest.TestCase):
+    """the window's least height: Blizzard's windowed height while the quest log is beside it (#402)"""
+
+    def setUp(self):
+        import re
+        src = (ROOT / "Map" / "Window.lua").read_text(encoding="utf-8")
+        m = re.search(r"\nlocal function MinHeight\(\)\n.*?\nend\n", src, re.S)
+        self.assertIsNotNone(m)
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            MIN_H = 320
+            blizzardSize = { 1000, 670 }
+            logShown = false
+            map = { QuestLog = { IsShown = function() return logShown end } }
+        """ + m.group(0) + "\n_G.MinHeight = MinHeight\n")
+
+    def test_quest_log_shown(self):
+        self.lua.execute("logShown = true")
+        self.assertEqual(self.lua.eval("MinHeight()"), 670)
+
+    def test_quest_log_hidden(self):
+        self.assertEqual(self.lua.eval("MinHeight()"), 320)
+
+    def test_before_blizzards_size_is_known(self):
+        self.lua.execute("logShown = true blizzardSize = nil")
+        self.assertEqual(self.lua.eval("MinHeight()"), 320)
+
 if __name__ == "__main__":
     unittest.main()
