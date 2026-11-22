@@ -42,6 +42,7 @@ class WindowTests(unittest.TestCase):
             function f:SetHeight(h) self.height = h end
             function f:SetMovable() end
             function f:GetWidth() return self.width end
+            function f:GetSize() return self.width, self.height end
             function f:GetHeight() return self.height end
             function f:GetEffectiveScale() return 1 end
             function f:GetScale() return self.scale end
