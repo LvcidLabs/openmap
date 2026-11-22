@@ -290,8 +290,21 @@ class HideShapesTests(unittest.TestCase):
                 for _, e in ipairs(list) do fn(e.files, e.x, e.y, e.w, e.h, 0, e.piece) end
             end
             function ZoneMask() return nil end
-            function Feather() return { feather = true } end
-            function Record(r, x, y, w, h) r.at = { x, y, w, h } end
+            W, H = 1024, 1024
+            recs = { on = true }
+            function PlaceRecord(rec) rec[1].anchored = true end
+            function Record(r, x, y, w, h)
+                r.at = { x, y, w, h }
+                r.omRec = { r, x, y, w, h }
+                function r:ClearAllPoints() self.anchored = false end
+                recs[#recs + 1] = r.omRec
+                PlaceRecord(r.omRec)
+            end
+            function Feather()
+                local mask = { feather = true }
+                Record(mask, 0, 0, W, H)
+                return mask
+            end
             made = {}
             frame = {}
             function frame:CreateMaskTexture()
@@ -300,7 +313,8 @@ class HideShapesTests(unittest.TestCase):
                 return m
             end
             function frame:CreateTexture()
-                local t = { masks = {} }
+                local t = { masks = {}, shown = true }
+                function t:SetShown(on) self.shown = on end
                 function t:SetTexture(file) self.file = file end
                 function t:SetTexCoord(...) self.coord = { ... } end
                 function t:AddMaskTexture(m) self.masks[#self.masks + 1] = m end
@@ -312,6 +326,7 @@ class HideShapesTests(unittest.TestCase):
         """)
         self.lua.execute(chunk("Shade.Hide.Shapes"))
         self.lua.execute(chunk("Shade.Hide.BuildIn"))
+        self.lua.execute(chunk("Shade.Hide.Cull"))
         # (the zone's art in 256 px tiles, 4 across; hidden: one rectangle reaching well past the piece)
         self.lua.execute("""
             p = { left = 0, top = 0, sx = 1, sy = 1, layer = { tileWidth = 256, tileHeight = 256, layerWidth = 1024 } }
@@ -337,6 +352,20 @@ class HideShapesTests(unittest.TestCase):
 
     def test_covers_the_whole_piece(self):
         self.assertEqual(sum(t.at[3] * t.at[4] for t in self.made()), 300 * 200)
+
+    def test_only_nearby_fragments_and_their_masks_stay_anchored(self):
+        left, sliver, right = sorted(self.made(), key=lambda tile: tile.at[1])
+        self.lua.execute("cullBox = { 0, 0, 0.2, 0.5 }; Shade.Hide.Cull(recs, true)")
+        self.assertTrue(left.shown and left.anchored and left.masks[2].anchored)
+        self.assertFalse(sliver.shown or sliver.anchored)
+        self.assertTrue(sliver.masks[2].anchored)
+        self.assertFalse(right.shown or right.anchored or right.masks[2].anchored)
+        self.lua.execute("cullBox = { 0.26, 0, 0.4, 0.5 }; Shade.Hide.Cull(recs, true)")
+        self.assertFalse(left.shown or left.anchored or left.masks[2].anchored)
+        self.assertTrue(right.shown and right.anchored and right.masks[2].anchored)
+        self.assertTrue(right.masks[1].anchored)
+        self.lua.execute("Shade.Hide.Cull(recs, false)")
+        self.assertFalse(right.shown or right.anchored or right.masks[2].anchored or right.masks[1].anchored)
 
 
 if __name__ == "__main__":

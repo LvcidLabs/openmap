@@ -4,6 +4,9 @@
 local _, ns = ...
 
 ns.MapChangelog = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", }, items = {
+		"|cff6e2c0aClose-up map performance|r: with minimap detail on and unexplored areas hidden, the map draws fewer masked fragments and skips the ones outside the view.",
+	} },
 	{ version = "v0.8.12", date = "2026-11-21", heads = { [1] = "Improved", [7] = "Fixed", }, items = {
 		"|cff6e2c0aThe map works in a fight|r: since v0.8.11 the map stood still in combat (the game's map can't be moved by an addon then without breaking the quest tracker, #345). In a fight OpenMap's map now moves onto frames of its own, over the game's, which is left as it is: zoom, drag, click and resize it as usual, with your arrow, your party and raid, your quests and their areas, the name of the place under the cursor, Questie's and other addons' map icons, and Ctrl-click's waypoint. As the fight ends it all goes back on the game's map, where you left it (#386, #389). (New files: restart the game after updating, a /reload isn't enough.)",
 		"|cff6e2c0aGerman reads better|r: missing German texts filled in and others reworded, in the game's own terms. By gOOvER.",
@@ -68,8 +71,5 @@ ns.MapChangelog = {
 	{ version = "v0.8.8", date = "2026-11-13", heads = { [1] = "Fixed", }, items = {
 		"|cff6e2c0aParty and raid markers stay steady|r: one marker per member, moving smoothly. OpenMap's ring now follows Blizzard's own dot where the game places a member, instead of a second dot of its own that lagged behind it; elsewhere OpenMap's dot keeps its highlight and tooltip as it moves. The ring is now a thin gold edge (the wide one round a dark gap read as a target: #158, #170). By puschie286.",
 		"|cff6e2c0aFriends on the map: your own faction only.|r Your place is only shared with, and shown from, players of your own faction: Battle.net friends on the other faction no longer see where you are, nor you them (a player's report: it let Horde and Alliance find each other for PvP).",
-	} },
-	{ version = "v0.8.6", date = "2026-11-12", heads = { [1] = "Improved", }, items = {
-		"|cff6e2c0aIcons stay shown while zooming|r: \"Fade icons while zooming\" is now off for everyone, as zooming is smooth enough with them shown; turn it on again in the menu's On the map tab if you prefer it.",
 	} },
 }

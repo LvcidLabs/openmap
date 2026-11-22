@@ -4,6 +4,9 @@
 local _, ns = ...
 
 ns.MapChangelog = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Improved", }, items = {
+		"|cff6e2c0aClose-up map performance|r: with minimap detail on and unexplored areas hidden, the map draws fewer masked fragments and skips the ones outside the view.",
+	} },
 	{ version = "v0.8.12", date = "2026-11-21", heads = { [1] = "New", [2] = "Improved", [10] = "Fixed", }, items = {
 		"|cff6e2c0aShow places to explore|r (the map's menu and Options, off until turned on): for each zone's Explore achievement, the places you haven't explored yet, each with a soft gold outline of the ground that explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and the achievement's progress. Further out, each zone shows how many places it has left.",
 		"|cff6e2c0aThe map works in a fight|r: since v0.8.11 the map stood still in combat (the game's map can't be moved by an addon then without breaking the quest tracker, #345). In a fight OpenMap's map now moves onto frames of its own, over the game's, which is left as it is: zoom, drag, click and resize it as usual, with your arrow, your party and raid, your quests and their areas, the name of the place under the cursor, Questie's and other addons' map icons, and Ctrl-click's waypoint. As the fight ends it all goes back on the game's map, where you left it (#386, #389). (New files: restart the game after updating, a /reload isn't enough.)",
@@ -98,8 +101,5 @@ ns.MapChangelog = {
 		"|cff6e2c0aParty and raid markers stay steady|r: one marker per member, moving smoothly. OpenMap's ring now follows Blizzard's own dot where the game places a member, instead of a second dot of its own that lagged behind it; elsewhere OpenMap's dot keeps its highlight and tooltip as it moves. The ring is now a thin gold edge (the wide one round a dark gap read as a target: #158, #170). By puschie286.",
 		"|cff6e2c0aFriends on the map: your own faction only.|r Your place is only shared with, and shown from, players of your own faction: Battle.net friends on the other faction no longer see where you are, nor you them (a player's report: it let Horde and Alliance find each other for PvP).",
 		"|cff6e2c0aFriends in another realm group show on the map|r: a friend on CAMWOW US1 and one on US2 (or EU4 and EU5) never saw each other with \"Share where you are\" on (#164, #167).",
-	} },
-	{ version = "v0.8.7", date = "2026-11-12", heads = { [1] = "Fixed", }, items = {
-		"|cff6e2c0aQuestie's icons show on the first map you open|r: with Questie 12.8, a map opened on a zone showed none of Questie's icons (their tooltips still came up) until you'd zoomed out to the continent once: icons Questie placed before the map was first opened stayed under its art (#194, #193, #195).",
 	} },
 }

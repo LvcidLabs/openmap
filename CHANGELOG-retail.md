@@ -1,5 +1,12 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Improved
+
+- **Close-up map performance**: with minimap detail on and unexplored areas hidden, the map
+  draws fewer masked fragments and skips the ones outside the view.
+
 ## v0.8.12 (2026-11-21)
 
 ### Improved
