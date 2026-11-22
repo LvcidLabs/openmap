@@ -146,6 +146,7 @@ end
 local function ChatLink(p)
 	local link
 	if C_Map.GetUserWaypointHyperlink and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates
+		and not InCombatLockdown()   -- (in a fight: its note and place as text, #295)
 		and (not C_Map.CanSetUserWaypointOnMap or C_Map.CanSetUserWaypointOnMap(p.map)) then
 		local before = C_Map.GetUserWaypoint and C_Map.GetUserWaypoint()
 		if pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(p.map, p.x, p.y)) then

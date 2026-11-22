@@ -1553,7 +1553,7 @@ local function Setup()
 	-- the map underneath, clamped to its edge: on the stitched map, where the cursor is, on the zone there
 	if map.GamepadTryPlaceWaypoint then
 		hooksecurefunc(map, "GamepadTryPlaceWaypoint", function()
-			if not active or not PadCursor() or not (C_Map.HasUserWaypoint and C_Map.HasUserWaypoint()) then return end
+			if not active or InCombatLockdown() or not PadCursor() or not (C_Map.HasUserWaypoint and C_Map.HasUserWaypoint()) then return end   -- (#295)
 			local u, v = mod.CursorWorld()
 			local chain = u and S.ChainAt(u, v)
 			local mapID = chain and chain[#chain]

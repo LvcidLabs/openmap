@@ -22,6 +22,8 @@ class ZoneWaypointTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r"""
             Enum = { UIMapType = { Continent = 2, Zone = 3 } }
+            fight = false
+            function InCombatLockdown() return fight end
             -- the waypoint as Blizzard set it: on the continent (1415), at its own clamped point
             wp = { 1415, 0.9, 0.5 }
             set, tracked = {}, false
@@ -45,6 +47,11 @@ class ZoneWaypointTests(unittest.TestCase):
             function mod.FromWorld(id, u, v) return (u % 0.5) * 2, v end
         """ + m.group(0))
 
+
+    def test_in_a_fight_left_as_the_game_set_it(self):
+        # (set from OpenMap's code in a fight, the tracker's next redraw failed: #295)
+        self.lua.execute("fight = true mod.ZoneWaypoint()")
+        self.assertEqual(len(list(self.lua.eval("set").values())), 0)
     def test_put_on_the_zone_under_the_cursor_and_followed(self):
         self.lua.execute("mod.ZoneWaypoint()")
         p = self.lua.eval("set[1]")

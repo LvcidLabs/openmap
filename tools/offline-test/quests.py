@@ -108,6 +108,7 @@ QuestMapFrame_ShowQuestDetails = function(id) details[#details + 1] = id end
 L = setmetatable({}, { __index = function(_, k) return k end })
 mod = { defaults = {}, db = {} }
 ns = { MapStitch = S, L = L }
+function ns.OutOfCombat(_, fn) return fn() end   -- (Core.lua's; out of a fight here: at once)
 function ns:GetModule() return mod end
 function mod.IsStitched() return stitched end
 function mod.HostMap() return host end
@@ -312,11 +313,13 @@ class Quests(unittest.TestCase):
         self.assertEqual(self.lua.eval("#details"), 0, "Blizzard's quest details opened from OpenMap's code")
         self.assertEqual(self.lua.eval("#opened"), 0, "Blizzard's quest log opened from OpenMap's code")
 
-    def test_click_on_the_usual_map_still_shows_the_quest_in_the_log(self):
+    def test_click_on_the_usual_map_tracks_and_leaves_the_details_to_the_player(self):
+        # (the quest log's list, the quest lit as the one followed; its details opened from OpenMap's code
+        # held a quest ID it set, and their Share button was blocked: #426)
         self.usual_map()
         self.click()   # (the one zone Blizzard's map isn't on: 200)
         self.assertEqual(list(self.lua.eval("calls").values()), ["watch 200", "track 200"])
-        self.assertEqual(list(self.lua.eval("details").values()), [200])
+        self.assertEqual(list(self.lua.eval("details").values()), [])
 
     def hint(self):
         self.lua.execute("Refresh() pin = drawn[1] pin.scripts.OnEnter(pin) hint = tip[#tip]")

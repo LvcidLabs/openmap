@@ -216,7 +216,7 @@ end
 -- the game's own calls: nothing of Blizzard's map is touched
 local zoning = false
 function mod.ZoneWaypoint()
-	if zoning or not (mod.IsStitched and mod.IsStitched()) or not map or not map:IsShown() then return end
+	if zoning or InCombatLockdown() or not (mod.IsStitched and mod.IsStitched()) or not map or not map:IsShown() then return end   -- (#295)
 	local mapID, x, y = BlizzardPin()
 	if not mapID or not x then return end
 	local info = C_Map.GetMapInfo(mapID)
@@ -252,8 +252,11 @@ function mod.OwnViewWaypoint()
 	local zx, zy = mod.FromWorld(zone, u, v)
 	if not (zx and zy and zx >= 0 and zx <= 1 and zy >= 0 and zy <= 1 and UiMapPoint) then return false end
 	zoning = true
-	local ok = pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(zone, zx, zy))
-	if ok and C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true) end
+	-- (the waypoint itself as the fight ends: set from OpenMap's code in it, the tracker's redraw failed, #295)
+	ns.OutOfCombat("waypoint", function()
+		local ok = pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(zone, zx, zy))
+		if ok and C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true) end
+	end)
 	zoning = false
 	return ok
 end
@@ -294,7 +297,7 @@ end
 function mod.TrackPoint(mapID, x, y, title)
 	local info = C_Map.GetMapInfo(mapID)
 	local blizzard = false
-	if C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates
+	if C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates and not InCombatLockdown()   -- (#295)
 		and (not C_Map.CanSetUserWaypointOnMap or C_Map.CanSetUserWaypointOnMap(mapID)) then
 		blizzard = pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(mapID, x, y)) and BlizzardPin() ~= nil
 		if blizzard and C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true) end

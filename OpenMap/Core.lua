@@ -112,6 +112,25 @@ function ns.RegisterEvent(owner, event, fn)
 	return true
 end
 
+-- fn() now, or as the fight ends (the latest one for each `key`). For the game's quest tracking, super-tracking
+-- and waypoint calls: made from OpenMap's code, they have the objective tracker redraw on the next frame
+-- carrying OpenMap's taint, and in a fight that redraw reads your buffs, which the game then refuses ("auras
+-- ... secret while tainted by OpenMap"), and that redraw stops (#295)
+local afterFight, afterFightOwner = {}, {}
+function ns.OutOfCombat(key, fn)
+	if not (InCombatLockdown and InCombatLockdown()) then return fn() end
+	afterFight[key] = fn
+	ns.RegisterEvent(afterFightOwner, "PLAYER_REGEN_ENABLED", function()
+		local list = afterFight
+		afterFight = {}
+		ns.UnregisterEvent(afterFightOwner, "PLAYER_REGEN_ENABLED")
+		for _, f in pairs(list) do
+			local ok, err = pcall(f)
+			if not ok then geterrorhandler()(err) end
+		end
+	end)
+end
+
 function ns.UnregisterEvent(owner, event)
 	local list = handlers[event]
 	if not list then return end

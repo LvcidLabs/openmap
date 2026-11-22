@@ -139,10 +139,12 @@ local function Click(pin)
 	local q = pin.data
 	if not q then return end
 	if C_SuperTrack and C_SuperTrack.SetSuperTrackedQuestID then
-		if C_QuestLog.AddQuestWatch and not (C_QuestLog.GetQuestWatchType and C_QuestLog.GetQuestWatchType(q.id)) then
-			pcall(C_QuestLog.AddQuestWatch, q.id)
-		end
-		C_SuperTrack.SetSuperTrackedQuestID(q.id)
+		ns.OutOfCombat("quest", function()
+			if C_QuestLog.AddQuestWatch and not (C_QuestLog.GetQuestWatchType and C_QuestLog.GetQuestWatchType(q.id)) then
+				pcall(C_QuestLog.AddQuestWatch, q.id)
+			end
+			pcall(C_SuperTrack.SetSuperTrackedQuestID, q.id)
+		end)
 	end
 	Focus()                                         -- (at once: the redraw the event asks for comes later)
 	if S.GlideToWorld then S.GlideToWorld(pin.u, pin.v, ZOOM_TO) end
@@ -152,14 +154,15 @@ local function Click(pin)
 	-- (in combat with the gamepad's UI, Blizzard's quest details would set the pad's buttons from
 	-- OpenMap's code, which combat blocks: they wait, as a dungeon's map does)
 	if mod.PadWaits and mod.PadWaits() then return end
+	-- (the quest log opened, its list with the quest lit as the one followed; its details are the player's
+	-- click there, the game's own. Opened from here, the details held a quest ID OpenMap's code set, and their
+	-- Share button passed it to a protected call the game then blocked, blaming OpenMap: #426)
 	local log = map and map.QuestLog
-	local details = G("QuestMapFrame_ShowQuestDetails")
-	if not log or not details or (map.IsMaximized and map:IsMaximized()) then return end
+	if not log or (map.IsMaximized and map:IsMaximized()) then return end
 	if not log:IsShown() and not InCombatLockdown() and map.HandleUserActionOpenSidePanel then
 		map:HandleUserActionOpenSidePanel()
 		if map.SidePanelToggle and map.SidePanelToggle.Refresh then map.SidePanelToggle:Refresh() end
 	end
-	if log:IsShown() then details(q.id) end
 end
 
 -- the state mark over a pin's badge (made once: pins are pooled, and this set's are only ever quests)
