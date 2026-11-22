@@ -1247,7 +1247,14 @@ function mod:SetupExtras(worldMap)
 	map, sc = worldMap, worldMap.ScrollContainer
 	map:HookScript("OnShow", function() fader:SetShown((mod.db.moveFade or 0) > 0) ApplyFpsCap() end)
 	map:HookScript("OnHide", function() fader:Hide() faded = 1 SetFade(1) ApplyFpsCap() end)
-	map:HookScript("OnHide", function() WarmStop() mod.TimeClose("warm art held", WarmHold) end)
+	-- (and round you again: the view it closed on can be another place's, and the opening is centred on
+	-- you. Around.mapID cleared: a closing in the middle of the let-go left that set part held)
+	map:HookScript("OnHide", function()
+		WarmStop()
+		mod.TimeClose("warm art held", WarmHold)
+		Around.mapID = nil
+		C_Timer.After(0.5, mod.WarmAround)
+	end)
 	map:HookScript("OnShow", WarmLetGo)
 	-- (a new zone: its art warmed while the map is closed, a moment after arriving; a warming a fight
 	-- paused goes on once it's over)
