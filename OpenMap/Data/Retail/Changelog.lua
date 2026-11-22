@@ -4,12 +4,14 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [4] = "Improved", }, items = {
+	{ version = "v0.8.13", date = "2026-11-22", heads = { [1] = "Fixed", [5] = "Improved", [7] = "Known issue", }, items = {
 		"|cff6e2c0aPlaces you've explored show on the map|r: the map read what you'd explored as it was built at login, maybe before the game had sent it, and then only when the game said something new was explored. It reads it again as the map first opens and after you enter a new subzone (#422, #410).",
 		"|cff6e2c0aNo stack overflow as the map closes|r with Keep warm on, when a frame of the map holds thousands of icons' anchors (#414).",
 		"|cff6e2c0aThe map's art ready before it opens, in more cases|r (keep-warm round you, v0.8.12): the art round you is warmed again each time the map closes (closed on another place, the next opening, centred on you, came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.",
+		"|cff6e2c0aThe map closed in a fight reopens where you left it|r: it reopened on the view from before the fight.",
 		"|cff6e2c0aClose-up map performance|r: with minimap detail on and unexplored areas hidden, the map draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.",
 		"|cff6e2c0aSupporting OpenMap|r: the foot of What's new's Credits page has a link to copy, for those who'd like to.",
+		"Opening the map in a fight can print \"Interface action failed because of an AddOn\" once a session. It's harmless: the map, the quest log and the tracker all work; only the quest log's controller navigation marks are skipped for that one refresh.",
 	} },
 	{ version = "v0.8.12", date = "2026-11-21", heads = { [1] = "Improved", [7] = "Fixed", }, items = {
 		"|cff6e2c0aThe map works in a fight|r: since v0.8.11 the map stood still in combat (the game's map can't be moved by an addon then without breaking the quest tracker, #345). In a fight OpenMap's map now moves onto frames of its own, over the game's, which is left as it is: zoom, drag, click and resize it as usual, with your arrow, your party and raid, your quests and their areas, the name of the place under the cursor, Questie's and other addons' map icons, and Ctrl-click's waypoint. As the fight ends it all goes back on the game's map, where you left it (#386, #389). (New files: restart the game after updating, a /reload isn't enough.)",
