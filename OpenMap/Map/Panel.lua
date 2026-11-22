@@ -250,6 +250,10 @@ local function Rows()
 	rows[#rows + 1] = { L["Dungeons"] }
 	rows[#rows + 1] = row(L["Dungeon maps"], "dungeonMaps", Icon("INV_Misc_Map_01"), mod.DungeonMapsOn, mod.SetDungeonMaps)
 	rows[#rows + 1] = optRow(L["Dungeon maps inside dungeons"], "dungeonInside", Icon("INV_Misc_Key_13"))
+	if mod.SetBattlegroundMaps then             -- (Battlegrounds.lua: WoW Forever's toc loads it, retail's doesn't)
+		rows[#rows + 1] = row(L["Battleground maps"], "bgMaps", Icon("INV_BannerPVP_02"),
+			function() return db.bgMaps ~= false end, mod.SetBattlegroundMaps)
+	end
 	rows[#rows + 1] = optRow(L["Level ranges"], "dungeonLevels", Icon("Spell_ChargePositive"))
 	rows[#rows + 1] = optRow(L["Dungeon bosses"], "dungeonBosses", Icon("INV_Misc_Bone_ElfSkull_01"))
 	-- (with Questie, Dungeon Journal or NeedRoll: where they come from is in Options)

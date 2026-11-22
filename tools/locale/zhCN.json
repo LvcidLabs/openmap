@@ -571,5 +571,8 @@
  "Your own arrow on the world map at this size.": "世界地图上你自己的箭头按此大小显示。",
  "Your arrow over everything": "箭头置于最上层",
  "Draw your own arrow above every other addon's icons and pins on the map.": "将你自己的箭头绘制在地图上所有其他插件的图标和标记之上。",
- "OpenMap is free and made in spare time. To support it:": "OpenMap 免费，利用业余时间制作。支持它："
+ "OpenMap is free and made in spare time. To support it:": "OpenMap 免费，利用业余时间制作。支持它：",
+ "Battleground maps": "战场地图",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "战场地图可以像世界地图一样放大，近处由游戏的小地图显示细节（按“小地图细节”的设置）。关闭：游戏自己的地图，保持原样。",
+ "Battleground": "战场"
 }

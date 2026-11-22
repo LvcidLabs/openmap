@@ -102,7 +102,13 @@ local function PlaceAt()
 	end
 	local x, y
 	if mod.PadCursor() and map.GetNormalizedGamepadCursorPosition then x, y = map:GetNormalizedGamepadCursorPosition()
-	else x, y = map:GetNormalizedCursorPosition() end
+	else
+		-- (off the map's own art, over the frame round a map smaller than the window, a battleground's or a
+		-- dungeon's: Blizzard's position is clamped to its edge, "57.6, 0.0"; off the map, no place: "--")
+		local canvas = map.GetCanvas and map:GetCanvas()
+		if canvas and canvas.IsMouseOver and not canvas:IsMouseOver() then return mapID, -1, -1, -1, -1 end
+		x, y = map:GetNormalizedCursorPosition()
+	end
 	local info = C_Map.GetMapInfoAtPosition(mapID, x, y)
 	if info and info.mapID ~= mapID then
 		local l, r, t, b = C_Map.GetMapRectOnMap(info.mapID, mapID)

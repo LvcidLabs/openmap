@@ -571,5 +571,8 @@
  "Your own arrow on the world map at this size.": "Sua própria seta no mapa-múndi neste tamanho.",
  "Your arrow over everything": "Sua seta acima de tudo",
  "Draw your own arrow above every other addon's icons and pins on the map.": "Desenha sua própria seta acima dos ícones e marcadores de qualquer outro addon no mapa.",
- "OpenMap is free and made in spare time. To support it:": "O OpenMap é gratuito e feito nas horas vagas. Para apoiá-lo:"
+ "OpenMap is free and made in spare time. To support it:": "O OpenMap é gratuito e feito nas horas vagas. Para apoiá-lo:",
+ "Battleground maps": "Mapas de campos de batalha",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "O mapa de um campo de batalha aproxima como o mapa-múndi, e de perto o minimapa do jogo mostra seus detalhes (conforme o ajuste Detalhe do minimapa). Desligado: o próprio mapa do jogo, como era.",
+ "Battleground": "Campo de Batalha"
 }

@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- **The cursor's coordinates off a battleground's or dungeon's map read "--"**: over the frame round a map
+  smaller than the window, they showed the map's edge (57.6, 0.0).
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
   top of the map when Move Any anchored the window at the bottom. By puschie286.
 - **No "auras ... secret while tainted by OpenMap" error from the quest tracker in a fight**: clicking a quest

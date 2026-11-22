@@ -571,5 +571,8 @@
  "Your own arrow on the world map at this size.": "Ваша стрелка на карте мира в этом размере.",
  "Your arrow over everything": "Ваша стрелка поверх всего",
  "Draw your own arrow above every other addon's icons and pins on the map.": "Отображает вашу стрелку поверх значков и меток любых других аддонов на карте.",
- "OpenMap is free and made in spare time. To support it:": "OpenMap бесплатен и делается в свободное время. Поддержать его можно здесь:"
+ "OpenMap is free and made in spare time. To support it:": "OpenMap бесплатен и делается в свободное время. Поддержать его можно здесь:",
+ "Battleground maps": "Карты полей боя",
+ "A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was.": "Карту поля боя можно приближать, как карту мира, а вблизи мини-карта игры показывает её детали (как задано в «Детали мини-карты»). Выкл.: собственная карта игры, как раньше.",
+ "Battleground": "Поле боя"
 }
