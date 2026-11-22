@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **The map's art ready before it opens, in more cases** (keep-warm round you, v0.8.12): the art round you
+  is warmed again each time the map closes (closed on another place, the next opening, centred on you,
+  came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its
+  own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.
+
 ## v0.8.12 (2026-11-21)
 
 ### Improved
