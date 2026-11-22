@@ -205,15 +205,25 @@ local function Off()
 end
 
 -- the option, or what's explored, changed: made again as each zone comes into view
+-- (only the zones where something's explored since are made again, and the counts only then: all of them made
+-- again each time, a map opening after a new subzone did thousands of calls, a hitch)
 function mod.RefreshExplore()
 	if not On() then Off() return end
 	Fresh()
-	for _, z in pairs(zones) do
-		if z.set and not z.dirty then Let(z) end
-		z.dirty = true
+	local changed = not counts or not counts.on
+	for mapID, z in pairs(zones) do
+		local done = Progress(mapID)
+		if z.done ~= done then
+			z.done = done
+			changed = true
+			if z.set and not z.dirty then Let(z) end
+			z.dirty = true
+		end
 	end
-	BuildCounts()
-	S.SetPinSetOn(counts, true)
+	if changed then
+		BuildCounts()
+		S.SetPinSetOn(counts, true)
+	end
 	Update()
 end
 

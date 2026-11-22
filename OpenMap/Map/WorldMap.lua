@@ -1652,11 +1652,13 @@ local function Setup()
 		if active then RaisePlayer() end
 	end)
 	dp.OnHide = function()
+		-- (the view noted first: closed in a fight, it's the own view's, which stopping it leaves behind; read
+		-- after, it was Blizzard's canvas's, the view from before the fight, and the map reopened there)
+		if mod.OnMapHidden then mod:OnMapHidden() end
 		if mod.OwnViewStop then mod.OwnViewStop(false) end
 		mod.instanceWorldBrowsing = nil
 		mod.instanceMapGeneration = (mod.instanceMapGeneration or 0) + 1
 		live = nil
-		if mod.OnMapHidden then mod:OnMapHidden() end
 		ticker:Hide()
 	end
 	local shown = Ours("map shown", function()

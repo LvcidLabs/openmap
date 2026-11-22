@@ -281,5 +281,26 @@ class ModuleTests(unittest.TestCase):
         self.mod.RefreshExplore()
         self.assertEqual(len(items(self.made["explore%d" % ELWYNN].lines)), 0)
 
+    def test_nothing_new_nothing_made_again(self):
+        # (a new subzone with the map open, or an opening after one: nothing explored since, nothing made again.
+        # All of it made each time was a hitch at every opening)
+        self.mod.db.explore = True
+        self.lua.execute("mapShown = true")
+        self.view(8)
+        elwynn, counts = self.made["explore%d" % ELWYNN], self.made["exploreCount"]
+        cleared, countsCleared = elwynn.cleared, counts.cleared
+        self.lua.eval("events.ZONE_CHANGED")()
+        self.view(8)
+        self.assertEqual((elwynn.cleared, counts.cleared), (cleared, countsCleared))
+        # (one explored: that zone and the counts made again)
+        key = sorted(k for k, _ in items(self.lua.eval("ns.MapExplore.pieces[%d]" % ELWYNN_ART)))[0]
+        self.lua.eval("unexplored")[key] = False
+        self.lua.eval("events.ZONE_CHANGED")()
+        self.view(8)
+        self.assertGreater(elwynn.cleared, cleared)
+        self.assertGreater(counts.cleared, countsCleared)
+        self.assertEqual(len(items(elwynn.pins)), self.pieces - 1)
+
+
 if __name__ == "__main__":
     unittest.main()
