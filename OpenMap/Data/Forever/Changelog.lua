@@ -4,11 +4,12 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [5] = "Improved", }, items = {
 		"|cff6e2c0aNo lag zooming with Show places to explore on|r: every zone you'd looked at kept its outlines, thousands of lines laid out again on every frame of each zoom and pan, nine times the map's own. Only the zones in view and a few recent ones keep them now (#411, #413, #419).",
 		"|cff6e2c0aNo stack overflow as the map closes|r with Show places to explore on and Keep warm (#414).",
 		"|cff6e2c0aPlaces to explore count what you've already explored|r: it read the map's own record, which can be from before the game sent your exploring after login; it asks the game now, and again as you explore (#417, #418, the Barrens showed 3 of 25).",
 		"|cff6e2c0aThe map's art ready before it opens, in more cases|r (keep-warm round you, v0.8.12): the art round you is warmed again each time the map closes (closed on another place, the next opening, centred on you, came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.",
+		"|cff6e2c0aClose-up map performance|r: with minimap detail on and unexplored areas hidden, the map draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.",
 	} },
 	{ version = "v0.8.12", date = "2026-11-21", heads = { [1] = "New", [2] = "Improved", [10] = "Fixed", }, items = {
 		"|cff6e2c0aShow places to explore|r (the map's menu and Options, off until turned on): for each zone's Explore achievement, the places you haven't explored yet, each with a soft gold outline of the ground that explores it (read from the game's own terrain) and a pin where to go; its tooltip names the place and the achievement's progress. Further out, each zone shows how many places it has left.",

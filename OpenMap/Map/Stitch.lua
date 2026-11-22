@@ -1775,6 +1775,7 @@ function S.Parts()
 		{ "blur", { blurRoot } },
 		{ "cities", { citiesRoot } },
 		{ "unexplored shade", { shadeRoot } },
+		{ "unexplored cover over minimap", { S.minimapCover } },
 		{ "minimap detail", { L.minimap } },
 		{ "grain", { L.grain } },
 		{ "caves", { L.under } },
@@ -2900,6 +2901,20 @@ function Shade.Hide.Rects(mapID)
 			end
 		end
 	end
+	-- Remove horizontal cuts introduced by unrelated pieces. Identical spans in
+	-- consecutive rows are one rectangle, so they only need one set of fragments.
+	local lastByLeft, countRects = {}, 0
+	for _, r in ipairs(out) do
+		local previous = lastByLeft[r[1]]
+		if previous and previous[3] == r[3] and previous[4] == r[2] then
+			previous[4] = r[4]
+		else
+			countRects = countRects + 1
+			out[countRects] = r
+			lastByLeft[r[1]] = r
+		end
+	end
+	for i = #out, countRects + 1, -1 do out[i] = nil end
 	Shade.Hide.rects[mapID] = { count, out }
 	return out, count
 end
@@ -2960,7 +2975,12 @@ function Shade.Hide.Build(mapID, rects, un, grade)
 	local p = Place(mapID)
 	local files = p and ArtFiles(mapID)
 	if not files or #files == 0 then return false end
-	local f = CreateFrame("Frame", nil, Shade.Hide.root)
+	if not S.minimapCover then
+		S.minimapCover = CreateFrame("Frame", nil, root)
+		S.minimapCover:SetAllPoints(root)
+		S.minimapCover:SetFrameLevel(S.artTop - 6)
+	end
+	local f = CreateFrame("Frame", nil, S.minimapCover)
 	f:SetAllPoints(root)
 	local recs, prev = Shade.Collect()
 	local made = Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
@@ -2981,6 +3001,8 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 			shape:SetTexture(t.file, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
 			Record(shape, t.x, t.y, t.fw, t.fh)      -- (the whole file: a mask isn't cut, it's placed)
 			tex:AddMaskTexture(shape)
+			tex.omRec.coverMask = shape.omRec
+			shape.omRec.coverShape = true
 			if land then tex:AddMaskTexture(land) end
 		end
 		return { frame = f, un = un, grade = grade }
@@ -3010,6 +3032,7 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 							s.mask = f:CreateMaskTexture()
 							s.mask:SetTexture(s.file, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
 							Record(s.mask, p.left + s.x0 * p.sx, p.top + s.y0 * p.sy, s.fw * p.sx, s.fh * p.sy)   -- (the whole file)
+						s.mask.omRec.coverShape = true
 						end
 						for copy = 1, band and 2 or 1 do
 							local tex = f:CreateTexture(nil, "ARTWORK", nil, copy - 1)
@@ -3018,6 +3041,7 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 							Record(tex, p.left + x0 * p.sx, p.top + y0 * p.sy, (x1 - x0) * p.sx, (y1 - y0) * p.sy)
 							tex:AddMaskTexture(mask)
 							tex:AddMaskTexture(s.mask)
+						tex.omRec.coverMask = s.mask.omRec
 							tex:SetDesaturation(desat)
 							if copy == 2 then
 								tex:AddMaskTexture(band)
@@ -3032,6 +3056,49 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 	return { frame = f, un = un, grade = grade }
 end
 
+-- A nearby zone can cover much more than the view. Keep only the fragments that meet the
+-- same padded view as the zone art, with their shape masks and the masks shared by the zone.
+function Shade.Hide.Cull(recs, on)
+	if not recs or (not on and not recs.on) then return end
+	recs.on = on
+	local any = false
+	if on then
+		local box = cullBox
+		local l, t, r, b
+		if box then l, t, r, b = box[1] * W, box[2] * H, box[3] * W, box[4] * H end
+		for _, rec in ipairs(recs) do
+			local mask = rec.coverMask
+			if mask then
+				local x, y = rec[2], rec[3]
+				local near = not box or (x + rec[4] > l and x < r and y + rec[5] > t and y < b)
+				rec.coverNear = near
+				if near then
+					mask.coverNeeded = true
+					any = true
+				end
+			end
+		end
+	end
+	for _, rec in ipairs(recs) do
+		local show
+		if rec.coverMask then
+			show = on and rec.coverNear
+		elseif rec.coverShape then
+			show = rec.coverNeeded == true
+			rec.coverNeeded = nil
+		else
+			show = any
+		end
+		local hidden = not show
+		if hidden ~= (rec.coverHidden or false) then
+			rec.coverHidden = hidden
+			local region = rec[1]
+			if show then PlaceRecord(rec) else region:ClearAllPoints() end
+			if rec.coverMask then region:SetShown(show) end
+		end
+	end
+end
+
 -- shown while unexplored land is hidden or darkened (darkened: a zone you've been to, one you haven't
 -- found at all being shaded whole over the minimap already), the minimap's detail is drawn, and the
 -- zone is near the view; made again when the player has explored more of it, or the mode or colours
@@ -3042,17 +3109,12 @@ function Shade.Hide.Show(mapID)
 	local want = (mode == "hide" or (mode == "dim" and Shade.Unexplored(mapID) == "some" and not Shade.Fog.Has(mapID)))
 		and Shade.Hide.minimap and root and Shade.Near(mapID)
 	if want then
-		if not Shade.Hide.root then
-			Shade.Hide.root = CreateFrame("Frame", nil, root)
-			Shade.Hide.root:SetAllPoints(root)
-			Shade.Hide.root:SetFrameLevel(S.artTop - 6)
-		end
 		local rects, un = Shade.Hide.Rects(mapID)
 		local g1, g2 = gradeNow[1], gradeNow[2]
 		if z and (z.un ~= un or z.gm ~= mode or z.g1 ~= g1 or z.g2 ~= g2) then
 			-- the old one let go: unanchored and its files dropped (it was left anchored)
 			if z.frame then z.frame:Hide() end
-			Shade.Anchor(z.recs, false)
+			Shade.Hide.Cull(z.recs, false)
 			for _, rec in ipairs(z.recs or NONE) do
 				local r = rec[1]
 				if r.SetTexture then pcall(r.SetTexture, r, nil) end
@@ -3065,11 +3127,11 @@ function Shade.Hide.Show(mapID)
 			z.un, z.gm, z.g1, z.g2 = un, mode, g1, g2
 			Shade.Hide.zones[mapID] = z
 		end
-		Shade.Anchor(z.recs, true)
+		Shade.Hide.Cull(z.recs, true)
 		if z.frame then z.frame:Show() end
 	elseif z and z.frame then
 		z.frame:Hide()
-		Shade.Anchor(z.recs, false)
+		Shade.Hide.Cull(z.recs, false)
 	end
 end
 
@@ -3293,6 +3355,8 @@ function S.Cull(u0, v0, u1, v1)
 		if here or inView[mapID] ~= here then        -- (one in view: its tiles near the new box)
 			inView[mapID] = here
 			ShowZone(mapID)
+		elseif Shade.Hide.minimap and Shade.Hide.mode then
+			Shade.Hide.Show(mapID)      -- the cover can reach beyond the zone's art rectangle
 		end
 	end
 	for _, c in ipairs(culled) do

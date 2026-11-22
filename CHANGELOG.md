@@ -16,6 +16,11 @@
   came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its
   own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.
 
+### Improved
+
+- **Close-up map performance**: with minimap detail on and unexplored areas hidden, the map
+  draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.
+
 ## v0.8.12 (2026-11-21)
 
 ### New
