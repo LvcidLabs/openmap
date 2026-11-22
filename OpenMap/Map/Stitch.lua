@@ -3032,7 +3032,7 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 							s.mask = f:CreateMaskTexture()
 							s.mask:SetTexture(s.file, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
 							Record(s.mask, p.left + s.x0 * p.sx, p.top + s.y0 * p.sy, s.fw * p.sx, s.fh * p.sy)   -- (the whole file)
-						s.mask.omRec.coverShape = true
+							s.mask.omRec.coverShape = true
 						end
 						for copy = 1, band and 2 or 1 do
 							local tex = f:CreateTexture(nil, "ARTWORK", nil, copy - 1)
@@ -3041,7 +3041,7 @@ function Shade.Hide.BuildIn(f, p, files, mapID, rects, un, grade)
 							Record(tex, p.left + x0 * p.sx, p.top + y0 * p.sy, (x1 - x0) * p.sx, (y1 - y0) * p.sy)
 							tex:AddMaskTexture(mask)
 							tex:AddMaskTexture(s.mask)
-						tex.omRec.coverMask = s.mask.omRec
+							tex.omRec.coverMask = s.mask.omRec
 							tex:SetDesaturation(desat)
 							if copy == 2 then
 								tex:AddMaskTexture(band)

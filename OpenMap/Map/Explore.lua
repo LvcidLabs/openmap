@@ -229,11 +229,14 @@ tinsert(S.exploredHooks, function()
 end)
 
 -- the game says something was explored (or sent what you'd explored, after login): made again, at once with
--- the map open, else as it next opens; and at the first opening of a session, what it holds by then
+-- the map open, else as it next opens; and at the first opening of a session, what it holds by then. (Into a new
+-- subzone too: a place explored can come without that event, #422)
 local owner, pending = {}, true
-ns.RegisterEvent(owner, "MAP_EXPLORATION_UPDATED", function()
+local function Explored()
 	if WorldMapFrame and WorldMapFrame:IsShown() and mod.db and mod.db.explore then mod.RefreshExplore() else pending = true end
-end)
+end
+ns.RegisterEvent(owner, "MAP_EXPLORATION_UPDATED", Explored)
+ns.RegisterEvent(owner, "ZONE_CHANGED", Explored)
 if WorldMapFrame then
 	WorldMapFrame:HookScript("OnShow", function()
 		if not pending or not (mod.db and mod.db.explore) then return end

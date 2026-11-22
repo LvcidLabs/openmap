@@ -4,6 +4,9 @@
 
 ### Fixed
 
+- **Places you've explored show on the map**: the map read what you'd explored as it was built at login,
+  maybe before the game had sent it, and then only when the game said something new was explored. It reads
+  it again as the map first opens and after you enter a new subzone (#422, #410).
 - **No stack overflow as the map closes** with Keep warm on, when a frame of the map holds thousands of
   icons' anchors (#414).
 - **The map's art ready before it opens, in more cases** (keep-warm round you, v0.8.12): the art round you

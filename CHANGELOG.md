@@ -4,6 +4,9 @@
 
 ### Fixed
 
+- **Places you've explored show on the map**: the map read what you'd explored as it was built at login,
+  maybe before the game had sent it, and then only when the game said something new was explored. It reads
+  it again as the map first opens and after you enter a new subzone (#422, #410).
 - **No lag zooming with Show places to explore on**: every zone you'd looked at kept its outlines, thousands
   of lines laid out again on every frame of each zoom and pan, nine times the map's own. Only the zones in
   view and a few recent ones keep them now (#411, #413, #419).

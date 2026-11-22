@@ -4,7 +4,8 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [5] = "Improved", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [6] = "Improved", }, items = {
+		"|cff6e2c0aPlaces you've explored show on the map|r: the map read what you'd explored as it was built at login, maybe before the game had sent it, and then only when the game said something new was explored. It reads it again as the map first opens and after you enter a new subzone (#422, #410).",
 		"|cff6e2c0aNo lag zooming with Show places to explore on|r: every zone you'd looked at kept its outlines, thousands of lines laid out again on every frame of each zoom and pan, nine times the map's own. Only the zones in view and a few recent ones keep them now (#411, #413, #419).",
 		"|cff6e2c0aNo stack overflow as the map closes|r with Show places to explore on and Keep warm (#414).",
 		"|cff6e2c0aPlaces to explore count what you've already explored|r: it read the map's own record, which can be from before the game sent your exploring after login; it asks the game now, and again as you explore (#417, #418, the Barrens showed 3 of 25).",

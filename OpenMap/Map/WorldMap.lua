@@ -1696,6 +1696,14 @@ local function Setup()
 	ns.RegisterEvent(mod, "ZONE_CHANGED_NEW_AREA", function()
 		if not S.IsBuilt() then return end
 		if map:IsShown() then S.RefreshCities() else citiesDirty = true end
+		exploredDirty = true
+	end)
+	-- (into a new subzone, where exploring happens: what's explored read again at the next opening, not only on
+	-- MAP_EXPLORATION_UPDATED, which a reveal can come without: places you'd found weren't shown, #410 #422)
+	local exploredOwner = {}
+	ns.RegisterEvent(exploredOwner, "ZONE_CHANGED", function()
+		if not S.IsBuilt() then return end
+		if map:IsShown() then S.RefreshExplored() else exploredDirty = true end
 	end)
 	map:HookScript("OnShow", function()
 		if not (exploredDirty or citiesDirty) then return end

@@ -4,7 +4,8 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [3] = "Improved", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", [4] = "Improved", }, items = {
+		"|cff6e2c0aPlaces you've explored show on the map|r: the map read what you'd explored as it was built at login, maybe before the game had sent it, and then only when the game said something new was explored. It reads it again as the map first opens and after you enter a new subzone (#422, #410).",
 		"|cff6e2c0aNo stack overflow as the map closes|r with Keep warm on, when a frame of the map holds thousands of icons' anchors (#414).",
 		"|cff6e2c0aThe map's art ready before it opens, in more cases|r (keep-warm round you, v0.8.12): the art round you is warmed again each time the map closes (closed on another place, the next opening, centred on you, came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.",
 		"|cff6e2c0aClose-up map performance|r: with minimap detail on and unexplored areas hidden, the map draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.",
