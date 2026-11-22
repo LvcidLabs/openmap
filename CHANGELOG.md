@@ -1,5 +1,17 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **No lag zooming with Show places to explore on**: every zone you'd looked at kept its outlines, thousands
+  of lines laid out again on every frame of each zoom and pan, nine times the map's own. Only the zones in
+  view and a few recent ones keep them now (#411, #413, #419).
+- **No stack overflow as the map closes** with Show places to explore on and Keep warm (#414).
+- **Places to explore count what you've already explored**: it read the map's own record, which can be from
+  before the game sent your exploring after login; it asks the game now, and again as you explore (#417,
+  #418, the Barrens showed 3 of 25).
+
 ## v0.8.12 (2026-11-21)
 
 ### New

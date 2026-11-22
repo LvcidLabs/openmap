@@ -1686,7 +1686,8 @@ local function Setup()
 	Timed("Extras", mod.SetupExtras, mod, map)
 	Timed("Flights", mod.SetupFlights, mod)
 	-- map closed: the world-wide re-grade waits for the next opening
-	local exploredDirty, citiesDirty = false, false
+	-- (dirty from the start: the map is built at login, maybe before the game has sent what you explored)
+	local exploredDirty, citiesDirty = true, false
 	ns.RegisterEvent(mod, "MAP_EXPLORATION_UPDATED", function()
 		if not S.IsBuilt() then return end
 		if map:IsShown() then S.RefreshExplored() else exploredDirty = true end

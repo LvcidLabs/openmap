@@ -1,5 +1,12 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **No stack overflow as the map closes** with Keep warm on, when a frame of the map holds thousands of
+  icons' anchors (#414).
+
 ## v0.8.12 (2026-11-21)
 
 ### Improved

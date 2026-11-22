@@ -951,6 +951,7 @@ do
 		for _, pin in ipairs(set.pins) do RecyclePin(set, pin) end
 		for _, line in ipairs(set.lines) do
 			line:Hide()
+			line:ClearAllPoints()       -- (pooled, not hung from an anchor: laid out again on every zoom frame)
 			set.linePool[#set.linePool + 1] = line
 		end
 		for _, a in ipairs(set.anchors) do DropAnchor(a) end

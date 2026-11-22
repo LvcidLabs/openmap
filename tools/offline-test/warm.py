@@ -78,7 +78,7 @@ class WarmCollectTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute("""
             WARM_MOST = 1200
-            local function Region(file, shown, alpha, step)
+            function Region(file, shown, alpha, step)
                 return { file = file, shown = shown, alpha = alpha, omStep = step,
                     IsObjectType = function(self, kind) return kind == "Texture" end,
                     IsShown = function(self) return self.shown end,
@@ -88,14 +88,31 @@ class WarmCollectTests(unittest.TestCase):
             function Frame(regions, children, shown, alpha)
                 return { IsShown = function() return shown ~= false end, GetAlpha = function() return alpha or 1 end,
                     GetRegions = function() return unpack(regions) end,
-                    GetChildren = function() return unpack(children or {}) end }
+                    GetNumRegions = function() return #regions end,
+                    GetChildren = function() return unpack(children or {}) end,
+                    GetNumChildren = function() return #(children or {}) end }
+            end
+            function Many(n)
+                local list = {}
+                for i = 1, n do list[i] = Region(nil, false, 0) end
+                list[1] = Region("anchors' frame", true, 1)
+                return list
             end
             root = Frame({ Region("shown", true, 1), Region("fading", true, 0, 0.25), Region("faded out", true, 0),
                 Region("hidden", false, 1), Region("shown", true, 1) },
                 { Frame({ Region("in a muted layer", true, 1) }, nil, true, 0), Frame({ Region("child", true, 1) }) })
         """)
-        source = chunk(EXTRAS, r"\nlocal function WarmCollect\(f, files, seen\)\n.*?\nend\n", "WarmCollect")
+        source = chunk(EXTRAS, r"\nlocal WARM_REGIONS.*?\nlocal function WarmCollect\(f, files, seen\)\n.*?\nend\n", "WarmCollect")
         self.lua.execute(source.replace("local function WarmCollect", "function WarmCollect", 1))
+
+    def test_a_frame_with_thousands_of_regions_skipped_not_a_stack_overflow(self):
+        # (the places to explore's anchors, thousands on the art's frame: { f:GetRegions() } overflowed the
+        # stack as the map closed, #414)
+        files = self.lua.eval("""(function()
+            local f = {}
+            WarmCollect(Frame(Many(20000), { Frame({ Region("child", true, 1) }) }), f, {})
+            return f end)()""")
+        self.assertEqual([files[i] for i in range(1, len(files) + 1)], ["child"])
 
     def test_shown_and_fading_held_once(self):
         files = self.lua.eval("(function() local f = {} WarmCollect(root, f, {}) return f end)()")
