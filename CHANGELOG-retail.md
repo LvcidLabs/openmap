@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
+  top of the map when Move Any anchored the window at the bottom. By puschie286.
 - **No "auras ... secret while tainted by OpenMap" error from the quest tracker in a fight**: clicking a quest
   on the map, Ctrl-click's waypoint and following a pin set the game's tracking and waypoint from OpenMap's
   code, and in a fight the tracker's next redraw failed. In a fight they're set as it ends now, and the

@@ -5,6 +5,7 @@ local _, ns = ...
 
 ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", }, items = {
+		"|cff6e2c0aWith Move Any, a bottom corner's resize keeps the map's top in place|r: dragging a bottom resize grip lifted the top of the map when Move Any anchored the window at the bottom. By puschie286.",
 		"|cff6e2c0aNo \"auras ... secret while tainted by OpenMap\" error from the quest tracker in a fight|r: clicking a quest on the map, Ctrl-click's waypoint and following a pin set the game's tracking and waypoint from OpenMap's code, and in a fight the tracker's next redraw failed. In a fight they're set as it ends now, and the automatic move of a waypoint onto its zone waits (#295).",
 		"|cff6e2c0aShare works on a quest opened from the map|r: clicking a quest's icon opens the quest log with the quest lit, and its details are your click there. Opened by OpenMap, the details' Share button was blocked (#426).",
 	} },
