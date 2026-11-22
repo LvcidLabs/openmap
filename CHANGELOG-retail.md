@@ -1,5 +1,32 @@
 # OpenMap changelog
 
+## v0.8.13 (2026-11-22)
+
+### Fixed
+
+- **Places you've explored show on the map**: the map read what you'd explored as it was built at login,
+  maybe before the game had sent it, and then only when the game said something new was explored. It reads
+  it again as the map first opens and after you enter a new subzone (#422, #410).
+- **No stack overflow as the map closes** with Keep warm on, when a frame of the map holds thousands of
+  icons' anchors (#414).
+- **The map's art ready before it opens, in more cases** (keep-warm round you, v0.8.12): the art round you
+  is warmed again each time the map closes (closed on another place, the next opening, centred on you,
+  came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its
+  own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.
+- **The map closed in a fight reopens where you left it**: it reopened on the view from before the fight.
+
+### Improved
+
+- **Close-up map performance**: with minimap detail on and unexplored areas hidden, the map
+  draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.
+- **Supporting OpenMap**: the foot of What's new's Credits page has a link to copy, for those who'd like to.
+
+### Known issue
+
+- Opening the map in a fight can print "Interface action failed because of an AddOn" once a session. It's
+  harmless: the map, the quest log and the tracker all work; only the quest log's controller navigation
+  marks are skipped for that one refresh.
+
 ## v0.8.12 (2026-11-21)
 
 ### Improved

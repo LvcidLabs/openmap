@@ -86,17 +86,18 @@ unexplored = {}                 -- key -> true: Elwynn's pieces still to explore
 S = { viewHooks = {}, exploredHooks = {}, built = true }
 function S.IsBuilt() return S.built end
 function S.Rect(mapID) if mapID == 1429 then return 0.4, 0.5, 0.6, 0.7 end return 0.1, 0.2, 0.1, 0.2 end
+stale = false                   -- the map's pieces as built at login: everything unexplored, whatever the game says
 function S.Pieces(mapID)
     if mapID ~= 1429 then return nil end
     local list = {}
-    for key in pairs(ns.MapExplore.pieces[1228]) do list[key] = { key = key, unexplored = unexplored[key] ~= false } end
+    for key in pairs(ns.MapExplore.pieces[1228]) do list[key] = { key = key, unexplored = stale or unexplored[key] ~= false } end
     return list
 end
 function S.PinSet(key, minZoom, level)
-    if not made[key] then made[key] = { key = key, on = true, minZoom = minZoom, pins = {}, lines = 0 } end
+    if not made[key] then made[key] = { key = key, on = true, minZoom = minZoom, pins = {}, lines = {} } end
     return made[key]
 end
-function S.ClearPinSet(set) set.pins = {} set.lines = 0 end
+function S.ClearPinSet(set) set.pins = {} set.lines = {} set.cleared = (set.cleared or 0) + 1 end
 function S.SetPinSetOn(set, on) set.on = on and true or false end
 local Pin = {}
 Pin.__index = Pin
@@ -107,12 +108,29 @@ function S.AddPin(set, u, v, look, data)
     set.pins[#set.pins + 1] = pin
     return pin
 end
-function S.AddPath(set, pts) set.lines = set.lines + #pts / 2 - 1 end
+function S.AddPath(set, pts) for _ = 1, #pts / 2 - 1 do set.lines[#set.lines + 1] = true end end
 ns.MapStitch = S
 ns.L = setmetatable({}, { __index = function(_, k) return k end })
 mod = { defaults = {}, db = {} }
 function ns:GetModule() return mod end
-C_MapExplorationInfo = { GetExploredMapTextures = function() return {} end }
+-- the game's own list of what's explored: Elwynn's pieces marked explored in `unexplored`
+C_MapExplorationInfo = { GetExploredMapTextures = function(mapID)
+    local out = {}
+    if mapID ~= 1429 then return out end
+    for key, un in pairs(unexplored) do
+        if un == false then
+            local w, h, x, y = key:match("^(%d+):(%d+):(%d+):(%d+)$")
+            out[#out + 1] = { textureWidth = tonumber(w), textureHeight = tonumber(h), offsetX = tonumber(x), offsetY = tonumber(y) }
+        end
+    end
+    return out
+end }
+events = {}
+function ns.RegisterEvent(owner, event, fn) events[event] = fn end
+function wipe(t) for k in pairs(t) do t[k] = nil end return t end
+C_Timer = { After = function(_, fn) fn() end }
+mapShown = false
+WorldMapFrame = { IsShown = function() return mapShown end, HookScript = function(self, _, fn) self.onShow = fn end }
 C_Map = { GetAreaInfo = function() return "?" end, GetMapInfo = function() return { name = "?" } end }
 function GetAchievementInfo(id) return id, "Explore" end
 function tinsert(t, v) t[#t + 1] = v end
@@ -152,7 +170,7 @@ class ModuleTests(unittest.TestCase):
         self.assertIsNotNone(elwynn)
         self.assertTrue(elwynn.on)
         self.assertEqual(len(items(elwynn.pins)), self.pieces)
-        self.assertGreater(elwynn.lines, self.pieces * 3)
+        self.assertGreater(len(items(elwynn.lines)), self.pieces * 3)
         # (a zone out of view: nothing made for it)
         self.assertIsNone(self.made["explore1426"])
         # the counts, further out: one a zone with places left
@@ -188,6 +206,100 @@ class ModuleTests(unittest.TestCase):
         self.mod.db.explore = True
         self.mod.RefreshExplore()
         self.assertEqual(len(items(self.made)), 0)
+
+    def test_the_games_exploring_not_the_maps_pieces(self):
+        # (the map's pieces built at login before the game sent what's explored: all unexplored there, while the
+        # game says one is explored. The game's word counts: the Barrens showed 3/25 explored, #417 #418)
+        self.lua.execute("stale = true")
+        key = sorted(k for k, _ in items(self.lua.eval("ns.MapExplore.pieces[%d]" % ELWYNN_ART)))[0]
+        self.lua.eval("unexplored")[key] = False
+        self.mod.db.explore = True
+        self.view(8)
+        self.assertEqual(len(items(self.made["explore%d" % ELWYNN].pins)), self.pieces - 1)
+
+    def test_made_again_when_the_game_says_something_was_explored(self):
+        self.mod.db.explore = True
+        self.lua.execute("mapShown = true")
+        self.view(8)
+        key = sorted(k for k, _ in items(self.lua.eval("ns.MapExplore.pieces[%d]" % ELWYNN_ART)))[0]
+        self.lua.eval("unexplored")[key] = False
+        self.lua.eval("events.MAP_EXPLORATION_UPDATED")()
+        self.view(8)
+        self.assertEqual(len(items(self.made["explore%d" % ELWYNN].pins)), self.pieces - 1)
+
+    def test_closed_made_again_as_the_map_opens(self):
+        self.mod.db.explore = True
+        self.view(8)
+        key = sorted(k for k, _ in items(self.lua.eval("ns.MapExplore.pieces[%d]" % ELWYNN_ART)))[0]
+        self.lua.eval("unexplored")[key] = False
+        self.lua.eval("events.MAP_EXPLORATION_UPDATED")()
+        self.lua.execute("mapShown = true WorldMapFrame.onShow()")
+        self.view(8)
+        self.assertEqual(len(items(self.made["explore%d" % ELWYNN].pins)), self.pieces - 1)
+
+    def load(self, keep):
+        """Explore.lua again, with KEEP_LINES set to `keep`"""
+        src = (ADDON / "Map" / "Explore.lua").read_text(encoding="utf-8")
+        src, n = re.subn(r"\nlocal KEEP_LINES = \d+\n", "\nlocal KEEP_LINES = %d\n" % keep, src)
+        self.assertEqual(n, 1, "KEEP_LINES")
+        self.setUp()
+        self.lua.execute("for k in pairs(Made()) do Made()[k] = nil end S.viewHooks = {} S.exploredHooks = {}")
+        fn = self.lua.eval("function(src) return assert(loadstring(src, 'Explore.lua')) end")(src)
+        fn("OpenMap", self.lua.eval("ns"))
+        self.mod.db.explore = True
+
+    def test_out_of_view_let_go_past_the_budget(self):
+        # (every zone toured kept its outlines: thousands of lines laid out again on each zoom frame, #411 #413
+        # #419, and their anchors overflowed the stack reading the art frame's regions, #414)
+        self.load(0)
+        self.view(8)
+        elwynn = self.made["explore%d" % ELWYNN]
+        n = len(items(elwynn.lines))
+        self.assertGreater(n, 0)
+        self.lua.eval("View")(0.15, 0.15, 0.02, 0.02, 8)         # (elsewhere: Elwynn out of view)
+        self.assertFalse(elwynn.on)
+        self.assertEqual(len(items(elwynn.lines)), 0)
+        self.view(8)                                             # (back: made again)
+        self.assertTrue(elwynn.on)
+        self.assertEqual(len(items(elwynn.lines)), n)
+
+    def test_within_the_budget_kept(self):
+        self.load(100000)
+        self.view(8)
+        elwynn = self.made["explore%d" % ELWYNN]
+        n, cleared = len(items(elwynn.lines)), elwynn.cleared
+        self.lua.eval("View")(0.15, 0.15, 0.02, 0.02, 8)
+        self.assertFalse(elwynn.on)
+        self.view(8)
+        self.assertEqual(len(items(elwynn.lines)), n)
+        self.assertEqual(elwynn.cleared, cleared)          # (not made again)
+
+    def test_turned_off_let_go(self):
+        self.mod.db.explore = True
+        self.view(8)
+        self.mod.db.explore = False
+        self.mod.RefreshExplore()
+        self.assertEqual(len(items(self.made["explore%d" % ELWYNN].lines)), 0)
+
+    def test_nothing_new_nothing_made_again(self):
+        # (a new subzone with the map open, or an opening after one: nothing explored since, nothing made again.
+        # All of it made each time was a hitch at every opening)
+        self.mod.db.explore = True
+        self.lua.execute("mapShown = true")
+        self.view(8)
+        elwynn, counts = self.made["explore%d" % ELWYNN], self.made["exploreCount"]
+        cleared, countsCleared = elwynn.cleared, counts.cleared
+        self.lua.eval("events.ZONE_CHANGED")()
+        self.view(8)
+        self.assertEqual((elwynn.cleared, counts.cleared), (cleared, countsCleared))
+        # (one explored: that zone and the counts made again)
+        key = sorted(k for k, _ in items(self.lua.eval("ns.MapExplore.pieces[%d]" % ELWYNN_ART)))[0]
+        self.lua.eval("unexplored")[key] = False
+        self.lua.eval("events.ZONE_CHANGED")()
+        self.view(8)
+        self.assertGreater(elwynn.cleared, cleared)
+        self.assertGreater(counts.cleared, countsCleared)
+        self.assertEqual(len(items(elwynn.pins)), self.pieces - 1)
 
 
 if __name__ == "__main__":

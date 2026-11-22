@@ -15,6 +15,7 @@
 ## X-License: MIT (code); map art is Blizzard's
 ## X-Curse-Project-ID: 1735937
 ## X-Website: https://github.com/openmap-world/openmap
+## X-Donate: https://ko-fi.com/jigrobbulus
 
 # Retail's toc: its data and textures are the Retail folders (Data\Retail\Client.lua)
 Data\Retail\Client.lua

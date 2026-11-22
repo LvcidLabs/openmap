@@ -1,5 +1,39 @@
 # OpenMap changelog
 
+## v0.8.13 (2026-11-22)
+
+### Fixed
+
+- **Places you've explored show on the map**: the map read what you'd explored as it was built at login,
+  maybe before the game had sent it, and then only when the game said something new was explored. It reads
+  it again as the map first opens and after you enter a new subzone (#422, #410).
+- **No lag zooming with Show places to explore on**: every zone you'd looked at kept its outlines, thousands
+  of lines laid out again on every frame of each zoom and pan, nine times the map's own. Only the zones in
+  view and a few recent ones keep them now (#411, #413, #419).
+- **No stack overflow as the map closes** with Show places to explore on and Keep warm (#414).
+- **Places to explore count what you've already explored**: it read the map's own record, which can be from
+  before the game sent your exploring after login; it asks the game now, and again as you explore (#417,
+  #418, the Barrens showed 3 of 25).
+- **The map's art ready before it opens, in more cases** (keep-warm round you, v0.8.12): the art round you
+  is warmed again each time the map closes (closed on another place, the next opening, centred on you,
+  came in cold); in a cave or another small map its zone is warmed (nothing was); and in a big zone its
+  own art comes first, the farther tiles last (they filled the 400 files and left it out). By cscoder69.
+- **The map closed in a fight reopens where you left it**: it reopened on the view from before the fight.
+- **Opening the map after you've moved is lighter with Show places to explore on**: only zones where you've
+  explored something since are drawn again, not all of them.
+
+### Improved
+
+- **Close-up map performance**: with minimap detail on and unexplored areas hidden, the map
+  draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.
+- **Supporting OpenMap**: the foot of What's new's Credits page has a link to copy, for those who'd like to.
+
+### Known issue
+
+- Opening the map in a fight can print "Interface action failed because of an AddOn" once a session. It's
+  harmless: the map, the quest log and the tracker all work; only the quest log's controller navigation
+  marks are skipped for that one refresh.
+
 ## v0.8.12 (2026-11-21)
 
 ### New

@@ -356,5 +356,19 @@ class AfterFightTests(unittest.TestCase):
         self.assertEqual(self.lua.eval("view").u, None)       # (the whole map: SetView)
 
 
+class ClosedInAFightTests(unittest.TestCase):
+    """the map closed in a fight reopens on the view it closed on: the own view's, noted before the own view stops
+    (noted after, it was Blizzard's canvas's, the view from before the fight)"""
+
+    def test_the_view_noted_before_the_own_view_stops(self):
+        m = re.search(r"\n\tdp\.OnHide = function\(\)\n(.*?)\n\tend\n", WORLDMAP, re.S)
+        self.assertIsNotNone(m, "dp.OnHide")
+        body = m.group(1)
+        noted, stopped = body.find("mod:OnMapHidden()"), body.find("mod.OwnViewStop(")
+        self.assertGreaterEqual(noted, 0)
+        self.assertGreaterEqual(stopped, 0)
+        self.assertLess(noted, stopped)
+
+
 if __name__ == "__main__":
     unittest.main()
