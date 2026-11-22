@@ -23,6 +23,7 @@
 
 - **Close-up map performance**: with minimap detail on and unexplored areas hidden, the map
   draws fewer masked fragments and skips the ones outside the view. By benjaminrobinet.
+- **Supporting OpenMap**: the foot of What's new's Credits page has a link to copy, for those who'd like to.
 
 ## v0.8.12 (2026-11-21)
 

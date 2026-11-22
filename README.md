@@ -8,6 +8,10 @@ There are already a bunch of map addons for Forever, and some of them are great.
 
 OpenMap stitches every zone map into one continuous map. Scroll out of Elwynn and you're looking at Westfall, Duskwood and Redridge, then the whole continent, then the world. No more clicking in and right-clicking out between zones. It lives inside the normal world map, so your quest log, the map's buttons, Questie and the rest of the standard map work as intended.
 
+## Support OpenMap
+
+OpenMap is free and always will be. If you'd like to support it, you can buy me a coffee on [Ko-fi](https://ko-fi.com/jigrobbulus).
+
 ## What it does
 
 - **One seamless map.** Zoom from the whole world down to street level, toward your cursor. It uses the map art from the game files, with the game's minimap blended in for extra detail at the closest zoom, without breaking the map's look.
@@ -40,8 +44,6 @@ I'd love help making this the best map addon for Forever. Bug reports, ideas, co
 - [docs/testing.md](docs/testing.md): the in-game check before a release; [docs/releasing.md](docs/releasing.md): publishing one
 - [docs/maintaining.md](docs/maintaining.md): triage, reviews, repository settings
 - [SECURITY.md](SECURITY.md): reporting security problems privately; [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-
-OpenMap is free and always will be. If you'd like to support it, you can buy me a coffee on [Ko-fi](https://ko-fi.com/jigrobbulus).
 
 ## About Claude
 
