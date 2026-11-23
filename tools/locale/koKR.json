@@ -571,5 +571,7 @@
  "Your own arrow on the world map at this size.": "세계 지도에 표시되는 내 화살표의 크기입니다.",
  "Your arrow over everything": "내 화살표를 항상 맨 위에 표시",
  "Draw your own arrow above every other addon's icons and pins on the map.": "지도의 다른 모든 애드온 아이콘과 핀 위에 내 화살표를 그립니다.",
- "OpenMap is free and made in spare time. To support it:": "OpenMap은 무료이며 여가 시간에 만들어집니다. 후원하려면:"
+ "OpenMap is free and made in spare time. To support it:": "OpenMap은 무료이며 여가 시간에 만들어집니다. 후원하려면:",
+ "Right-click: %s": "오른쪽 클릭: %s",
+ "a right-click for other addons' buttons, and keys in gold in the tooltips": "다른 애드온 버튼의 오른쪽 클릭, 그리고 툴팁의 금색 키"
 }

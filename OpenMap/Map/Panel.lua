@@ -101,6 +101,16 @@ local function ShowIcon(icon, look)
 	icon:SetSize(s, s)
 end
 
+-- a tooltip line's keys in gold, the text before its colon ("Shift-right-click: take it off the map")
+local function GoldKeys(line)
+	local key, rest = line:match("^(.-)([:：].*)$")
+	if not key or key == "" then return line end
+	return "|cffffd100" .. key .. "|r" .. rest
+end
+
+-- a button's right-click line, for its tooltip: "Right-click: <what it does>", the key in gold (API.lua)
+function mod.RightClickTip(text) return GoldKeys(L["Right-click: %s"]:format(text)) end
+
 local function Tip(owner, anchor, title, ...)
 	GameTooltip:SetOwner(owner, anchor)
 	GameTooltip:AddLine(title, LIT[1], LIT[2], 0)
@@ -566,6 +576,8 @@ local RefreshFavorites, RefreshRail
 local function FavClick(self, button)
 	if button == "RightButton" and IsShiftKeyDown() then
 		SetFavorite(self.entry.id, false)
+	elseif button == "RightButton" and self.entry.onRight then   -- (another addon's switch: its own right-click, API.lua)
+		self.entry.onRight()
 	elseif button == "RightButton" and not self.entry.right then
 		return
 	elseif self.entry.run then
@@ -580,9 +592,10 @@ end
 local function FavEnter(self)
 	local e2 = self.entry
 	local state = State(e2)
-	local off = L["Shift-right-click: take it off the map"]
+	local off = GoldKeys(L["Shift-right-click: take it off the map"])
 	Tip(self, self.tipAnchor or "ANCHOR_TOP", e2[1],
 		e2.run and { e2.tip } or { state == "on" and L["On: click to turn it off"] or L["Off: click to turn it on"] },
+		e2.rightTip and e2.rightTip() and { e2.rightTip(), 0.6, 0.6, 0.6 },
 		{ off .. " " .. L["(the stars in the OpenMap menu put buttons here)"], 0.6, 0.6, 0.6 })
 end
 
@@ -1410,7 +1423,10 @@ function mod:SetupPanel(worldMap)
 			RefreshTiles()
 			RefreshFavorites()
 		end)
-		t:SetScript("OnEnter", function(self) Tip(self, "ANCHOR_TOP", self.entry[1], { self.entry.tip }) end)
+		t:SetScript("OnEnter", function(self)
+			local e = self.entry
+			Tip(self, "ANCHOR_TOP", e[1], { e.tip }, e.rightTip and e.rightTip() and { e.rightTip(), 0.6, 0.6, 0.6 })
+		end)
 		t:SetScript("OnLeave", GameTooltip_Hide)
 		t.star = MakeStar(t, function() RefreshTiles() RefreshFavorites() end)
 		t.star:SetPoint("TOPRIGHT", -2, -2)

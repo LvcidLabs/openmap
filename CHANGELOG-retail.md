@@ -1,5 +1,17 @@
 # OpenMap changelog
 
+## Unreleased
+
+### New
+
+- **A right-click for other addons' buttons** (API version 5): `RegisterMenuToggle` takes `onRightClick`
+  and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click
+  (docs/api.md).
+
+### Improved
+
+- **Keys in gold in the buttons' tooltips**: Right-click, Shift-right-click.
+
 ## v0.8.13 (2026-11-22)
 
 ### Fixed

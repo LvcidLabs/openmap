@@ -89,11 +89,19 @@ OM.RegisterMenuToggle("MyAddon", {
 	icon = "Interface\\Icons\\INV_Misc_Herb_07",   -- optional
 	tab = "show",                       -- "show" (On the map), "look" or "more"; default "show"
 	section = "My Addon",               -- the heading it sits under; default "Other addons"
+	onRightClick = function() MyAddon:OpenOptions() end,   -- optional (version 5)
+	rightClickTip = "open My Addon's options",              -- optional (version 5)
 })
 ```
 
 It shows in that tab of the OpenMap menu and can be starred onto the map's button tray like
 OpenMap's own. Registering the same `id` again replaces it.
+
+(version 5) On the tray, a left-click flips the switch (`set(not get())`). `onRightClick` gives its
+button a right-click of your own: open a menu, your options, another feature. Without it a right-click
+does nothing. `rightClickTip` adds a line to the button's tooltip, "Right-click: open My Addon's
+options" (the key in gold; your text as it is, so translate it yourself). Shift-right-click stays
+OpenMap's: it takes the button off the tray.
 
 ### A section on a dungeon's map
 
