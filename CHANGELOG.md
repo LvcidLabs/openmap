@@ -1,5 +1,13 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **Fewer straight lines in the darkening**: with unexplored areas darkened, three of the game's explored-area
+  pieces (in Darkshore, Silverpine Forest and Hillsbrad Foothills) ended their darkening in a straight line
+  across the land. It now fades out there. By cscoder69.
+
 ## v0.8.13 (2026-11-22)
 
 ### Fixed
