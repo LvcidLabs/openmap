@@ -1,5 +1,12 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **No darkening over Riverglades' sea**: with unexplored areas darkened, the shade over Riverglades covered
+  its sea too, out to a straight edge. Its land now stops at its coast. By cscoder69.
+
 ## v0.8.13 (2026-11-22)
 
 ### Fixed
