@@ -1,5 +1,14 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **Stormwind sits in Elwynn's map**: the city's map had no cut, so the blank parchment round it covered
+  Elwynn's painting of the hills about the city, and Elwynn's "Stormwind" banner stayed faint under it. It's
+  now cut down to the city, like Orgrimmar and Thunder Bluff: Elwynn's banner is drawn over it from further out,
+  and gives way to the city's own as you close in. By cscoder69.
+
 ## v0.8.13 (2026-11-22)
 
 ### Fixed
