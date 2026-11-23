@@ -1,5 +1,13 @@
 # OpenMap changelog
 
+## Unreleased
+
+### Fixed
+
+- **No quest icon left in the middle of the screen as the map closes**: another addon's icon (HereBeDragons':
+  AllTheQuests', Questie's ...) whose pin the library let go in a fight was given back to the screen, shown,
+  as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again.
+
 ## v0.8.13 (2026-11-22)
 
 ### Fixed
