@@ -414,13 +414,18 @@ end
 --------------------------------------------------------------------------------
 
 local function SetLit(b, state)
+	local e = b.entry
+	-- (another addon's switch can light and grey its button apart from its state: litOf, greyOf, API.lua)
+	local lit = state == "on"
+	if e and e.litOf then lit = e.litOf() end
 	if b.boxed then
-		local c = state == "on" and LIT or BRONZE
+		local c = lit and LIT or BRONZE
 		b:SetBackdropBorderColor(c[1], c[2], c[3], 1)
 	end
-	b.glow:SetShown(state == "on")
+	b.glow:SetShown(lit)
 	-- (an action can be greyed and lit at once: the Pins list open while your pins are hidden)
-	local grey = state == "off" or (b.entry and b.entry.grey and b.entry.grey()) or false
+	local grey = state == "off" or (e and e.grey and e.grey()) or false
+	if e and e.greyOf then grey = e.greyOf() end
 	b.icon:SetDesaturated(grey)
 	b.icon:SetAlpha(grey and 0.55 or 1)
 end

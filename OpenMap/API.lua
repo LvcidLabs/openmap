@@ -100,26 +100,37 @@ end
 -- Adding your own
 --------------------------------------------------------------------------------
 
-local toggles = {}              -- { owner, id, label, icon, get, set, tab, section, onRightClick, rightClickTip }
+local toggles = {}              -- { owner, id, label, icon, get, set, tab, section, onRightClick, rightClickTip, lit, grey }
 local sections = {}             -- owner -> fn
 
 -- a switch of yours in OpenMap's menu: spec = { id, label, get = fn() -> bool, set = fn(bool),
 -- icon = texture path or fileID (optional), tab = "show" | "look" | "more" (default "show"),
 -- section = a heading (default "Other addons"), onRightClick = fn() (optional, version 5: a right-click
 -- on its button on the map does this instead of nothing), rightClickTip = what it does, for the button's
--- tooltip (optional, version 5) }. It can be starred onto the map like OpenMap's own.
+-- tooltip (optional, version 5), lit = fn() -> bool (optional, version 5: its button's gold edge and glow,
+-- get() when not given), grey = fn() -> bool, or false for never (optional, version 5: its button's icon
+-- greyed; when not given, while get() is false) }. It can be starred onto the map like OpenMap's own.
 function API.RegisterMenuToggle(owner, spec)
 	if type(owner) ~= "string" or type(spec) ~= "table" or type(spec.id) ~= "string" or type(spec.label) ~= "string"
 		or type(spec.get) ~= "function" or type(spec.set) ~= "function"
 		or (spec.onRightClick ~= nil and type(spec.onRightClick) ~= "function")
-		or (spec.rightClickTip ~= nil and type(spec.rightClickTip) ~= "string") then
-		error("OpenMapAPI.RegisterMenuToggle(owner, { id, label, get, set [, icon, tab, section, onRightClick, rightClickTip] })", 2)
+		or (spec.rightClickTip ~= nil and type(spec.rightClickTip) ~= "string")
+		or (spec.lit ~= nil and type(spec.lit) ~= "function")
+		or (spec.grey ~= nil and spec.grey ~= false and type(spec.grey) ~= "function") then
+		error("OpenMapAPI.RegisterMenuToggle(owner, { id, label, get, set [, icon, tab, section, onRightClick, rightClickTip, lit, grey] })", 2)
 	end
 	local tab = (spec.tab == "look" or spec.tab == "more") and spec.tab or "show"
 	for i = #toggles, 1, -1 do if toggles[i].owner == owner and toggles[i].id == spec.id then tremove(toggles, i) end end
 	toggles[#toggles + 1] = { owner = owner, id = spec.id, label = spec.label, icon = spec.icon, get = spec.get, set = spec.set,
 		tab = tab, section = type(spec.section) == "string" and spec.section or nil,
-		onRightClick = spec.onRightClick, rightClickTip = spec.onRightClick and spec.rightClickTip or nil }
+		onRightClick = spec.onRightClick, rightClickTip = spec.onRightClick and spec.rightClickTip or nil,
+		lit = spec.lit, grey = spec.grey }
+	if mod.RefreshPanel then mod:RefreshPanel() end
+end
+
+-- (version 5) your switches' buttons drawn again, their get(), lit() and grey() read anew: for when what
+-- they show changed outside OpenMap's menu and tray (your own button, a slash command)
+function API.RefreshMenuToggles()
 	if mod.RefreshPanel then mod:RefreshPanel() end
 end
 
@@ -167,6 +178,10 @@ function mod.ExtraMenuRows(row)
 					r.onRight = function() local ok, err = pcall(t.onRightClick) if not ok then geterrorhandler()(err) end end
 					if t.rightClickTip then r.rightTip = function() return mod.RightClickTip(t.rightClickTip) end end
 				end
+				-- (its button's look, Panel.lua's SetLit: lit and greyed apart from get())
+				if t.lit then r.litOf = function() local ok, v = pcall(t.lit) return ok and v and true or false end end
+				if t.grey == false then r.greyOf = function() return false end
+				elseif t.grey then r.greyOf = function() local ok, v = pcall(t.grey) return ok and v and true or false end end
 				out[#out + 1] = r
 			end
 		end

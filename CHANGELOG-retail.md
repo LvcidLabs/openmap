@@ -5,8 +5,9 @@
 ### New
 
 - **A right-click for other addons' buttons** (API version 5): `RegisterMenuToggle` takes `onRightClick`
-  and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click
-  (docs/api.md).
+  and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
+  and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;
+  `RefreshMenuToggles()` draws the buttons again (docs/api.md).
 
 ### Improved
 

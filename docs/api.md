@@ -91,6 +91,8 @@ OM.RegisterMenuToggle("MyAddon", {
 	section = "My Addon",               -- the heading it sits under; default "Other addons"
 	onRightClick = function() MyAddon:OpenOptions() end,   -- optional (version 5)
 	rightClickTip = "open My Addon's options",              -- optional (version 5)
+	lit = function() return MyAddonDB.showHerbs end,        -- optional (version 5)
+	grey = false,                                           -- optional (version 5)
 })
 ```
 
@@ -102,6 +104,19 @@ button a right-click of your own: open a menu, your options, another feature. Wi
 does nothing. `rightClickTip` adds a line to the button's tooltip, "Right-click: open My Addon's
 options" (the key in gold; your text as it is, so translate it yourself). Shift-right-click stays
 OpenMap's: it takes the button off the tray.
+
+(version 5) The button glows with a gold edge while `get()` is true and its icon greys while it's
+false. `lit` and `grey` set those apart: `lit = function() ... end` decides the glow, `grey =
+function() ... end` the greying, and `grey = false` never greys it. A button whose left-click opens
+something of yours and whose right-click turns a feature on or off can glow while that feature's on
+and never grey.
+
+```lua
+OM.RefreshMenuToggles()   -- (version 5)
+```
+
+draws your buttons again, reading `get`, `lit` and `grey` anew: call it when what they show changes
+outside OpenMap's menu and tray (your own button, a slash command).
 
 ### A section on a dungeon's map
 

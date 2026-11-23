@@ -5,7 +5,7 @@ local _, ns = ...
 
 ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", }, items = {
-		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click (docs/api.md).",
+		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md).",
 		"|cff6e2c0aKeys in gold in the buttons' tooltips|r: Right-click, Shift-right-click.",
 	} },
 	{ version = "v0.8.13", date = "2026-11-22", heads = { [1] = "Fixed", [8] = "Improved", [10] = "Known issue", }, items = {
