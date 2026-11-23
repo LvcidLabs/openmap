@@ -1106,6 +1106,16 @@ def shore(m):
 ZONE_LAND_SEED, ZONE_LAND_GROW, ZONE_LAND_MIN = 0.42, 0.47, 4000   # saturation; saturation; art px
 ZONE_LAND_ISLAND = 3000         # art px: land patches smaller than this, apart from the rest, are left out
 ZONE_LAND_SOFT = 5.0            # art px: the land mask's edge falloff (the darkening's, Stitch.lua's Shade)
+# a zone's sea traced by hand on its art, where the colours can't find it: Riverglades' (WoW Forever's own
+# map) is hatched in strokes as saturated as its land, and a strip of parchment parts it from the frame, so
+# the open sea zone_sea_found looks for isn't there (it finds the rivers). Its pieces cover the sea too.
+# The outline runs down the middle of the shore's pale band, out to the frame
+ZONE_SEA_TRACED = {
+    "Riverglades": [(690, 0), (700, 45), (712, 95), (760, 112), (810, 122), (845, 150), (862, 190),
+                    (878, 225), (905, 255), (905, 285), (870, 305), (820, 322), (800, 345), (800, 400),
+                    (795, 445), (790, 490), (760, 505), (720, 525), (690, 550), (640, 590), (590, 635),
+                    (560, 668), (1002, 668), (1002, 0)],
+}
 def zone_land(m):
     k = ("zland", m["id"])
     if k not in _cache:
@@ -1122,6 +1132,12 @@ def zone_land(m):
         coast = island_coast(m)
         if coast is not None:                             # (an island: its land is known, the rest is its sea)
             sea_ |= ~ndimage.binary_dilation(own_land(m) | coast, iterations=2)
+        traced = ZONE_SEA_TRACED.get(m["name"])
+        if traced:                                        # (a sea the colours can't find: traced by hand)
+            from PIL import ImageDraw
+            img_ = Image.new("L", (1002, 668), 0)
+            ImageDraw.Draw(img_).polygon(traced, fill=255)
+            sea_ |= np.asarray(img_) > 127
         solid = (t > 0.5) & ~ndimage.binary_dilation(sea_, iterations=1)
         lab, n = ndimage.label(solid)
         if n:
