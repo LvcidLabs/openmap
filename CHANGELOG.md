@@ -12,6 +12,9 @@
 
 ### Fixed
 
+- **Places to explore clear as you explore them**: a place explored with the map closed kept its outline and pin
+  until a /reload, and so did places explored before you logged in. The map is told as Blizzard's loads now, and
+  what you've explored is read again at the next opening (#434).
 - **The cursor's coordinates off a battleground's or dungeon's map read "--"**: over the frame round a map
   smaller than the window, they showed the map's edge (57.6, 0.0).
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
