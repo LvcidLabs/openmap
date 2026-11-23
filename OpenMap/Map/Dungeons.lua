@@ -10,6 +10,7 @@
 --------------------------------------------------------------------------------
 
 local _, ns = ...
+local function Gold(line) return ns.GoldKeys and ns.GoldKeys(line) or line end   -- (a tooltip's keys in gold: Panel.lua)
 local S = ns.MapStitch
 local mod = ns:GetModule("worldmap")
 local Look, Safe, L = ns.Look, ns.Safe, ns.L
@@ -1352,11 +1353,11 @@ local function Enter(pin)
 	local bosses = one and (Places().bosses or {})[one[1]]
 	if bosses and #bosses > 0 then GameTooltip:AddLine(L["%d bosses"]:format(#bosses), 0.8, 0.8, 0.8) end
 	if not MapsOn() then
-		GameTooltip:AddLine(#pin.instances == 1 and L["Click to see what's inside"] or L["Click to pick one"], 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(Gold(#pin.instances == 1 and L["Click: see what's inside"] or L["Click: pick one"]), 0.6, 0.6, 0.6)
 	elseif one then
-		GameTooltip:AddLine((DungeonMap(one) or FloorsOf(one)) and L["Click to open its map"] or L["Click to see what's inside (no map of it yet)"], 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(Gold((DungeonMap(one) or FloorsOf(one)) and L["Click: open its map"] or L["Click: see what's inside (no map of it yet)"]), 0.6, 0.6, 0.6)
 	else
-		GameTooltip:AddLine(L["Click to pick one and open its map"], 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(Gold(L["Click: pick one and open its map"]), 0.6, 0.6, 0.6)
 	end
 	GameTooltip:Show()
 end
@@ -1847,8 +1848,8 @@ FillSide = function()
 				tip = function(owner)
 					GameTooltip:SetOwner(owner, "ANCHOR_LEFT")
 					GameTooltip:AddLine(name, 1, 0.82, 0)
-					GameTooltip:AddLine(NeedRoll() and L["Click to see loot in NeedRoll"] or L["See the Loot tab for loot"], 0.6, 0.6, 0.6)
-					if _G.NeedRoll_ShowMap then GameTooltip:AddLine(L["Shift-click: where it is, on NeedRoll's map"], 0.6, 0.6, 0.6) end
+					GameTooltip:AddLine(Gold(NeedRoll() and L["Click: see its loot in NeedRoll"] or L["See the Loot tab for loot"]), 0.6, 0.6, 0.6)
+					if _G.NeedRoll_ShowMap then GameTooltip:AddLine(Gold(L["Shift-click: where it is, on NeedRoll's map"]), 0.6, 0.6, 0.6) end
 					GameTooltip:Show()
 				end }
 		end
@@ -1901,7 +1902,7 @@ FillSide = function()
 							local okReq, req = pcall(QDB.QueryQuestSingle, q.id, "requiredLevel")
 							GameTooltip:AddLine((LEVEL or "Level") .. " " .. q.level .. (okReq and req and req > 0 and ("  (" .. L["from %d"]:format(req) .. ")") or ""), 0.8, 0.8, 0.8)
 							GameTooltip:AddLine(q.done and L["Completed"] or q.inLog and L["In your quest log"] or "", 0.5, 0.95, 0.4)
-							if _G.NeedRoll_ShowQuest then GameTooltip:AddLine(L["Click to see it in NeedRoll"], 0.6, 0.6, 0.6) end
+							if _G.NeedRoll_ShowQuest then GameTooltip:AddLine(Gold(L["Click: see it in NeedRoll"]), 0.6, 0.6, 0.6) end
 							GameTooltip:Show()
 						end }
 				end
@@ -2077,7 +2078,7 @@ local function PinTip(pin)
 	GameTooltip:SetOwner(pin, "ANCHOR_RIGHT")
 	GameTooltip:AddLine(("%d. %s"):format(pin.index, pin.name), 1, 0.82, 0)
 	if pin.mine then GameTooltip:AddLine(L["Placed by you (/openmap bosses)"], 0.6, 0.6, 0.6) end
-	if NeedRoll() then GameTooltip:AddLine(L["Click to see loot in NeedRoll"], 0.6, 0.6, 0.6) end
+	if NeedRoll() then GameTooltip:AddLine(Gold(L["Click: see its loot in NeedRoll"]), 0.6, 0.6, 0.6) end
 	GameTooltip:Show()
 end
 

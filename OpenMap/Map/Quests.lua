@@ -15,6 +15,7 @@
 --------------------------------------------------------------------------------
 
 local _, ns = ...
+local function Gold(line) return ns.GoldKeys and ns.GoldKeys(line) or line end   -- (a tooltip's keys in gold: Panel.lua)
 local S = ns.MapStitch
 local mod = ns:GetModule("worldmap")
 local L = ns.L
@@ -73,8 +74,8 @@ local function Enter(pin)
 			if text and not finished then GameTooltip:AddLine((_G.QUEST_DASH or "- ") .. text, 1, 1, 1, true) end
 		end
 	end
-	GameTooltip:AddLine((PadView() or (map and map.IsMaximized and map:IsMaximized())) and L["Click: track this quest and zoom to it"]
-		or L["Click: track this quest, zoom to it and show it in the quest log"], 0.6, 0.6, 0.6)
+	GameTooltip:AddLine(Gold((PadView() or (map and map.IsMaximized and map:IsMaximized())) and L["Click: track this quest and zoom to it"]
+		or L["Click: track this quest, zoom to it and show it in the quest log"]), 0.6, 0.6, 0.6)
 	GameTooltip:Show()
 	-- (the controller view: the quest's area, as Blizzard's map shows it for its own icons: PadView.lua)
 	if PadView() and mod.PadQuestArea then mod.PadQuestArea(q.id, q.map) end

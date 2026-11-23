@@ -9,6 +9,7 @@
 --------------------------------------------------------------------------------
 
 local _, ns = ...
+local function Gold(line) return ns.GoldKeys and ns.GoldKeys(line) or line end   -- (a tooltip's keys in gold: Panel.lua)
 local mod = ns:GetModule("worldmap")
 local L = ns.L
 
@@ -297,7 +298,7 @@ local function Grip(corner)
 	end)
 	g:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, left and "ANCHOR_LEFT" or "ANCHOR_RIGHT")
-		GameTooltip:AddLine(L["Drag to resize the map"], 1, 1, 1)
+		GameTooltip:AddLine(Gold(L["Drag: resize the map"]), 1, 1, 1)
 		GameTooltip:Show()
 	end)
 	g:SetScript("OnLeave", GameTooltip_Hide)
@@ -390,7 +391,7 @@ function mod:SetupWindow(worldMap)
 		handle:SetScript("OnEnter", function(self)
 			if Maximized() then return end
 			GameTooltip:SetOwner(self, "ANCHOR_TOP")
-			GameTooltip:AddLine(L["Drag to move the map"], 1, 1, 1)
+			GameTooltip:AddLine(Gold(L["Drag: move the map"]), 1, 1, 1)
 			GameTooltip:Show()
 		end)
 		handle:SetScript("OnLeave", GameTooltip_Hide)

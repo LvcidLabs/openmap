@@ -282,7 +282,7 @@ function RefreshWaypoint()
 		local info = C_Map.GetMapInfo(mapID)
 		GameTooltip:AddLine(L["Waypoint"], 1, 0.82, 0)
 		GameTooltip:AddLine(("%s  %.1f, %.1f"):format(info and info.name or "", x * 100, y * 100), 1, 1, 1)
-		GameTooltip:AddLine(L["Click to stop following it"], 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(Gold(L["Click: stop following it"]), 0.6, 0.6, 0.6)
 		if not own then GameTooltip:AddLine(Gold(L["Shift-click: share in chat"]), 0.6, 0.6, 0.6) end
 		GameTooltip:Show()
 	end)

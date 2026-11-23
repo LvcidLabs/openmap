@@ -723,7 +723,7 @@ local function BuildRail()
 	rail.main:SetScript("OnDragStop", EndDrag)
 	rail.main:SetScript("OnEnter", function(self)
 		Tip(self, self.tipAnchor or "ANCHOR_LEFT", "OpenMap", { L["Search, find me, map pins, the quest log, report a problem, options, and what the map shows."] },
-			{ L["Drag it anywhere round the map's edge."], 0.6, 0.6, 0.6 })
+			{ GoldKeys(L["Drag: move it anywhere round the map's edge"]), 0.6, 0.6, 0.6 })
 	end)
 	rail.main:SetScript("OnLeave", GameTooltip_Hide)
 	-- the arrow: the way the favourites go to unfold them, back toward the OpenMap tab to fold them
@@ -1716,7 +1716,7 @@ function mod:SetupPanel(worldMap)
 	grip:SetScript("OnHide", function(self) self:SetScript("OnUpdate", nil) end)
 	grip:SetScript("OnEnter", function(self)
 		Tip(self, "ANCHOR_TOP", L["Resize the OpenMap menu"],
-			{ L["Drag to change width and height. The settings scroll when needed."] })
+			{ GoldKeys(L["Drag: change its width and height. The settings scroll when needed."]) })
 	end)
 	grip:SetScript("OnLeave", GameTooltip_Hide)
 

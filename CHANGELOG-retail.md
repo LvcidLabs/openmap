@@ -11,8 +11,9 @@
 
 ### Improved
 
-- **Keys in gold in the tooltips** of the map's buttons and of map pins: Click, Right-click, Shift-click,
-  Alt-click. A map pin's tooltip reads "Click: edit its note, follow, share or delete it".
+- **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
+  map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
+  minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map").
 
 ## v0.8.13 (2026-11-22)
 
