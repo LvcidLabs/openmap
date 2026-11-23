@@ -11,7 +11,8 @@
 
 ### Improved
 
-- **Keys in gold in the buttons' tooltips**: Right-click, Shift-right-click.
+- **Keys in gold in the tooltips** of the map's buttons and of map pins: Click, Right-click, Shift-click,
+  Alt-click. A map pin's tooltip reads "Click: edit its note, follow, share or delete it".
 
 ## v0.8.13 (2026-11-22)
 

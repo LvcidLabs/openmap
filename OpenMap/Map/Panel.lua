@@ -107,6 +107,7 @@ local function GoldKeys(line)
 	if not key or key == "" then return line end
 	return "|cffffd100" .. key .. "|r" .. rest
 end
+ns.GoldKeys = GoldKeys   -- (the map pins' tooltips too: Pins.lua, Nav.lua)
 
 -- a button's right-click line, for its tooltip: "Right-click: <what it does>", the key in gold (API.lua)
 function mod.RightClickTip(text) return GoldKeys(L["Right-click: %s"]:format(text)) end

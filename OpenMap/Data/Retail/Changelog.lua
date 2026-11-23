@@ -6,7 +6,7 @@ local _, ns = ...
 ns.MapChangelog = {
 	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", }, items = {
 		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md).",
-		"|cff6e2c0aKeys in gold in the buttons' tooltips|r: Right-click, Shift-right-click.",
+		"|cff6e2c0aKeys in gold in the tooltips|r of the map's buttons and of map pins: Click, Right-click, Shift-click, Alt-click. A map pin's tooltip reads \"Click: edit its note, follow, share or delete it\".",
 	} },
 	{ version = "v0.8.13", date = "2026-11-22", heads = { [1] = "Fixed", [5] = "Improved", [7] = "Known issue", }, items = {
 		"|cff6e2c0aPlaces you've explored show on the map|r: the map read what you'd explored as it was built at login, maybe before the game had sent it, and then only when the game said something new was explored. It reads it again as the map first opens and after you enter a new subzone (#422, #410).",
