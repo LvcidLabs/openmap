@@ -577,5 +577,7 @@
  "Right-click: %s": "Clic droit : %s",
  "a right-click for other addons' buttons, and keys in gold in the tooltips": "un clic droit pour les boutons des autres addons et les touches en or dans les infobulles",
  "Right-click: edit it": "Clic droit : la modifier",
- "Right-click: open its card": "Clic droit : ouvrir sa fiche"
+ "Right-click: open its card": "Clic droit : ouvrir sa fiche",
+ "TomTom waypoint too": "Point de passage TomTom aussi",
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un repère suivi sur la carte place aussi le point de passage et la flèche de TomTom, en plus de ceux de Blizzard."
 }

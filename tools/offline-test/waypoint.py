@@ -78,5 +78,42 @@ class ZoneWaypointTests(unittest.TestCase):
         self.assertEqual(self.lua.eval("#set"), 1)
 
 
+class TomTomTests(unittest.TestCase):
+    """A waypoint followed sets TomTom's too, unless "TomTom waypoint too" is off (#444)"""
+    def setUp(self):
+        clear = re.search(r"\nlocal tomtomPoint\nlocal function ClearTomTom\(\)\n.*?\nend\n", NAV, re.S)
+        track = re.search(r"\nfunction mod\.TrackPoint\(mapID, x, y, title\)\n.*?\nend\n", NAV, re.S)
+        toggle = re.search(r"\nfunction mod\.SetTomTomWaypoint\(on\).*?\nend\n", NAV, re.S)
+        for m in (clear, track, toggle):
+            self.assertIsNotNone(m, "Nav.lua's TomTom waypoint")
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute(r"""
+            function InCombatLockdown() return false end
+            C_Map = { GetMapInfo = function(id) return { name = "Elwynn Forest" } end }
+            added, removed = {}, {}
+            TomTom = {
+                AddWaypoint = function(self, id, x, y, opts) added[#added + 1] = { id, x, y, opts.title } return "handle" .. #added end,
+                RemoveWaypoint = function(self, h) removed[#removed + 1] = h end,
+            }
+            function RefreshWaypoint() end
+            mod = { db = {}, char = {} }
+        """ + clear.group(0) + track.group(0) + toggle.group(0))
+
+    def test_on_by_default(self):
+        self.lua.execute("mod.TrackPoint(1429, 0.4, 0.6, 'Goldshire')")
+        self.assertEqual(self.lua.eval("#added"), 1)
+        self.assertEqual(self.lua.eval("added[1][4]"), "Goldshire")
+
+    def test_off_no_tomtom_waypoint(self):
+        self.lua.execute("mod.db.tomtom = false mod.TrackPoint(1429, 0.4, 0.6)")
+        self.assertEqual(self.lua.eval("#added"), 0)
+        self.assertEqual(self.lua.eval("mod.char.pin[1]"), 1429)    # (OpenMap's own waypoint still set)
+
+    def test_turned_off_clears_the_one_set(self):
+        self.lua.execute("mod.TrackPoint(1429, 0.4, 0.6) mod.SetTomTomWaypoint(false)")
+        self.assertEqual(self.lua.eval("removed[1]"), "handle1")
+        self.assertFalse(self.lua.eval("mod.db.tomtom"))
+
+
 if __name__ == "__main__":
     unittest.main()

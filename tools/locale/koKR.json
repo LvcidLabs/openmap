@@ -577,5 +577,7 @@
  "Right-click: %s": "오른쪽 클릭: %s",
  "a right-click for other addons' buttons, and keys in gold in the tooltips": "다른 애드온 버튼의 오른쪽 클릭, 그리고 툴팁의 금색 키",
  "Right-click: edit it": "오른쪽 클릭: 편집",
- "Right-click: open its card": "오른쪽 클릭: 카드 열기"
+ "Right-click: open its card": "오른쪽 클릭: 카드 열기",
+ "TomTom waypoint too": "TomTom 이동 지점도",
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "지도에서 추적하는 핀이 블리자드의 이동 지점과 함께 TomTom의 이동 지점과 화살표도 설정합니다."
 }

@@ -4,8 +4,9 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [3] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [3] = "Improved", [4] = "Fixed", }, items = {
 		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md). By Lvcidx0.",
+		"|cff6e2c0aTomTom's waypoint can be left out|r: with TomTom on, \"TomTom waypoint too\" (OpenMap's menu > More, and Options) is on as before; off, a pin you follow on the map sets only Blizzard's waypoint (#444).",
 		"|cff6e2c0aKeys in gold in the tooltips|r: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons, map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the minimap button and the window's corners. Each reads \"Key: what it does\" (\"Click: open its map\"). By Lvcidx0.",
 		"|cff6e2c0aThe cursor's coordinates off a battleground's or dungeon's map read \"--\"|r: over the frame round a map smaller than the window, they showed the map's edge (57.6, 0.0).",
 		"|cff6e2c0aNo quest icon left in the middle of the screen as the map closes|r: another addon's icon (HereBeDragons': AllTheQuests', Questie's ...) whose pin the library let go in a fight was given back to the screen, shown, as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again (#448). By imigu17.",

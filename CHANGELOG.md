@@ -13,6 +13,8 @@
   and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
   and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;
   `RefreshMenuToggles()` draws the buttons again (docs/api.md). By Lvcidx0.
+- **TomTom's waypoint can be left out**: with TomTom on, "TomTom waypoint too" (OpenMap's menu > More, and
+  Options) is on as before; off, a pin you follow on the map sets only Blizzard's waypoint (#444).
 
 ### Improved
 

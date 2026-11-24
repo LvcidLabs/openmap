@@ -358,6 +358,9 @@ local function Rows()
 	rows[#rows + 1] = optRow(L["Load the zone in view"], "autoSwitch", Icon("Ability_Hunter_Pathfinding"))
 	fromOptions(L["Ctrl-click drops a pin"], "ctrlClickPin", Icon("INV_Misc_Map_01"))
 	fromOptions(L["Follow new pins"], "pinsFollowNew", Icon("INV_Misc_Map_01"))
+	if _G.TomTom and TomTom.AddWaypoint then      -- (#444: only with TomTom on)
+		fromOptions(L["TomTom waypoint too"], "tomtom", Icon("INV_Misc_Map_01"))
+	end
 	rows[#rows + 1] = { L["Reopen map (choose one)"] }
 	for _, choice in ipairs({ { "player", L["Center on player"] }, { "zoom", L["Center on player, keep zoom"] }, { "inzone", L["Center on your zone"] }, { "always", L["Always remember"] },
 		{ "visible", L["Remember while visible"] } }) do

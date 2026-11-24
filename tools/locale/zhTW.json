@@ -577,5 +577,7 @@
  "Right-click: %s": "右鍵點擊：%s",
  "a right-click for other addons' buttons, and keys in gold in the tooltips": "其他插件按鈕的右鍵點擊，以及提示中的金色按鍵",
  "Right-click: edit it": "右鍵點擊：編輯",
- "Right-click: open its card": "右鍵點擊：開啟資訊卡"
+ "Right-click: open its card": "右鍵點擊：開啟資訊卡",
+ "TomTom waypoint too": "同時設定 TomTom 路徑點",
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "在地圖上追蹤的標記除了 Blizzard 的路徑點之外，也會設定 TomTom 的路徑點與箭頭。"
 }

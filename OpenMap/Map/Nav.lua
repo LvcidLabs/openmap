@@ -19,6 +19,7 @@ local function Gold(line) return ns.GoldKeys and ns.GoldKeys(line) or line end  
 
 local d = mod.defaults
 d.group = true
+d.tomtom = true      -- a waypoint followed on the map sets TomTom's too, if TomTom is on (#444)
 
 local map, sc
 
@@ -306,7 +307,7 @@ function mod.TrackPoint(mapID, x, y, title)
 	mod.char.pin = not blizzard and { mapID, x, y } or nil
 	local tomtom = _G.TomTom
 	ClearTomTom()
-	if tomtom and tomtom.AddWaypoint then
+	if tomtom and tomtom.AddWaypoint and mod.db.tomtom ~= false then
 		local name = (title and title ~= "") and title or (info and info.name) or "OpenMap"
 		local ok, point = pcall(tomtom.AddWaypoint, tomtom, mapID, x, y, { title = name, from = "OpenMap" })
 		if ok then tomtomPoint = point end
@@ -333,6 +334,10 @@ function mod.SetPinMode(on)
 	if mod.OnPinMode then mod.OnPinMode(pinArmed) end
 end
 function mod.ClearPin() ClearPin() end         -- (the waypoint: no longer followed)
+function mod.SetTomTomWaypoint(on)             -- (off: the one OpenMap set goes too)
+	mod.db.tomtom = on and true or false
+	if not on then ClearTomTom() end
+end
 
 --------------------------------------------------------------------------------
 -- Search
@@ -939,4 +944,8 @@ function mod:NavOptions(opts, get, set, off)
 		desc = L["Choose one behavior. Center on player: always open on you. Center on player, keep zoom: open on you, at the zoom you closed the map at. Center on your zone: open on the whole zone you're in, wherever you are in it. Always remember: restore your previous position and zoom, even after changing zones. Remember while visible: restore only if your current location is inside the previous view, even across zone boundaries. Otherwise, open on you. Maps opened for a quest still show the quest's area."] }
 	opts.group = { type = "toggle", name = L["Party and raid members"], order = 35, get = get, set = set, disabled = off,
 		desc = L["Class-coloured dots for your group anywhere on the stitched map."] }
+	opts.tomtom = { type = "toggle", name = L["TomTom waypoint too"], order = 35.92, width = "full", disabled = off,
+		get = function() return mod.db.tomtom ~= false end, set = function(_, v) mod.SetTomTomWaypoint(v) end,
+		hidden = function() return not (_G.TomTom and TomTom.AddWaypoint) end,
+		desc = L["A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's."] }
 end

@@ -577,5 +577,7 @@
  "Right-click: %s": "Clic destro: %s",
  "a right-click for other addons' buttons, and keys in gold in the tooltips": "un clic destro per i pulsanti degli altri addon e i tasti in oro nei tooltip",
  "Right-click: edit it": "Clic destro: modificala",
- "Right-click: open its card": "Clic destro: aprine il pannello"
+ "Right-click: open its card": "Clic destro: aprine il pannello",
+ "TomTom waypoint too": "Anche il punto di TomTom",
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un segnalino che segui sulla mappa imposta anche il punto e la freccia di TomTom, oltre a quelli di Blizzard."
 }
