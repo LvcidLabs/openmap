@@ -6,6 +6,9 @@
 
 - **The cursor's coordinates off a battleground's or dungeon's map read "--"**: over the frame round a map
   smaller than the window, they showed the map's edge (57.6, 0.0).
+- **No quest icon left in the middle of the screen as the map closes**: another addon's icon (HereBeDragons':
+  AllTheQuests', Questie's ...) whose pin the library let go in a fight was given back to the screen, shown,
+  as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again (#448). By imigu17.
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
   top of the map when Move Any anchored the window at the bottom. By puschie286.
 - **No "auras ... secret while tainted by OpenMap" error from the quest tracker in a fight**: clicking a quest
