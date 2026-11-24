@@ -421,6 +421,79 @@ class InstanceHostTests(unittest.TestCase):
             assert(Active() and S.shown)
         """)
 
+    def test_other_dungeon_maps_hide_the_world_with_default_settings(self):
+        self.lua.execute("""
+            mod.db.hideWorldPinsInInstances, mod.db.dungeonMaps = false, true
+            local needroll, journal = true, false
+            function mod.NeedRollMap() return needroll end
+            function mod.DungeonJournalMapShown() return journal end
+            for _, value in ipairs({ 'party', 'raid' }) do
+                inside, kind = true, value
+                State(947)
+                assert(not Active() and not S.shown, 'world over the NeedRoll map')
+            end
+            State(2)
+            assert(not mod.instanceWorldHidden, 'a real dungeon map suspended')
+            for _, value in ipairs({ 'pvp', 'arena' }) do
+                kind = value
+                State(947)
+                assert(Active(), 'a battleground has no such map')
+            end
+            inside, kind = true, 'party'
+            needroll = false                 -- (its Map in dungeons: Game)
+            State(947)
+            assert(Active(), 'world hidden with the NeedRoll map off')
+            journal = true
+            mod:RefreshInstancePins()
+            assert(not Active(), 'world over the Dungeon Journal map')
+            journal = false                  -- (its World Map button)
+            mod:RefreshInstancePins()
+            assert(Active() and S.shown)
+            journal = true                   -- (its Dungeon Map button)
+            mod:RefreshInstancePins()
+            assert(not Active())
+            inside, kind = false, 'none'
+            mod:RefreshInstancePins()
+            assert(Active())
+        """)
+
+    def test_right_click_past_needroll_with_default_settings(self):
+        self.lua.execute("""
+            mod.db.hideWorldPinsInInstances, mod.db.dungeonMaps = false, true
+            function mod.NeedRollMap() return true end
+            inside, kind = true, 'party'
+            State(947)
+            assert(not Active())
+            Mouse('RightButton')
+            overlay = false
+            Flush()
+            assert(Active() and mod.instanceWorldBrowsing)
+        """)
+
+    def test_own_view_put_away_for_another_dungeon_map(self):
+        self.lua.execute("""
+            mod.db.hideWorldPinsInInstances, mod.db.dungeonMaps = false, true
+            own, fighting = { on = true }, true
+            function mod.OwnViewStop() own.on = false end
+            function mod.DungeonJournalMapShown() return true end
+            inside, kind = true, 'party'
+            State(947)
+            assert(not own.on and not S.shown)
+        """)
+
+    def test_needroll_map_setting(self):
+        dungeons = (ROOT / 'OpenMap/Map/Dungeons.lua').read_text(encoding='utf-8')
+        body = re.search(r'local function NeedRoll\(\).*?mod\.NeedRollMap = NeedRollMap\n', dungeons, re.S).group()
+        self.lua.execute('SlashCmdList = {}\n' + body + """
+            assert(not mod.NeedRollMap())
+            SlashCmdList.NEEDROLL = function() end
+            assert(mod.NeedRollMap())
+            NeedRollDB = { dungeonMap = 'game' }
+            assert(not mod.NeedRollMap())
+            NeedRollDB.dungeonMap = 'needroll'
+            assert(mod.NeedRollMap())
+        """)
+
     def test_hover_label_does_not_query_world_under_overlay(self):
         extras = (ROOT / 'OpenMap/Map/Extras.lua').read_text()
         label = re.search(r'local function AreaLabelOnUpdate\(.*?\nend\n', extras, re.S).group()

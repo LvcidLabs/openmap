@@ -1215,6 +1215,13 @@ end
 function mod.DungeonViewShown() return view and view:IsShown() or false end
 
 local function NeedRoll() return SlashCmdList and SlashCmdList.NEEDROLL end
+-- its map laid over the game's inside a dungeon: its "Map in dungeons", not set to Game (its own default is on)
+local function NeedRollMap()
+	if not NeedRoll() then return false end
+	local settings = _G.NeedRollDB
+	return not (type(settings) == "table" and settings.dungeonMap == "game")
+end
+mod.NeedRollMap = NeedRollMap
 
 -- (in combat with the gamepad's UI the game's own map isn't changed by OpenMap: WorldMap.lua's
 -- mod.PadCombat; once a while, said why)
@@ -2471,7 +2478,7 @@ local function InstanceHere()
 end
 
 function mod.ActiveDungeonWing()
-	if not (map and map:IsShown() and MapsOn()) or mod.db.dungeonInside == false or NeedRoll() then return end
+	if not (map and map:IsShown() and MapsOn()) or mod.db.dungeonInside == false or NeedRollMap() then return end
 	local record = SavedWing()
 	if type(record) == "table" and InstanceIDs() == record[1] then return record, record == confirmedWing end
 end
@@ -2486,7 +2493,7 @@ function mod.NoteDungeonWing(event, initialLogin, reloading)
 	if not instID then return end
 	WingHere(instID, lfgID, portalWing)
 	if confirmedWing and confirmedWing ~= previous and map and map:IsShown() and not (view and view:IsShown())
-		and MapsOn() and mod.db.dungeonInside ~= false and not NeedRoll() then
+		and MapsOn() and mod.db.dungeonInside ~= false and not NeedRollMap() then
 		local inst, record = InstanceHere()
 		if inst and record then mod.DungeonJournalHandlesMap(inst, record, true) end
 	end
@@ -2508,7 +2515,7 @@ end
 local function NoteDungeonMap()
 	local inst = InstanceHere()
 	if not inst or mod.db.dungeonMapNoted or not MapsOn() or mod.db.dungeonInside == false then return end
-	if mod.DungeonJournalHandlesMap(inst) or NeedRoll() then return end
+	if mod.DungeonJournalHandlesMap(inst) or NeedRollMap() then return end
 	mod.db.dungeonMapNoted = true
 	ns:Print(L["Opening the map in a dungeon shows OpenMap's map of it. To turn that off: OpenMap's menu > Dungeons > Dungeon maps inside dungeons."])
 end
@@ -2659,7 +2666,7 @@ function mod:SetupDungeons(worldMap)
 			-- (Dungeon Journal shows its own map of the dungeon you're in, its bosses on it: OpenMap's isn't put
 			-- over it as the map opens there, #302. An entrance clicked on the world map still opens OpenMap's)
 			local sharedInstance = ns.Client == "Forever" and WING_LFG[inst[1]] ~= nil
-			if NeedRoll() or mod.DungeonJournalHandlesMap(inst, record, sharedInstance) then return end   -- (NeedRoll's own map: #267)
+			if NeedRollMap() or mod.DungeonJournalHandlesMap(inst, record, sharedInstance) then return end   -- (NeedRoll's own map: #267)
 			local id = DungeonMap(inst)
 			if not id then OpenView(inst, nil) elseif map:GetMapID() ~= id then S.OpenMap(id) end
 		end)

@@ -33,9 +33,9 @@ local function PadUI()
 	return (mod.PadViewOn and mod.PadViewOn()) or (InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()) or false
 end
 local function Data(mapID) return ns.MapBattlegrounds and mapID and ns.MapBattlegrounds[mapID] end
--- (the battleground you're in: its map left exactly Blizzard's. Its group dots' right-click, Report AFK,
--- is Blizzard's only, and OpenMap's zoom steps make every scale the map works out from them OpenMap's:
--- the report was blocked. Its map opened from outside still zooms)
+-- (the battleground you're in: no zoom steps or tiles of OpenMap's on its map. Its group dots' right-click,
+-- Report AFK, is blocked when Blizzard's code there has read what OpenMap wrote; the zoom steps are one such
+-- write, not the only one (WorldMap.lua's Attach, #82, #459). Its map opened from outside still zooms)
 local function Inside(mapID)
 	local bg = Data(mapID)
 	if not bg or not IsInInstance then return false end

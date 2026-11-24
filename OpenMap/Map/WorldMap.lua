@@ -931,6 +931,8 @@ local function Attach(mapID, refreshed)
 	local wasHidden = mod.instanceWorldHidden
 	mod.instanceWorldHidden = mod.InstanceWorldHidden(mapID)
 	active = mod.enabled and not mod.instanceWorldHidden and Stitchable(mapID) and S.IsBuilt() and S.Layout(mapID) or false
+	-- (another addon's dungeon map up in a fight: the own view would cover it)
+	if not active and own and own.on and mod.OwnViewStop then mod.OwnViewStop(false) end
 	S.SetShown(active)
 	mod:UpdateBrightness()
 	BlizzardArt()
@@ -1651,8 +1653,16 @@ local function Setup()
 	end
 	hooksecurefunc(map, "OnMapChanged", function()
 		if active then RaisePlayer() end
+		-- (NeedRoll's map goes as another map is picked: the world's back, as after its right-click)
+		if mod.instanceWorldHidden and mod.instanceHost and map:IsShown() and map:GetMapID() ~= mod.instanceHost
+			and not (mod.DungeonJournalMapShown and mod.DungeonJournalMapShown()) then
+			mod.instanceWorldBrowsing = true
+			mod:RefreshInstancePins()
+			if not InCombatLockdown() then sc:CreateZoomLevels() sc:ResetZoom() end
+		end
 	end)
 	dp.OnHide = function()
+		mod.instanceHost = nil
 		-- (the view noted first: closed in a fight, it's the own view's, which stopping it leaves behind; read
 		-- after, it was Blizzard's canvas's, the view from before the fight, and the map reopened there)
 		if mod.OnMapHidden then mod:OnMapHidden() end
@@ -1667,8 +1677,13 @@ local function Setup()
 		mod.instanceWorldBrowsing = nil
 		mod.instanceMapGeneration = (mod.instanceMapGeneration or 0) + 1
 		if not (S.IsBuilt() and ExtrasBuilt()) and map:GetMapID() then sc:OnCanvasSizeChanged() end   -- built on first showing
+		mod.instanceHost = map:GetMapID()
 		mod:RefreshInstancePins()
 		if mod.instanceWorldHidden then ticker:Show() RaisePlayer() end
+		-- (Dungeon Journal puts its map up as the map opens, maybe after this)
+		if mod.HasDungeonJournal and mod.HasDungeonJournal() then
+			C_Timer.After(0, function() if map:IsShown() then mod:RefreshInstancePins() end end)
+		end
 		if active then
 			ticker:Show()
 			S.Recull()
@@ -1924,7 +1939,7 @@ function mod:OnEnable()
 		ns.RegisterEvent(self.instancePinsEvents, "LOADING_SCREEN_DISABLED", function(_, event) mod.NoteDungeonWing(event) end)
 	end
 	ns.RegisterEvent(self.instancePinsEvents, "GLOBAL_MOUSE_UP", function(_, _, button)
-		if button ~= "RightButton" or not mod.instancePinsHidden or mod.db.dungeonMaps ~= false
+		if button ~= "RightButton" or not mod.instanceWorldHidden
 			or mod.instanceWorldBrowsing or not map or not map:IsShown() or not sc:IsMouseOver()
 			or (mod.MenuShown and mod.MenuShown()) then return end
 		local generation = mod.instanceMapGeneration
@@ -1969,8 +1984,16 @@ end
 
 function mod.InstanceWorldHidden(mapID)
 	-- A real dungeon map keeps its native player/group positions. Only suspend a world host.
-	return mod.instancePinsHidden and not mod.instanceWorldBrowsing and mod.db.dungeonMaps == false
-		and Stitchable(mapID or (map and map:GetMapID())) or false
+	if not Stitchable(mapID or (map and map:GetMapID())) then return false end
+	local inside, kind = IsInInstance()
+	inside, kind = ns.Safe.Value(inside), ns.Safe.Value(kind)
+	if inside and (kind == "party" or kind == "raid") then
+		-- Another addon's map of the dungeon, which OpenMap's art, icons and own view (in a fight) were drawn
+		-- over: they're put away, whatever the markers' setting.
+		if mod.DungeonJournalMapShown and mod.DungeonJournalMapShown() then return true end
+		if not mod.instanceWorldBrowsing and mod.NeedRollMap and mod.NeedRollMap() then return true end
+	end
+	return mod.instancePinsHidden and not mod.instanceWorldBrowsing and mod.db.dungeonMaps == false or false
 end
 
 function mod:RefreshInstancePins(onlyPins)
@@ -1979,7 +2002,7 @@ function mod:RefreshInstancePins(onlyPins)
 	inside, kind = ns.Safe.Value(inside), ns.Safe.Value(kind)
 	self.instancePinsHidden = self.db.hideWorldPinsInInstances and inside
 		and (kind == "party" or kind == "raid" or kind == "pvp" or kind == "arena") or false
-	if not self.instancePinsHidden then self.instanceWorldBrowsing = nil end
+	if not inside then self.instanceWorldBrowsing = nil end
 	if not inside and self.RememberOutsideInstance then self.RememberOutsideInstance() end
 	S.SetWorldPinsHidden(self.instancePinsHidden and not self.instanceWorldBrowsing)
 	if not onlyPins and map and sc and S.IsBuilt()
@@ -1991,7 +2014,7 @@ function mod:RefreshInstancePins(onlyPins)
 end
 
 function mod:BrowseInstanceWorld()
-	if not self.instancePinsHidden or self.db.dungeonMaps ~= false or self.instanceWorldBrowsing
+	if not self.instanceWorldHidden or self.instanceWorldBrowsing
 		or not map or not map:IsShown() or not Stitchable(map:GetMapID()) then return end
 	self.instanceWorldBrowsing = true
 	self:RefreshInstancePins()

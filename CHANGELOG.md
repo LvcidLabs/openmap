@@ -8,9 +8,8 @@
   Islands zoom in like the world map, and up close the game's own minimap of the battleground shows
   its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with
   your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open
-  its map from anywhere. In the battleground you're in, its map stays the game's own, as before, so the
-  right-click on your group's dots to report a player AFK works. To turn it off: OpenMap's menu > Dungeons >
-  Battleground maps.
+  its map from anywhere. In the battleground you're in, its map stays the game's own, as before. To turn it
+  off: OpenMap's menu > Dungeons > Battleground maps.
 - **A right-click for other addons' buttons** (API version 5): `RegisterMenuToggle` takes `onRightClick`
   and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
   and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;
@@ -26,6 +25,9 @@
 
 ### Fixed
 
+- **NeedRoll's and Dungeon Journal's dungeon maps aren't covered**: inside a dungeon or raid, OpenMap's world
+  art and icons, and its own view in a fight, were drawn over their maps. They're put away while either is up.
+  With NeedRoll's Map in dungeons set to Game, "Dungeon maps inside dungeons" works again.
 - **Places to explore clear as you explore them**: a place explored with the map closed kept its outline and pin
   until a /reload, and so did places explored before you logged in. The map is told as Blizzard's loads now, and
   what you've explored is read again at the next opening (#434).
