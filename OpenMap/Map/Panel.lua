@@ -101,6 +101,17 @@ local function ShowIcon(icon, look)
 	icon:SetSize(s, s)
 end
 
+-- a tooltip line's keys in gold, the text before its colon ("Shift-right-click: take it off the map")
+local function GoldKeys(line)
+	local key, rest = line:match("^(.-)([:：].*)$")
+	if not key or key == "" then return line end
+	return "|cffffd100" .. key .. "|r" .. rest
+end
+ns.GoldKeys = GoldKeys   -- (the map pins' tooltips too: Pins.lua, Nav.lua)
+
+-- a button's right-click line, for its tooltip: "Right-click: <what it does>", the key in gold (API.lua)
+function mod.RightClickTip(text) return GoldKeys(L["Right-click: %s"]:format(text)) end
+
 local function Tip(owner, anchor, title, ...)
 	GameTooltip:SetOwner(owner, anchor)
 	GameTooltip:AddLine(title, LIT[1], LIT[2], 0)
@@ -408,13 +419,18 @@ end
 --------------------------------------------------------------------------------
 
 local function SetLit(b, state)
+	local e = b.entry
+	-- (another addon's switch can light and grey its button apart from its state: litOf, greyOf, API.lua)
+	local lit = state == "on"
+	if e and e.litOf then lit = e.litOf() end
 	if b.boxed then
-		local c = state == "on" and LIT or BRONZE
+		local c = lit and LIT or BRONZE
 		b:SetBackdropBorderColor(c[1], c[2], c[3], 1)
 	end
-	b.glow:SetShown(state == "on")
+	b.glow:SetShown(lit)
 	-- (an action can be greyed and lit at once: the Pins list open while your pins are hidden)
-	local grey = state == "off" or (b.entry and b.entry.grey and b.entry.grey()) or false
+	local grey = state == "off" or (e and e.grey and e.grey()) or false
+	if e and e.greyOf then grey = e.greyOf() end
 	b.icon:SetDesaturated(grey)
 	b.icon:SetAlpha(grey and 0.55 or 1)
 end
@@ -570,6 +586,8 @@ local RefreshFavorites, RefreshRail
 local function FavClick(self, button)
 	if button == "RightButton" and IsShiftKeyDown() then
 		SetFavorite(self.entry.id, false)
+	elseif button == "RightButton" and self.entry.onRight then   -- (another addon's switch: its own right-click, API.lua)
+		self.entry.onRight()
 	elseif button == "RightButton" and not self.entry.right then
 		return
 	elseif self.entry.run then
@@ -584,9 +602,10 @@ end
 local function FavEnter(self)
 	local e2 = self.entry
 	local state = State(e2)
-	local off = L["Shift-right-click: take it off the map"]
+	local off = GoldKeys(L["Shift-right-click: take it off the map"])
 	Tip(self, self.tipAnchor or "ANCHOR_TOP", e2[1],
 		e2.run and { e2.tip } or { state == "on" and L["On: click to turn it off"] or L["Off: click to turn it on"] },
+		e2.rightTip and e2.rightTip() and { e2.rightTip(), 0.6, 0.6, 0.6 },
 		{ off .. " " .. L["(the stars in the OpenMap menu put buttons here)"], 0.6, 0.6, 0.6 })
 end
 
@@ -708,7 +727,7 @@ local function BuildRail()
 	rail.main:SetScript("OnDragStop", EndDrag)
 	rail.main:SetScript("OnEnter", function(self)
 		Tip(self, self.tipAnchor or "ANCHOR_LEFT", "OpenMap", { L["Search, find me, map pins, the quest log, report a problem, options, and what the map shows."] },
-			{ L["Drag it anywhere round the map's edge."], 0.6, 0.6, 0.6 })
+			{ GoldKeys(L["Drag: move it anywhere round the map's edge"]), 0.6, 0.6, 0.6 })
 	end)
 	rail.main:SetScript("OnLeave", GameTooltip_Hide)
 	-- the arrow: the way the favourites go to unfold them, back toward the OpenMap tab to fold them
@@ -1414,7 +1433,10 @@ function mod:SetupPanel(worldMap)
 			RefreshTiles()
 			RefreshFavorites()
 		end)
-		t:SetScript("OnEnter", function(self) Tip(self, "ANCHOR_TOP", self.entry[1], { self.entry.tip }) end)
+		t:SetScript("OnEnter", function(self)
+			local e = self.entry
+			Tip(self, "ANCHOR_TOP", e[1], { e.tip }, e.rightTip and e.rightTip() and { e.rightTip(), 0.6, 0.6, 0.6 })
+		end)
 		t:SetScript("OnLeave", GameTooltip_Hide)
 		t.star = MakeStar(t, function() RefreshTiles() RefreshFavorites() end)
 		t.star:SetPoint("TOPRIGHT", -2, -2)
@@ -1698,7 +1720,7 @@ function mod:SetupPanel(worldMap)
 	grip:SetScript("OnHide", function(self) self:SetScript("OnUpdate", nil) end)
 	grip:SetScript("OnEnter", function(self)
 		Tip(self, "ANCHOR_TOP", L["Resize the OpenMap menu"],
-			{ L["Drag to change width and height. The settings scroll when needed."] })
+			{ GoldKeys(L["Drag: change its width and height. The settings scroll when needed."]) })
 	end)
 	grip:SetScript("OnLeave", GameTooltip_Hide)
 

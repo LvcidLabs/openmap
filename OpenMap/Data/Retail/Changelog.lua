@@ -4,8 +4,11 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [2] = "Improved", [3] = "Fixed", }, items = {
+		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md). By Lvcidx0.",
+		"|cff6e2c0aKeys in gold in the tooltips|r: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons, map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the minimap button and the window's corners. Each reads \"Key: what it does\" (\"Click: open its map\"). By Lvcidx0.",
 		"|cff6e2c0aThe cursor's coordinates off a battleground's or dungeon's map read \"--\"|r: over the frame round a map smaller than the window, they showed the map's edge (57.6, 0.0).",
+		"|cff6e2c0aNo quest icon left in the middle of the screen as the map closes|r: another addon's icon (HereBeDragons': AllTheQuests', Questie's ...) whose pin the library let go in a fight was given back to the screen, shown, as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again (#448). By imigu17.",
 		"|cff6e2c0aWith Move Any, a bottom corner's resize keeps the map's top in place|r: dragging a bottom resize grip lifted the top of the map when Move Any anchored the window at the bottom. By puschie286.",
 		"|cff6e2c0aNo \"auras ... secret while tainted by OpenMap\" error from the quest tracker in a fight|r: clicking a quest on the map, Ctrl-click's waypoint and following a pin set the game's tracking and waypoint from OpenMap's code, and in a fight the tracker's next redraw failed. In a fight they're set as it ends now, and the automatic move of a waypoint onto its zone waits (#295).",
 		"|cff6e2c0aShare works on a quest opened from the map|r: clicking a quest's icon opens the quest log with the quest lit, and its details are your click there. Opened by OpenMap, the details' Share button was blocked (#426).",

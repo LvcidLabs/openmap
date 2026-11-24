@@ -9,6 +9,16 @@
   its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with
   your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open
   its map from anywhere. To turn it off: OpenMap's menu > Dungeons > Battleground maps.
+- **A right-click for other addons' buttons** (API version 5): `RegisterMenuToggle` takes `onRightClick`
+  and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
+  and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;
+  `RefreshMenuToggles()` draws the buttons again (docs/api.md). By Lvcidx0.
+
+### Improved
+
+- **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
+  map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
+  minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map"). By Lvcidx0.
 
 ### Fixed
 
