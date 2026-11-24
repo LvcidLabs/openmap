@@ -4,11 +4,13 @@
 
 ### New
 
-- **Battleground maps zoom in**: in Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear Islands
-  the map zooms in like the world map, and up close the game's own minimap of the battleground shows
+- **Battleground maps zoom in**: the maps of Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear
+  Islands zoom in like the world map, and up close the game's own minimap of the battleground shows
   its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with
   your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open
-  its map from anywhere. To turn it off: OpenMap's menu > Dungeons > Battleground maps.
+  its map from anywhere. In the battleground you're in, its map stays the game's own, as before, so the
+  right-click on your group's dots to report a player AFK works. To turn it off: OpenMap's menu > Dungeons >
+  Battleground maps.
 - **A right-click for other addons' buttons** (API version 5): `RegisterMenuToggle` takes `onRightClick`
   and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
   and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;

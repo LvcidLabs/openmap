@@ -188,6 +188,34 @@ class BattlegroundTests(unittest.TestCase):
         self.assertFalse(layer.shown)
         self.assertFalse(any(t.shown for t in layer.kids.values() if t.kind == "Texture"))
 
+    def enter(self, instanceID):
+        # (in a battleground: Blizzard's zoom table remembered, to see nothing of OpenMap's replaced it)
+        self.lua.execute("""
+            function IsInInstance() return true, "pvp" end
+            function GetInstanceInfo() return "", "pvp", 0, "", 40, 0, false, %d end
+            local create = sc.CreateZoomLevels
+            sc.CreateZoomLevels = function(self) create(self) blizzards = self.zoomLevels end
+        """ % instanceID)
+
+    def test_inside_its_battleground_blizzards_map(self):
+        # (its group dots' Report AFK is Blizzard's only: OpenMap's zoom steps on its map blocked it)
+        self.enter(489)
+        self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460) sc.scale = 4 map:OnCanvasScaleChanged()")
+        self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
+        self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
+        self.assertFalse(self.lua.eval("canvas.kids[1] and canvas.kids[1].shown or false"))
+        # (the setting switched there: Blizzard's zoom steps not made again from OpenMap's code)
+        before = self.lua.eval("created")
+        self.lua.execute("mod.SetBattlegroundMaps(false) mod.SetBattlegroundMaps(true)")
+        self.assertEqual(self.lua.eval("created"), before)
+        self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
+
+    def test_inside_one_another_still_zooms(self):
+        # (Alterac Valley's map looked at from Warsong Gulch: not the one you're in)
+        self.enter(489)
+        self.lua.execute("map:Show() map:SetMap(1459)")
+        self.assertGreater(len(self.lua.eval("sc.zoomLevels")), 1)
+
     def test_search_places(self):
         places = self.lua.eval("mod.BattlegroundPlaces()")
         names = [p.name for p in places.values()]

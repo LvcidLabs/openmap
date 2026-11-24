@@ -32,8 +32,20 @@ local deepest = {}              -- uiMapID -> the deepest zoom (times its fit)
 local function PadUI()
 	return (mod.PadViewOn and mod.PadViewOn()) or (InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()) or false
 end
-local function On() return mod.db.bgMaps ~= false and not PadUI() end
 local function Data(mapID) return ns.MapBattlegrounds and mapID and ns.MapBattlegrounds[mapID] end
+-- (the battleground you're in: its map left exactly Blizzard's. Its group dots' right-click, Report AFK,
+-- is Blizzard's only, and OpenMap's zoom steps make every scale the map works out from them OpenMap's:
+-- the report was blocked. Its map opened from outside still zooms)
+local function Inside(mapID)
+	local bg = Data(mapID)
+	if not bg or not IsInInstance then return false end
+	local _, kind = IsInInstance()
+	if kind ~= "pvp" then return false end
+	local instanceID = GetInstanceInfo and select(8, GetInstanceInfo())
+	return instanceID == nil or instanceID == bg[1]
+end
+mod.InsideBattleground = Inside
+local function On(mapID) return mod.db.bgMaps ~= false and not PadUI() and not (mapID and Inside(mapID)) end
 function mod.IsBattlegroundMap(mapID) return Data(mapID) ~= nil end
 
 local function Smooth(x, r)
@@ -161,7 +173,7 @@ end
 
 local function Refresh()
 	local mapID = map:GetMapID()
-	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() then
+	if map:IsShown() and On(mapID) and Data(mapID) and not mod.IsStitched() then
 		Show(mapID)
 	else
 		Hide()
@@ -172,7 +184,7 @@ end
 -- to the deepest, a wheel notch apart, as the world map's. After WorldMap.lua's own hook, which leaves
 -- a map that isn't stitched to Blizzard
 local function ZoomLevels(self)
-	if not On() or not Data(self.mapID) or mod.IsStitched() then return end
+	if not On(self.mapID) or not Data(self.mapID) or mod.IsStitched() then return end
 	local zl = self.zoomLevels
 	local base = zl and zl[1] and zl[1].scale
 	if not base then return end
@@ -186,7 +198,7 @@ end
 
 function mod.SetBattlegroundMaps(on)
 	mod.db.bgMaps = on and true or false
-	if map and map:IsShown() and Data(map:GetMapID()) and not InCombatLockdown() then
+	if map and map:IsShown() and Data(map:GetMapID()) and not Inside(map:GetMapID()) and not InCombatLockdown() then
 		sc:CreateZoomLevels()
 		sc:ResetZoom()
 	end
@@ -220,7 +232,7 @@ function mod:SetupBattlegrounds(worldMap)
 	map:HookScript("OnShow", Refresh)
 	map:HookScript("OnHide", Hide)
 	if map:IsShown() then
-		if Data(map:GetMapID()) then sc:CreateZoomLevels() end
+		if Data(map:GetMapID()) and not Inside(map:GetMapID()) then sc:CreateZoomLevels() end
 		Refresh()
 	end
 end
