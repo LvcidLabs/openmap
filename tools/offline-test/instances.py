@@ -248,6 +248,17 @@ class InstanceHostTests(unittest.TestCase):
             end
         """)
 
+    def test_modes_written_only_where_openmaps_were_put_in(self):
+        # (a battleground's map, never stitched: nothing written on it, #472)
+        self.lua.execute("""
+            State(1459)
+            assert(not Active() and Wheel() == nil, "Blizzard's modes written on a map OpenMap never stitched")
+            State(947)
+            assert(Active() and Wheel() == 'openmap')
+            State(1459)
+            assert(Wheel() == 'native', "Blizzard's modes not put back")
+        """)
+
     def test_right_click_restores_interactive_world_after_needroll_closes(self):
         self.lua.execute("""
             inside, kind = true, 'party'

@@ -90,6 +90,13 @@ local function Refit()
 	end
 end
 
+-- the battleground you're in, its window at Blizzard's size: Blizzard has laid its map out, and done again from
+-- here its scale would be OpenMap's, which its clicks read (Report AFK blocked, #472). A size of your own needs it
+local function LaidByBlizzard()
+	local inside = mod.InsideBattleground and mod.InsideBattleground(map:GetMapID())
+	return inside and not mod.db.windowSize and not (map.IsMaximized and map:IsMaximized() and mod.db.fullWidth) or false
+end
+
 local function UpdateSpacer()
 	if not map.UpdateSpacerFrameAnchoring then return end
 	if mod.KeepPadCursor then mod.KeepPadCursor(map.UpdateSpacerFrameAnchoring, map) else map:UpdateSpacerFrameAnchoring() end
@@ -330,6 +337,7 @@ function mod:SetupWindow(worldMap)
 		if refitted or maxRefitted then maxRefitted = false return end
 		if not map:IsShown() or (mod.IsStitched and mod.IsStitched()) then return end
 		if InCombatLockdown() then afterCombat = true return end
+		if LaidByBlizzard() then return end
 		Refit()
 	end
 	-- (what waited out combat: the window laid out again, the question asked)
@@ -672,7 +680,7 @@ SetupQuestLog = function()
 	local logRefitQueued = false
 	local function FlushLogRefit()
 		logRefitQueued = false
-		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring then
+		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring and not LaidByBlizzard() then
 			UpdateSpacer()
 			Refit()
 		end

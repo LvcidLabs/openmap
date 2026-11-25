@@ -939,6 +939,7 @@ local function Attach(mapID, refreshed)
 	if InCombatLockdown() then
 		afterCombat = true                          -- (Blizzard's map left as it is in a fight: CombatOver)
 	elseif active then
+		mod.modesOurs = true
 		sc:SetMouseWheelZoomMode(MAP_CANVAS_MOUSE_WHEEL_ZOOM_BEHAVIOR_NONE)
 		sc:SetScalingMode("SCALING_MODE_LINEAR")
 	end
@@ -947,7 +948,10 @@ local function Attach(mapID, refreshed)
 	else
 		for pin in pairs(groupBlipSizes) do ScaleGroupBlips(pin) end
 		for pin in pairs(loweredGroupBlips) do LayerGroupBlips(pin) end
-		if not InCombatLockdown() then
+		-- (only where OpenMap's were put in: Blizzard's map reads its scaling mode each frame and works its scale out
+		-- after, and its clicks read that scale; written on a battleground's map, Report AFK was blocked, #472)
+		if mod.modesOurs and not InCombatLockdown() then
+			mod.modesOurs = false
 			sc:SetMouseWheelZoomMode(wheelMode)
 			sc:SetScalingMode(scalingMode)
 		end
@@ -1676,7 +1680,9 @@ local function Setup()
 		HookHighlight()
 		mod.instanceWorldBrowsing = nil
 		mod.instanceMapGeneration = (mod.instanceMapGeneration or 0) + 1
-		if not (S.IsBuilt() and ExtrasBuilt()) and map:GetMapID() then sc:OnCanvasSizeChanged() end   -- built on first showing
+		if not (S.IsBuilt() and ExtrasBuilt()) and map:GetMapID() and not (mod.InsideBattleground and mod.InsideBattleground(map:GetMapID())) then
+			sc:OnCanvasSizeChanged()                -- built on first showing (not from here on your battleground's map, #472)
+		end
 		mod.instanceHost = map:GetMapID()
 		mod:RefreshInstancePins()
 		if mod.instanceWorldHidden then ticker:Show() RaisePlayer() end
@@ -1761,7 +1767,9 @@ local function Setup()
 	if setupStart then ns.loadMs.setup = debugprofilestop() - setupStart end
 
 	-- the map may already be showing something
-	if map:IsShown() and map:GetMapID() then sc:OnCanvasSizeChanged() end
+	if map:IsShown() and map:GetMapID() and not (mod.InsideBattleground and mod.InsideBattleground(map:GetMapID())) then
+		sc:OnCanvasSizeChanged()
+	end
 end
 
 -- for Extras / Flights / Townsfolk / Panel / Paint
