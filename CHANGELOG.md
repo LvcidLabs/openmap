@@ -33,6 +33,10 @@
 
 ### Fixed
 
+- **Places to explore count what you've explored, in every zone**: a zone long explored still read 6 of 12
+  (Elwynn) or 0 of 16 (Tirisfal). The game lists the pieces of a zone's newer map art, the same places in
+  other sizes, and they were matched against the older art's whole size and place. A piece now counts when
+  the game lists one at its place, or says its ground is explored (#445, #478). By bhalial.
 - **Right-click on your group's dots is the game's**: on any map, a right-click on a group member's dot, and any
   right-click on the map of the battleground you're in, is left to the game rather than zooming out (#472).
 - **Townsfolk under quests' icons**: vendors, innkeepers and the other townsfolk are OpenMap's lowest icons now, under
