@@ -4,9 +4,10 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "New", [4] = "Improved", [5] = "Fixed", }, items = {
+	{ version = "Unreleased", date = "", heads = { [1] = "New", [5] = "Improved", [6] = "Fixed", }, items = {
 		"|cff6e2c0aBattleground maps zoom in|r: the maps of Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear Islands zoom in like the world map, and up close the game's own minimap of the battleground shows its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open its map from anywhere, or inside the battleground. /openmap bg says what its map has of OpenMap's. To turn it off: OpenMap's menu > Dungeons > Battleground maps.",
 		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md). By Lvcidx0.",
+		"|cff6e2c0aThe waypoint's distance in meters|r: \"Waypoint distance in meters\" (Options, off by default) shows the distance under the game's waypoint arrow on your screen in meters, and in km from 1000 m, instead of yards.",
 		"|cff6e2c0aTomTom's waypoint can be left out|r: with TomTom on, \"TomTom waypoint too\" (OpenMap's menu > More, and Options) is on as before; off, a pin you follow on the map sets only Blizzard's waypoint (#444).",
 		"|cff6e2c0aKeys in gold in the tooltips|r: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons, map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the minimap button and the window's corners. Each reads \"Key: what it does\" (\"Click: open its map\"). By Lvcidx0.",
 		"|cff6e2c0aRight-click on your group's dots is the game's|r: on any map, a right-click on a group member's dot, and any right-click on the map of the battleground you're in, goes to the game (its Report AFK menu in a battleground) rather than zooming out. OpenMap's clicks on the map are now handled after the game's own (#472).",

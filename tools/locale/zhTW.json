@@ -579,5 +579,9 @@
  "Right-click: edit it": "右鍵點擊：編輯",
  "Right-click: open its card": "右鍵點擊：開啟資訊卡",
  "TomTom waypoint too": "同時設定 TomTom 路徑點",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "在地圖上追蹤的標記除了 Blizzard 的路徑點之外，也會設定 TomTom 的路徑點與箭頭。"
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "在地圖上追蹤的標記除了 Blizzard 的路徑點之外，也會設定 TomTom 的路徑點與箭頭。",
+ "Waypoint distance in meters": "路徑點距離以公尺顯示",
+ "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "螢幕上遊戲路徑點箭頭下方的距離以公尺顯示（1000公尺起以公里顯示），而不是碼。",
+ "%d m": "%d公尺",
+ "%.1f km": "%.1f公里"
 }

@@ -115,5 +115,74 @@ class TomTomTests(unittest.TestCase):
         self.assertFalse(self.lua.eval("mod.db.tomtom"))
 
 
+class WaypointMetersTests(unittest.TestCase):
+    """The game's waypoint arrow's distance in meters (Nav.lua): its text written again after Blizzard's update, from a
+    secure hook, nothing else of Blizzard's written; off by default, a secret distance left alone, a client without the
+    method or text: nothing"""
+
+    def setUp(self):
+        block = NAV[NAV.index("local YARD = 0.9144"):NAV.index("function mod:NavOptions")]
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            secret = false
+            function issecretvalue(v) return secret and type(v) == "number" end
+            Safe = {}
+            function Safe.Value(v) if issecretvalue(v) then return nil end return v end
+            function Safe.Call(fn, ...) local ok, v = pcall(fn, ...) if ok then return Safe.Value(v) end end
+            function Safe.Finite(n) return type(n) == "number" and n == n and n ~= math.huge end
+            L = setmetatable({}, { __index = function(_, k) return k end })
+            mod = { db = {} }
+            distance = 250
+            C_Navigation = { GetDistance = function() return distance end }
+            function hooksecurefunc(t, name, fn)
+                local was = rawget(t, name)
+                rawset(t, name, function(...) was(...) fn(...) end)
+            end
+            -- Blizzard's frame, locked: a write to it (not its text's own) errors
+            text = { shown = true }
+            function text:IsShown() return self.shown end
+            function text:SetText(t) self.text = t end
+            function text:GetText() return self.text end
+            SuperTrackedFrame = { DistanceText = text }
+            function SuperTrackedFrame:UpdateDistanceText() self.DistanceText:SetText(string.format("%d yds", distance)) end
+            setmetatable(SuperTrackedFrame, { __newindex = function(_, k) error("wrote Blizzard's " .. tostring(k)) end })
+            IN_GAME_NAVIGATION_RANGE = "%s yds"
+        """)
+        self.lua.execute(block)
+
+    def update(self):
+        self.lua.execute("SuperTrackedFrame:UpdateDistanceText()")
+        return self.lua.eval("text.text")
+
+    def test_off_by_default_blizzards_yards(self):
+        self.assertTrue(self.lua.eval("mod.SetupWaypointMeters()"))
+        self.assertEqual(self.update(), "250 yds")
+
+    def test_meters_and_km(self):
+        self.lua.execute("mod.SetupWaypointMeters() mod.db.waypointMeters = true")
+        self.assertEqual(self.update(), "229 m")                 # (250 yards)
+        self.lua.execute("distance = 2000")
+        self.assertEqual(self.update(), "1.8 km")
+        self.assertEqual(self.lua.eval("IN_GAME_NAVIGATION_RANGE"), "%s yds")   # (the game's text untouched)
+
+    def test_left_alone_when_secret_hidden_or_none(self):
+        self.lua.execute("mod.SetupWaypointMeters() mod.db.waypointMeters = true secret = true")
+        self.assertEqual(self.update(), "250 yds")
+        self.lua.execute("secret = false text.shown = false")
+        self.assertEqual(self.update(), "250 yds")
+        self.lua.execute("text.shown = true distance = 0")
+        self.assertEqual(self.update(), "0 yds")
+
+    def test_hooked_once_and_not_without_the_frame(self):
+        self.lua.execute("mod.SetupWaypointMeters() mod.SetupWaypointMeters() mod.db.waypointMeters = true")
+        self.assertEqual(self.update(), "229 m")
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.execute("L = {} mod = { db = {} } Safe = {}")
+        lua.execute(NAV[NAV.index("local YARD = 0.9144"):NAV.index("function mod:NavOptions")])
+        self.assertFalse(lua.eval("mod.SetupWaypointMeters()"))
+        lua.execute("SuperTrackedFrame = {}")
+        self.assertFalse(lua.eval("mod.SetupWaypointMeters()"))
+
+
 if __name__ == "__main__":
     unittest.main()

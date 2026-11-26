@@ -579,5 +579,9 @@
  "Right-click: edit it": "Правый щелчок: изменить",
  "Right-click: open its card": "Правый щелчок: открыть карточку",
  "TomTom waypoint too": "Путевая точка TomTom тоже",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Метка, которую вы отслеживаете на карте, ставит не только путевую точку Blizzard, но и путевую точку со стрелкой TomTom."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Метка, которую вы отслеживаете на карте, ставит не только путевую точку Blizzard, но и путевую точку со стрелкой TomTom.",
+ "Waypoint distance in meters": "Расстояние до точки в метрах",
+ "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "Расстояние под стрелкой точки маршрута на экране — в метрах (от 1000 — в км), а не в ярдах.",
+ "%d m": "%d м",
+ "%.1f km": "%.1f км"
 }

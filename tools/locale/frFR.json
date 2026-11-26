@@ -579,5 +579,9 @@
  "Right-click: edit it": "Clic droit : la modifier",
  "Right-click: open its card": "Clic droit : ouvrir sa fiche",
  "TomTom waypoint too": "Point de passage TomTom aussi",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un repère suivi sur la carte place aussi le point de passage et la flèche de TomTom, en plus de ceux de Blizzard."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un repère suivi sur la carte place aussi le point de passage et la flèche de TomTom, en plus de ceux de Blizzard.",
+ "Waypoint distance in meters": "Distance du point de passage en mètres",
+ "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "La distance sous la flèche du point de passage du jeu à l'écran, en mètres (en km à partir de 1000) au lieu de yards.",
+ "%d m": "%d m",
+ "%.1f km": "%.1f km"
 }

@@ -20,6 +20,7 @@ local function Gold(line) return ns.GoldKeys and ns.GoldKeys(line) or line end  
 local d = mod.defaults
 d.group = true
 d.tomtom = true      -- a waypoint followed on the map sets TomTom's too, if TomTom is on (#444)
+d.waypointMeters = false   -- Blizzard's distance to the waypoint you follow, in meters (its arrow on the screen)
 
 local map, sc
 
@@ -934,6 +935,45 @@ function mod:SetupNav(worldMap)
 		rosterWait = 0.5
 		RefreshGroup()
 	end)
+	-- (the waypoint arrow's distance in meters: its frame may come later than this, so tried as the world loads too)
+	if not mod.SetupWaypointMeters() then
+		local waiter = {}
+		ns.RegisterEvent(waiter, "PLAYER_ENTERING_WORLD", function()
+			if mod.SetupWaypointMeters() then ns.UnregisterEvent(waiter, "PLAYER_ENTERING_WORLD") end
+		end)
+	end
+end
+
+--------------------------------------------------------------------------------
+-- The waypoint's distance in meters: Blizzard's arrow on the screen (SuperTrackedFrame) writes "123 yds" every
+-- frame (UpdateDistanceText); after it, only its text is written again, in meters. Nothing else of Blizzard's is
+-- written (not the IN_GAME_NAVIGATION_RANGE text, no field of the frame), from a secure hook; a distance the game
+-- keeps secret is left as Blizzard wrote it. A client without that method or text: nothing happens
+--------------------------------------------------------------------------------
+
+local YARD = 0.9144
+local metersHooked = false
+local function MetersText(yards)
+	local m = yards * YARD
+	if m >= 1000 then return L["%.1f km"]:format(m / 1000) end
+	return L["%d m"]:format(math.floor(m + 0.5))
+end
+mod.WaypointMetersText = MetersText
+local function Meters(frame)
+	if not mod.db.waypointMeters then return end
+	local fs = frame and frame.DistanceText
+	if not (fs and fs.IsShown and fs:IsShown() and fs.SetText) then return end
+	local yards = C_Navigation and Safe.Call(C_Navigation.GetDistance)
+	if type(yards) ~= "number" or yards <= 0 or not Safe.Finite(yards) then return end
+	fs:SetText(MetersText(yards))
+end
+function mod.SetupWaypointMeters()
+	if metersHooked then return true end
+	local frame = _G.SuperTrackedFrame
+	if type(frame) ~= "table" or type(frame.UpdateDistanceText) ~= "function" or type(frame.DistanceText) ~= "table" then return false end
+	metersHooked = true
+	hooksecurefunc(frame, "UpdateDistanceText", Meters)
+	return true
 end
 
 function mod:NavOptions(opts, get, set, off)
@@ -948,4 +988,7 @@ function mod:NavOptions(opts, get, set, off)
 		get = function() return mod.db.tomtom ~= false end, set = function(_, v) mod.SetTomTomWaypoint(v) end,
 		hidden = function() return not (_G.TomTom and TomTom.AddWaypoint) end,
 		desc = L["A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's."] }
+	opts.waypointMeters = { type = "toggle", name = L["Waypoint distance in meters"], order = 35.93, width = "full", get = get,
+		set = function(info, v) set(info, v) mod.SetupWaypointMeters() end,
+		desc = L["The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards."] }
 end

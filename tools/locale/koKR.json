@@ -579,5 +579,9 @@
  "Right-click: edit it": "오른쪽 클릭: 편집",
  "Right-click: open its card": "오른쪽 클릭: 카드 열기",
  "TomTom waypoint too": "TomTom 이동 지점도",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "지도에서 추적하는 핀이 블리자드의 이동 지점과 함께 TomTom의 이동 지점과 화살표도 설정합니다."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "지도에서 추적하는 핀이 블리자드의 이동 지점과 함께 TomTom의 이동 지점과 화살표도 설정합니다.",
+ "Waypoint distance in meters": "경유지 거리를 미터로",
+ "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "화면의 경유지 화살표 아래 거리를 야드 대신 미터로 표시합니다 (1000 이상은 km).",
+ "%d m": "%dm",
+ "%.1f km": "%.1fkm"
 }

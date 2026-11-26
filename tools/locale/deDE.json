@@ -583,5 +583,9 @@
  "Right-click: edit it": "Rechtsklick: bearbeiten",
  "Right-click: open its card": "Rechtsklick: Markierungsfenster öffnen",
  "TomTom waypoint too": "Auch TomTom-Wegpunkt",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Eine Markierung, der Ihr auf der Karte folgt, setzt neben dem Wegpunkt von Blizzard auch den Wegpunkt und Pfeil von TomTom."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Eine Markierung, der Ihr auf der Karte folgt, setzt neben dem Wegpunkt von Blizzard auch den Wegpunkt und Pfeil von TomTom.",
+ "Waypoint distance in meters": "Wegpunktentfernung in Metern",
+ "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "Die Entfernung unter dem Wegpunktpfeil des Spiels auf Eurem Bildschirm, in Metern (ab 1000 in km) statt in Yards.",
+ "%d m": "%d m",
+ "%.1f km": "%.1f km"
 }
