@@ -329,7 +329,7 @@ local function BuildView()
 	view:SetClipsChildren(true)
 	-- (the gamepad's cursor presses its tabs and buttons, and A on it isn't the map's under it: Gamepad.lua)
 	mod.padRoots[#mod.padRoots + 1] = view
-	if not PadView() then tinsert(UISpecialFrames, "OpenMapDungeonView") end   -- (the Gamepad UI reads that list)
+	if not PadView() then ns.CloseOnEscape("OpenMapDungeonView") end   -- (the Gamepad UI reads that list)
 	local bg = view:CreateTexture(nil, "BACKGROUND")
 	bg:SetAllPoints()
 	bg:SetColorTexture(0.05, 0.04, 0.03, 0.96)
@@ -720,6 +720,7 @@ local function BuildView()
 				local f = _G[name]
 				if f and f ~= self and type(f) == "table" and f.IsShown and f:IsShown() then return end
 			end
+			if ns.EscapeFrameShown(self) then return end   -- (OpenMap's own windows: Core.lua's list)
 			self:SetPropagateKeyboardInput(false)
 			passing = false
 			CloseView()
@@ -1375,7 +1376,7 @@ local function Chooser()
 	chooser:EnableMouse(true)
 	chooser:SetClampedToScreen(true)
 	chooser.pad = { Look:Dropdown(chooser) }      -- (the game's own dropdowns' look)
-	if not PadView() then tinsert(UISpecialFrames, "OpenMapDungeonChooser") end   -- (the Gamepad UI reads that list)
+	if not PadView() then ns.CloseOnEscape("OpenMapDungeonChooser") end   -- (the Gamepad UI reads that list)
 	chooser.rows = {}
 	chooser:SetScript("OnShow", function(self) self:RegisterEvent("GLOBAL_MOUSE_DOWN") end)
 	chooser:SetScript("OnHide", function(self) self:UnregisterEvent("GLOBAL_MOUSE_DOWN") end)

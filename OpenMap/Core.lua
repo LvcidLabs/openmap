@@ -131,6 +131,34 @@ function ns.OutOfCombat(key, fn)
 	end)
 end
 
+-- OpenMap's windows closed by Escape, and as the game closes every window (each zone change): on a list of OpenMap's
+-- own, closed after Blizzard's own pass (a hook on CloseSpecialWindows), not on Blizzard's UISpecialFrames. Blizzard
+-- reads that list as it closes windows, and with OpenMap's names on it the rest of its pass ran as OpenMap's: the
+-- world map's anchor it laid out again came out OpenMap's, every opening after read it, and the battleground's
+-- Report AFK from a group dot was blocked (#472; the taint log: "reading global OpenMapMenu ... CloseSpecialWindows")
+ns.EscapeFrames = {}
+local escapeHooked = false
+function ns.CloseOnEscape(name)
+	for _, n in ipairs(ns.EscapeFrames) do if n == name then return end end
+	ns.EscapeFrames[#ns.EscapeFrames + 1] = name
+	if escapeHooked or type(CloseSpecialWindows) ~= "function" then return end
+	escapeHooked = true
+	hooksecurefunc("CloseSpecialWindows", function()
+		for _, n in ipairs(ns.EscapeFrames) do
+			local f = _G[n]
+			if type(f) == "table" and f.IsShown and f:IsShown() and f.Hide then f:Hide() end
+		end
+	end)
+end
+-- whether one of OpenMap's windows on that list is up (Dungeons.lua's own Escape)
+function ns.EscapeFrameShown(except)
+	for _, n in ipairs(ns.EscapeFrames) do
+		local f = _G[n]
+		if f and f ~= except and type(f) == "table" and f.IsShown and f:IsShown() then return true end
+	end
+	return false
+end
+
 function ns.UnregisterEvent(owner, event)
 	local list = handlers[event]
 	if not list then return end

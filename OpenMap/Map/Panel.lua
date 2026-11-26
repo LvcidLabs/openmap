@@ -1385,7 +1385,7 @@ function mod:SetupPanel(worldMap)
 	close:SetFrameLevel(menu:GetFrameLevel() + 20)
 	close:SetHitRectInsets(-4, -4, -4, -4)
 	close:SetScript("OnClick", function() SetOpen(false) end)
-	if not PadView() then tinsert(UISpecialFrames, "OpenMapMenu") end
+	if not PadView() then ns.CloseOnEscape("OpenMapMenu") end
 	menu:SetScript("OnHide", function()
 		-- (Escape, or the X: closed. The map closing hides it too, but then it opens again with the map)
 		if map:IsShown() then

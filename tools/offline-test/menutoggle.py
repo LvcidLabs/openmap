@@ -157,5 +157,47 @@ class MinimapAlwaysTests(unittest.TestCase):
                         self.assertTrue(0 <= a <= 1 + 1e-9, (mix, wn, fine, a))
 
 
+
+class EscapeListTests(unittest.TestCase):
+    """OpenMap's windows aren't on Blizzard's UISpecialFrames (Core.lua's CloseOnEscape): Blizzard reads that list as it
+    closes windows (Escape, every zone change), and OpenMap's names there made the rest of its pass OpenMap's, the world
+    map's anchor with it: Report AFK in a battleground blocked (#472). They're closed after Blizzard's pass instead."""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        core = (ROOT / "Core.lua").read_text(encoding="utf-8")
+        block = core[core.index("ns.EscapeFrames = {}"):core.index("function ns.UnregisterEvent(")]
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            ns = {}
+            UISpecialFrames = setmetatable({}, { __newindex = function() error("wrote Blizzard's UISpecialFrames") end })
+            closed = 0
+            function CloseSpecialWindows() closed = closed + 1 return false end
+            hooks = 0
+            function hooksecurefunc(name, fn)
+                local was = _G[name]
+                _G[name] = function(...) local r = was(...) fn(...) return r end
+                hooks = hooks + 1
+            end
+            local function Frame(shown) return { shown = shown, IsShown = function(self) return self.shown end, Hide = function(self) self.shown = false end } end
+            OpenMapMenu, OpenMapNews, OpenMapBench = Frame(true), Frame(false), Frame(true)
+        """ + block)
+
+    def test_closed_after_blizzards_pass_never_on_its_list(self):
+        self.lua.execute('ns.CloseOnEscape("OpenMapMenu") ns.CloseOnEscape("OpenMapNews") ns.CloseOnEscape("OpenMapMenu")')
+        self.assertEqual(self.lua.eval("hooks"), 1)                     # (hooked once)
+        self.assertEqual(self.lua.eval("#ns.EscapeFrames"), 2)          # (each name once)
+        self.assertTrue(self.lua.eval("ns.EscapeFrameShown()"))
+        self.lua.execute("CloseSpecialWindows()")
+        self.assertEqual(self.lua.eval("closed"), 1)                    # (Blizzard's own pass ran, then ours)
+        self.assertFalse(self.lua.eval("OpenMapMenu.shown"))
+        self.assertTrue(self.lua.eval("OpenMapBench.shown"))           # (not on the list: left)
+        self.assertFalse(self.lua.eval("ns.EscapeFrameShown()"))
+
+    def test_no_name_put_on_blizzards_list(self):
+        for f in list((ROOT / "Map").glob("*.lua")) + list(ROOT.glob("*.lua")):
+            self.assertNotIn("tinsert(UISpecialFrames", f.read_text(encoding="utf-8"), f.name)
+
+
 if __name__ == "__main__":
     unittest.main()

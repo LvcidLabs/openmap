@@ -383,7 +383,7 @@ local function CodeBox(text)
 		codeFrame:EnableMouse(true)
 		local top, title = Look:Window(codeFrame, "")   -- (the map window's own frame, its title bar and X)
 		codeFrame:SetSize(560, 150 + top)
-		if not PadView() then tinsert(UISpecialFrames, "OpenMapPinsCode") end   -- (the Gamepad UI reads that list)
+		if not PadView() then ns.CloseOnEscape("OpenMapPinsCode") end   -- (the Gamepad UI reads that list)
 		codeFrame.title = title
 		local scroll = CreateFrame("ScrollFrame", nil, codeFrame, "UIPanelScrollFrameTemplate")
 		scroll:SetPoint("TOPLEFT", 16, -10 - top)
