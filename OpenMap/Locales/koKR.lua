@@ -56,7 +56,7 @@ L["Areas you haven't explored yet: shown as they are, darkened and cooled (and a
 L["Arrow"] = "화살표"
 L["Arrow size"] = "화살표 크기"
 L["As a code"] = "코드로"
-L["At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads."] = "최대로 확대했을 때 세부 묘사를 위해 게임의 미니맵을 얼마나 섞을지 정합니다. 항상 그려진 지도가 우선입니다."
+L["At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom)."] = "가장 가까운 확대에서 세부를 위해 섞는 게임 미니맵의 양으로, 미니맵 불투명도(모든 확대에서의 최대값)를 넘지 않습니다."
 L["At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom."] = "최대로 확대했을 때 게임의 미니맵을 섞어 세부 묘사(숲, 바위, 건물)를 더합니다. 끄면 아무리 확대해도 그려진 지도만 보입니다."
 L["Auctioneers"] = "경매인"
 L["Auto"] = "자동"

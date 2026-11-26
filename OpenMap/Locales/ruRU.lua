@@ -56,7 +56,7 @@ L["Areas you haven't explored yet: shown as they are, darkened and cooled (and a
 L["Arrow"] = "Стрелка"
 L["Arrow size"] = "Размер стрелки"
 L["As a code"] = "Кодом"
-L["At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads."] = "Сколько мини-карты игры подмешивается для детализации при самом крупном масштабе. Рисованная карта всегда остается основной."
+L["At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom)."] = "При самом близком масштабе — сколько миникарты игры подмешивается для деталей, не больше непрозрачности миникарты (максимума при любом масштабе)."
 L["At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom."] = "При самом крупном масштабе подмешивать мини-карту игры для детализации (деревья, скалы, здания). Если выключено, видна только рисованная карта, как бы сильно вы ни приближали."
 L["Auctioneers"] = "Аукционеры"
 L["Auto"] = "Авто"

@@ -37,7 +37,6 @@
  "An arrow: drag from its tail to where it points.": "Una flecha: arrastra desde la cola hasta donde apunta.",
  "Areas you haven't explored yet: shown as they are, darkened and cooled (and a zone you haven't found at all darkened from every zoom, the continents' too), or hidden like Blizzard's own map (blank parchment until you get there).": "Áreas que aún no exploraste: mostradas tal cual, oscurecidas y con tonos fríos (y una zona que no descubriste en absoluto, oscurecida en todos los niveles de zoom, también en los continentes), u ocultas como en el mapa de Blizzard (pergamino en blanco hasta que llegues).",
  "Arrow": "Flecha",
- "At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads.": "En el zoom máximo, cuánto del minimapa del juego se mezcla para dar detalle. El mapa pintado siempre predomina.",
  "At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom.": "En el zoom máximo, mezcla el minimapa del juego para dar detalle (árboles, rocas, edificios). Desactivado, solo ves el mapa pintado, por mucho que acerques el zoom.",
  "Auctioneers": "Subastadores",
  "Auto": "Auto",
@@ -589,5 +588,6 @@
  "Object": "Objeto",
  "Not on the map: %s": "No está en el mapa: %s",
  "Always": "Siempre",
- "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Lo pronto que se mezcla el detalle del minimapa al acercar: más a la derecha, antes. Del todo a la derecha, Siempre: desde el mundo entero, a cualquier zoom."
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Lo pronto que se mezcla el detalle del minimapa al acercar: más a la derecha, antes. Del todo a la derecha, Siempre: desde el mundo entero, a cualquier zoom.",
+ "At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom).": "En el zoom más cercano, cuánto del minimapa del juego se mezcla para dar detalle, nunca más que la opacidad del minimapa (lo máximo a cualquier zoom)."
 }

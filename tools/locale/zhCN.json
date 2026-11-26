@@ -37,7 +37,6 @@
  "An arrow: drag from its tail to where it points.": "箭头：从箭尾拖向所指的方向。",
  "Areas you haven't explored yet: shown as they are, darkened and cooled (and a zone you haven't found at all darkened from every zoom, the continents' too), or hidden like Blizzard's own map (blank parchment until you get there).": "尚未探索的区域：可按原样显示；可调暗并偏冷色显示（完全未发现的区域在任何缩放下都会调暗，大陆地图上也一样）；也可像暴雪自带的地图那样隐藏（在你到达之前是一片空白的羊皮纸）。",
  "Arrow": "箭头",
- "At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads.": "放大到最大时，混入多少游戏小地图来补充细节。手绘地图始终为主。",
  "At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom.": "放大到最大时，混入游戏小地图以补充细节（树木、岩石、建筑）。关闭时，无论放大多少都只显示手绘地图。",
  "Auctioneers": "拍卖师",
  "Auto": "自动",
@@ -589,5 +588,6 @@
  "Object": "物体",
  "Not on the map: %s": "不在地图上：%s",
  "Always": "始终",
- "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "放大时小地图细节多早混入：越靠右越早。最右端为“始终”：从整个世界起，任何缩放都显示。"
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "放大时小地图细节多早混入：越靠右越早。最右端为“始终”：从整个世界起，任何缩放都显示。",
+ "At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom).": "最近缩放时混入多少游戏小地图以显示细节，不超过小地图不透明度（任何缩放下的最大值）。"
 }

@@ -932,9 +932,11 @@ function mod:CloseOptions(opts, get, set, off)
 	opts.closeHeader = ns.Header(ns.L["Up close"], 50)
 	opts.minimap = { type = "toggle", name = ns.L["Minimap detail"], order = 50.5, width = "full", get = get, set = set, disabled = off,
 		desc = ns.L["At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom."] }
-	opts.minimapMix = { type = "range", name = ns.L["Minimap strength"], order = 51, min = 0, max = 0.8, step = 0.05, isPercent = true,
+	-- (up to 100%: never more than Minimap opacity, the most it shows at any zoom, which the painted map's look is kept
+	-- by: Close.lua's mix is min(strength, most), and its hand-overs hold at 100% too)
+	opts.minimapMix = { type = "range", name = ns.L["Minimap strength"], order = 51, min = 0, max = 1, step = 0.05, isPercent = true,
 		get = get, set = set, disabled = noMinimap,
-		desc = ns.L["At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads."] }
+		desc = ns.L["At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom)."] }
 	opts.minimapFrom = { type = "range", name = ns.L["Minimap detail from zoom"], order = 51.1, min = MINI_FROM[1], max = MINI_FROM[2], step = MINI_FROM[3],
 		get = get, set = set, disabled = function() return noMinimap() or (mod.db.minimapMix or 0) == 0 end,
 		desc = ns.L["How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show."] }

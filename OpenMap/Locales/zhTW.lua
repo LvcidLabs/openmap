@@ -56,7 +56,7 @@ L["Areas you haven't explored yet: shown as they are, darkened and cooled (and a
 L["Arrow"] = "箭頭"
 L["Arrow size"] = "箭頭大小"
 L["As a code"] = "產生代碼"
-L["At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads."] = "放到最大時，混入多少遊戲小地圖來補足細節。手繪地圖始終為主。"
+L["At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom)."] = "最近縮放時混入多少遊戲小地圖以顯示細節，不超過小地圖不透明度（任何縮放下的最大值）。"
 L["At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom."] = "放到最大時，混入遊戲小地圖來補足細節（樹林、岩石、建築）。關閉時，無論放多大都只會看到手繪地圖。"
 L["Auctioneers"] = "拍賣師"
 L["Auto"] = "自動"

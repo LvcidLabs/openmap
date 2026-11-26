@@ -56,7 +56,7 @@ L["Areas you haven't explored yet: shown as they are, darkened and cooled (and a
 L["Arrow"] = "Flèche"
 L["Arrow size"] = "Taille de la flèche"
 L["As a code"] = "En code"
-L["At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads."] = "Au zoom le plus proche, la part de minicarte du jeu mêlée à la carte pour le détail. La carte peinte reste toujours dominante."
+L["At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom)."] = "Au zoom le plus proche, la part de la minicarte du jeu mêlée pour le détail, jamais plus que l'opacité de la minicarte (le maximum à tout zoom)."
 L["At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom."] = "Au zoom le plus proche, mêler la minicarte du jeu à la carte pour le détail (arbres, rochers, bâtiments). Désactivé, vous ne voyez que la carte peinte, quel que soit le zoom."
 L["Auctioneers"] = "Commissaires-priseurs"
 L["Auto"] = "Auto"

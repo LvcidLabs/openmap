@@ -37,7 +37,6 @@
  "An arrow: drag from its tail to where it points.": "Стрелка: тяните от хвоста туда, куда она указывает.",
  "Areas you haven't explored yet: shown as they are, darkened and cooled (and a zone you haven't found at all darkened from every zoom, the continents' too), or hidden like Blizzard's own map (blank parchment until you get there).": "Области, которые вы еще не исследовали: показаны как есть, затемнены в холодных тонах (а зона, которую вы еще вовсе не открыли, затемнена при любом масштабе, и на картах континентов тоже) или скрыты, как на карте Blizzard (чистый пергамент, пока вы туда не доберетесь).",
  "Arrow": "Стрелка",
- "At the closest zoom, how much of the game's minimap is mixed in for detail. The painted map always leads.": "Сколько мини-карты игры подмешивается для детализации при самом крупном масштабе. Рисованная карта всегда остается основной.",
  "At the closest zoom, mix in the game's minimap for detail (tree cover, rocks, buildings). Off, the painted map is all you see, however far you zoom.": "При самом крупном масштабе подмешивать мини-карту игры для детализации (деревья, скалы, здания). Если выключено, видна только рисованная карта, как бы сильно вы ни приближали.",
  "Auctioneers": "Аукционеры",
  "Auto": "Авто",
@@ -589,5 +588,6 @@
  "Object": "Объект",
  "Not on the map: %s": "Нет на карте: %s",
  "Always": "Всегда",
- "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Как рано при приближении подмешиваются детали миникарты: правее — раньше. В крайнем правом положении, Всегда: с вида всего мира, при любом масштабе."
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Как рано при приближении подмешиваются детали миникарты: правее — раньше. В крайнем правом положении, Всегда: с вида всего мира, при любом масштабе.",
+ "At the closest zoom, how much of the game's minimap is mixed in for detail, never more than Minimap opacity (the most it shows at any zoom).": "При самом близком масштабе — сколько миникарты игры подмешивается для деталей, не больше непрозрачности миникарты (максимума при любом масштабе)."
 }

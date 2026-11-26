@@ -139,5 +139,23 @@ class MinimapAlwaysTests(unittest.TestCase):
         self.assertIn("from <= MINI_FROM[1] and 1", close)            # (at the least: there at every zoom)
 
 
+    def test_strength_up_to_100(self):
+        # (Minimap strength to 100%: never more than Minimap opacity, the most at any zoom; the menu's slider reads
+        # Options' range; the hand-overs' strengths stay finite and in 0..1 at full strength)
+        close = (ROOT / "Map" / "Close.lua").read_text(encoding="utf-8")
+        self.assertIn('opts.minimapMix = { type = "range", name = ns.L["Minimap strength"], order = 51, min = 0, max = 1,', close)
+        self.assertIn("local mix = math.min(base, most) *", close)
+        self.assertIn('{ "minimapMix", L["Minimap strength"]', PANEL)
+        from lupa.lua51 import LuaRuntime
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        body = close[close.index("\t\t\tlocal a3 = mix * wn"):close.index("\t\t\tif lods then")]
+        f = lua.eval("function(mix, wn, fine) " + body + " return a3, a2, a1 end")
+        for mix in (1.0, 0.85):
+            for wn in (0, 0.5, 1):
+                for fine in (0, 0.5, 1):
+                    for a in f(mix, wn, fine):
+                        self.assertTrue(0 <= a <= 1 + 1e-9, (mix, wn, fine, a))
+
+
 if __name__ == "__main__":
     unittest.main()
