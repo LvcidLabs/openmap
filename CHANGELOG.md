@@ -14,8 +14,14 @@
   and `rightClickTip`, so an addon's button on the map can do something of its own on a right-click,
   and `lit` and `grey`, so its gold edge and its greying can show something other than its switch;
   `RefreshMenuToggles()` draws the buttons again (docs/api.md). By Lvcidx0.
-- **The waypoint's distance in meters**: "Waypoint distance in meters" (Options, off by default) shows the distance
+- **The waypoint's distance in meters**: "Waypoint distance in meters" (OpenMap's menu > More, off by default) shows the distance
   under the game's waypoint arrow on your screen in meters, and in km from 1000 m, instead of yards.
+- **A search box on the map's title bar**: type a place in "Find a place", at the top right of the map window, and
+  the map takes you there. It finds zones, cities, the areas inside each zone (Goldshire, the Crossroads ...),
+  dungeons, caves, flight masters, boats and zeppelins, battlegrounds and your map pins by their notes; with Questie
+  also NPCs, objects and quests by name (a quest shows who gives it and who takes it in) and townsfolk by kind
+  (Innkeepers, Vendors ...). Something in several places is marked at each. A key opens the map and puts you in the
+  box: Key Bindings > OpenMap: Find a place. The search is no longer inside the menu.
 - **TomTom's waypoint can be left out**: with TomTom on, "TomTom waypoint too" (OpenMap's menu > More, and
   Options) is on as before; off, a pin you follow on the map sets only Blizzard's waypoint (#444).
 

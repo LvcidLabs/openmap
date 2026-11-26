@@ -56,6 +56,7 @@ jobs:
       - run: python -P tools/offline-test/cursor.py
       - run: python -P tools/offline-test/flights.py
       - run: python -P tools/offline-test/menutoggle.py
+      - run: python -P tools/offline-test/search.py
       # (WoW Forever's own data: its combat list, caves, painted gaps, sea chart, places to explore and battleground maps)
       - if: matrix.client == 'forever'
         run: |

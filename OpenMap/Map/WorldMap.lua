@@ -1762,7 +1762,7 @@ local function Setup()
 			elseif citiesDirty then citiesDirty = false S.RefreshCities() end
 		end)
 	end)
-	Timed("Nav", mod.SetupNav, mod, map)          -- (before the menu: it holds Nav's search box)
+	Timed("Nav", mod.SetupNav, mod, map)          -- (before the menu; Nav puts the search on the title bar)
 	Timed("Pins", mod.SetupPins, mod, map)
 	if mod.SetupOwnView then mod:SetupOwnView(map) end   -- (the map in a fight: OwnView.lua)
 	Timed("Friends", mod.SetupFriends, mod, map)

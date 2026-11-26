@@ -583,5 +583,11 @@
  "Waypoint distance in meters": "경유지 거리를 미터로",
  "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "화면의 경유지 화살표 아래 거리를 야드 대신 미터로 표시합니다 (1000 이상은 km).",
  "%d m": "%dm",
- "%.1f km": "%.1fkm"
+ "%.1f km": "%.1fkm",
+ "Area": "장소",
+ "Cave": "동굴",
+ "NPC": "NPC",
+ "Quest": "퀘스트",
+ "Object": "물체",
+ "Not on the map: %s": "지도에 없음: %s"
 }

@@ -1410,11 +1410,7 @@ function mod:SetupPanel(worldMap)
 	local inner = W - 2 * PAD
 	local y = -titleH - 12
 	if titleH == 0 then y = -30 end
-	local search = mod.CreateSearch and mod.CreateSearch(menu, inner - 8)
-	if search then
-		search:SetPoint("TOPLEFT", PAD + 6, y)
-		y = y - 32
-	end
+	-- (the search is on the window's title bar now, Nav.lua: always there with OpenMap's map, not one click away)
 
 	-- the actions: a tile each, with its star in the corner
 	local actions = Actions()
@@ -1770,13 +1766,14 @@ end
 -- opening the map first if it's closed (a player's request: a key for Find me)
 -- (in a section of their own, each named OpenMap: ..., so the bindings' search finds them: in the AddOns
 -- section, under a header, they were hard to find)
-for key, text in pairs({ FIND = L["Find me"], PIN = L["Drop a pin"], PINS = L["Pins"], QUILL = L["Quill"],
+for key, text in pairs({ FIND = L["Find me"], SEARCH = L["Find a place"], PIN = L["Drop a pin"], PINS = L["Pins"], QUILL = L["Quill"],
 	QUESTLOG = L["Quest log"], MENU = L["The map's menu"] }) do
 	_G["BINDING_NAME_OPENMAP_" .. key] = "OpenMap: " .. text
 end
 function _G.OpenMap_Binding(id)
 	if not (mod.enabled and menu) then return end
 	if id == "menu" then mod:OpenMenu() return end
+	if id == "search" then if mod.FocusSearch then mod.FocusSearch() end return end
 	local run
 	for _, e in ipairs(Actions()) do if e.id == id then run = e.run end end
 	if not run then return end

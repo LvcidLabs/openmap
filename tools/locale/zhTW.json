@@ -583,5 +583,11 @@
  "Waypoint distance in meters": "路徑點距離以公尺顯示",
  "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "螢幕上遊戲路徑點箭頭下方的距離以公尺顯示（1000公尺起以公里顯示），而不是碼。",
  "%d m": "%d公尺",
- "%.1f km": "%.1f公里"
+ "%.1f km": "%.1f公里",
+ "Area": "地點",
+ "Cave": "洞穴",
+ "NPC": "NPC",
+ "Quest": "任務",
+ "Object": "物件",
+ "Not on the map: %s": "不在地圖上：%s"
 }

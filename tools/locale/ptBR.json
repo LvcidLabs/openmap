@@ -583,5 +583,11 @@
  "Waypoint distance in meters": "Distância do ponto de referência em metros",
  "The distance under the game's waypoint arrow on your screen, in meters (km from 1000) instead of yards.": "A distância sob a seta do ponto de referência do jogo na sua tela, em metros (km a partir de 1000) em vez de jardas.",
  "%d m": "%d m",
- "%.1f km": "%.1f km"
+ "%.1f km": "%.1f km",
+ "Area": "Área",
+ "Cave": "Caverna",
+ "NPC": "PNJ",
+ "Quest": "Missão",
+ "Object": "Objeto",
+ "Not on the map: %s": "Não está no mapa: %s"
 }
