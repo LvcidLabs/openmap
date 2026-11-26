@@ -192,7 +192,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "Cuánto se acercan los bordes de cada zona a una paleta común, para que montañas y bordes pasen suavemente de una zona a otra. El interior de cada zona conserva sus propios colores. Por debajo del 100 %, no se usan los mosaicos de zona ya preparados y cada zona se dibuja con su propio arte, lo que cuesta más al hacer zoom.",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "Desde qué acercamiento (en veces la vista del mundo entero) empieza a mezclarse el detalle del minimapa: más bajo aparece antes, más alto después; con 1x está desde el mundo entero. Más lejos de donde pueden dibujarse sus propias piezas, se muestran copias más pequeñas.",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "Cuánto se acerca el mapa, en veces la vista del mundo entero (en las ciudades, la mitad más). A partir de 48, más o menos, el arte solo se agranda.",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "Desde qué acercamiento empieza a mezclarse el detalle del minimapa: más bajo aparece antes, más alto después.",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "Cuánto se desvanece el mapa mientras caminas o montas, para que veas hacia dónde vas. 0% lo deja opaco. Nunca se desvanece mientras el mouse está encima.",
  "Choose your map": "Elige tu mapa",
  "Icon size": "Tamaño de íconos",
@@ -236,7 +235,6 @@
  "Minimap": "Minimapa",
  "Minimap button": "Botón del minimapa",
  "Minimap detail": "Detalle del minimapa",
- "Minimap detail from": "Detalle del minimapa desde",
  "Minimap detail from zoom": "Detalle del minimapa desde el zoom",
  "Minimap detail, most opacity": "Detalle del minimapa, opacidad máxima",
  "Minimap in the gaps": "Minimapa en los huecos",
@@ -589,5 +587,7 @@
  "NPC": "PNJ",
  "Quest": "Misión",
  "Object": "Objeto",
- "Not on the map: %s": "No está en el mapa: %s"
+ "Not on the map: %s": "No está en el mapa: %s",
+ "Always": "Siempre",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Lo pronto que se mezcla el detalle del minimapa al acercar: más a la derecha, antes. Del todo a la derecha, Siempre: desde el mundo entero, a cualquier zoom."
 }

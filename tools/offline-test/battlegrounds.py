@@ -209,10 +209,16 @@ class BattlegroundTests(unittest.TestCase):
         self.lua.execute("sc.scale = sc.zoomLevels[#sc.zoomLevels].scale map:OnCanvasScaleChanged()")
         self.assertTrue(layer.shown)
         self.assertTrue(any(t.shown and t.alpha > 0.5 for t in layer.kids.values() if t.kind == "Texture"))
-        # (the setting switched there: its zoom steps made again)
+        # (switched off there: nothing of Blizzard's map called from OpenMap's code; as Blizzard makes its zoom steps
+        # again on the next opening, OpenMap's aren't written: Blizzard's one, its own, and no tiles; #472)
+        before = self.lua.eval("created")
         self.lua.execute("mod.SetBattlegroundMaps(false)")
+        self.assertEqual(self.lua.eval("created"), before)
+        self.assertFalse(layer.shown)
+        self.lua.execute("map:SetMap(1460)")
         self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
-        self.lua.execute("mod.SetBattlegroundMaps(true)")
+        self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
+        self.lua.execute("mod.SetBattlegroundMaps(true) map:SetMap(1460)")
         self.assertGreater(len(self.lua.eval("sc.zoomLevels")), 1)
 
     def test_diagnostic(self):

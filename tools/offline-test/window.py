@@ -163,6 +163,30 @@ class WindowTests(unittest.TestCase):
         self.assertIn("Clamp,SetPoint", drag_calls)
         self.assertTrue(drag_calls.endswith("Spacer,Refit"))
 
+        # in a battleground or arena: nothing of the window's place, size or scale set from OpenMap's code, whatever
+        # the settings (Blizzard's map read OpenMap's anchor as it opened, and its whole opening ran as OpenMap's: #472)
+        bg_calls = lua.execute('''
+        function IsInInstance() return true, "pvp" end
+        testMap.calls = {}
+        testMap.width, testMap.height = 640, 480
+        testMap.scripts.OnShow(testMap)
+        testLog.scripts.OnShow(testLog)
+        local grip
+        for _, f in ipairs(created) do
+            if f.scripts.OnMouseDown and f.scripts.OnMouseUp then grip = f break end
+        end
+        cursorX, cursorY = 500, 300
+        grip.scripts.OnMouseDown(grip)
+        cursorX, cursorY = 620, 220
+        grip.scripts.OnUpdate(grip)
+        grip.scripts.OnMouseUp(grip)
+        mod:ResetWindow()
+        local out = table.concat(testMap.calls, ",")
+        IsInInstance = nil
+        return out
+        ''')
+        self.assertEqual("", bg_calls)
+
 
 
 if __name__ == "__main__":

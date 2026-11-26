@@ -1528,11 +1528,15 @@ function mod:SetupPanel(worldMap)
 	zoomRow = SliderRow(sliders, COL, { label = L["Deepest zoom"], icon = Icon("INV_Misc_Spyglass_02"), range = mod.MAX_ZOOM,
 		get = function() return mod.db.maxZoom end, set = mod.SetMaxZoom,
 		tip = L["How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged."] })
-	miniRow = SliderRow(sliders, COL, { label = L["Minimap detail from"], icon = Icon("Spell_Nature_FarSight"), range = mod.MINI_FROM,
-		get = function() return mod.db.minimapFrom end,
-		set = function(v) mod.db.minimapFrom = v if mod.RefreshView then mod.RefreshView() end end,
+	-- (the zoom it mixes in from, the other way round: further right, sooner; at the far right, from the whole world,
+	-- always. A player took the far right for "the most", and it was the latest. Options keeps the zoom itself)
+	local miniLo, miniHi = mod.MINI_FROM[1], mod.MINI_FROM[2]
+	miniRow = SliderRow(sliders, COL, { label = L["Minimap detail"], icon = Icon("Spell_Nature_FarSight"), range = mod.MINI_FROM,
+		get = function() return miniLo + miniHi - (mod.db.minimapFrom or 20) end,
+		set = function(v) mod.db.minimapFrom = miniLo + miniHi - v if mod.RefreshView then mod.RefreshView() end end,
+		text = function(v) return v >= miniHi and L["Always"] or ("%dx"):format(miniLo + miniHi - v) end,
 		enabled = function() return mod.db.minimap and (mod.db.minimapMix or 0) > 0 end,
-		tip = L["How far in the minimap's detail starts to mix in: lower comes in sooner, higher later."] })
+		tip = L["How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom."] })
 	opacityRow = SliderRow(sliders, COL, { label = L["Minimap opacity"], icon = Icon("Spell_Nature_FarSight"), range = { 0, 1, 0.05 },
 		get = function() return mod.db.minimapDeep end,
 		set = function(v) mod.db.minimapDeep = v if mod.RefreshView then mod.RefreshView() end end,

@@ -192,7 +192,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "Насколько края каждой зоны приводятся к общей палитре, чтобы горы и границы плавно переходили из зоны в зону. Внутренние части зон сохраняют свои цвета. Ниже 100% готовые фрагменты зон не используются, и каждая зона рисуется из собственной карты, что требует больше ресурсов при масштабировании.",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "С какого приближения (во сколько раз крупнее вида всего мира) начинают подмешиваться детали мини-карты: меньше — раньше, больше — позже; при 1x они видны уже на карте всего мира. Там, где ее собственные фрагменты отрисовать нельзя, показываются их уменьшенные копии.",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "Насколько сильно приближается карта, во сколько раз крупнее вида всего мира (города — еще в полтора раза больше). После примерно 48 изображение лишь растягивается.",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "С какого приближения подмешиваются детали мини-карты: меньше — раньше, больше — позже.",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "Насколько карта становится прозрачной, пока вы идете или едете верхом, чтобы видеть дорогу. При 0% карта непрозрачна. Когда курсор над картой, она не становится прозрачной.",
  "Choose your map": "Выберите карту",
  "Icon size": "Размер значков",
@@ -236,7 +235,6 @@
  "Minimap": "Мини-карта",
  "Minimap button": "Кнопка у мини-карты",
  "Minimap detail": "Детали мини-карты",
- "Minimap detail from": "Мини-карта с масштаба",
  "Minimap detail from zoom": "Детали мини-карты с масштаба",
  "Minimap detail, most opacity": "Детали мини-карты: макс. непрозрачность",
  "Minimap in the gaps": "Мини-карта в пустотах",
@@ -589,5 +587,7 @@
  "NPC": "НИП",
  "Quest": "Задание",
  "Object": "Объект",
- "Not on the map: %s": "Нет на карте: %s"
+ "Not on the map: %s": "Нет на карте: %s",
+ "Always": "Всегда",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Как рано при приближении подмешиваются детали миникарты: правее — раньше. В крайнем правом положении, Всегда: с вида всего мира, при любом масштабе."
 }

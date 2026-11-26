@@ -97,6 +97,19 @@ local function LaidByBlizzard()
 	return inside and not mod.db.windowSize and not (map.IsMaximized and map:IsMaximized() and mod.db.fullWidth) or false
 end
 
+-- In a battleground or arena: nothing of the window's place, size or scale set from OpenMap's code, whatever the
+-- window settings. Blizzard's map read the anchor OpenMap had put on it as it opened ("WorldMapFrame:SetPoint()" in
+-- the taint log, every opening), and the whole opening ran as OpenMap's: the canvas's scale and scroll it reset came
+-- out OpenMap's, a right-click on a group dot read them, and Report AFK was blocked (#472). The window is where
+-- Blizzard puts it there; your place and size come back outside
+local function InBattleground()
+	if not IsInInstance then return false end
+	local inside, kind = IsInInstance()
+	inside, kind = ns.Safe.Value(inside), ns.Safe.Value(kind)
+	return inside and (kind == "pvp" or kind == "arena") or false
+end
+mod.WindowHandsOff = InBattleground
+
 local function UpdateSpacer()
 	if not map.UpdateSpacerFrameAnchoring then return end
 	if mod.KeepPadCursor then mod.KeepPadCursor(map.UpdateSpacerFrameAnchoring, map) else map:UpdateSpacerFrameAnchoring() end
@@ -125,6 +138,7 @@ end
 
 local function Apply()
 	if not map or Maximized() or ours or sizing or classicMap then return end
+	if InBattleground() then return end
 	if Locked() then return end
 	-- (a place or size saved that isn't one, NaN or infinite, or no size at all: forgotten, or the map would
 	-- be put there every time it opens, blank: #260)
@@ -164,6 +178,7 @@ end
 -- screen); the stitched map is the whole world, so it takes the screen's full width
 FillScreen = function()
 	if not map or not Maximized() or classicMap then return end
+	if InBattleground() then return end
 	if InCombatLockdown() then afterCombat = true return end
 	if not moveAny and math.abs((map:GetScale() or 1) - 1) > 0.001 then map:SetScale(1) end   -- (the windowed size is the window's)
 	if not mod.db.fullWidth then return end
@@ -183,7 +198,7 @@ function mod:ResetWindow()
 	mod.db.window = false
 	mod.db.windowScale = 1
 	mod.db.windowSize = false
-	if map and not moveAny then
+	if map and not moveAny and not InBattleground() then
 		ours = true
 		map:SetScale(1)
 		if blizzardSize and not Maximized() then map:SetSize(blizzardSize[1], blizzardSize[2]) Refit() end
@@ -219,7 +234,7 @@ local function FitRightGrip()
 end
 
 local function Clamp(w, h)
-	if not map or moveAny or classicMap or InCombatLockdown() then return end
+	if not map or moveAny or classicMap or InCombatLockdown() or InBattleground() then return end
 	w, h = w or map:GetWidth(), h or map:GetHeight()
 	if not (w and h) or w <= 0 then return end
 	local side = math.max(0, w - 160)
@@ -242,7 +257,7 @@ local function Grip(corner)
 	end
 	local start
 	g:SetScript("OnMouseDown", function()
-		if Maximized() or Locked() then return end
+		if Maximized() or Locked() or InBattleground() then return end
 		local x, y = GetCursorPosition()
 		-- (where the window is, now: not known yet, or the drag would anchor it at 0, 0, bottom left: #241)
 		local l, r, t = map:GetLeft(), map:GetRight(), map:GetTop()
@@ -337,7 +352,7 @@ function mod:SetupWindow(worldMap)
 		if refitted or maxRefitted then maxRefitted = false return end
 		if not map:IsShown() or (mod.IsStitched and mod.IsStitched()) then return end
 		if InCombatLockdown() then afterCombat = true return end
-		if LaidByBlizzard() then return end
+		if LaidByBlizzard() or InBattleground() then return end
 		Refit()
 	end
 	-- (what waited out combat: the window laid out again, the question asked)
@@ -393,7 +408,7 @@ function mod:SetupWindow(worldMap)
 		handle:RegisterForDrag("LeftButton")
 		handle:SetScript("OnDragStart", function()
 			-- (in combat the map's protected: moving it from here is refused)
-			if Maximized() or (InCombatLockdown() and map:IsProtected()) then return end
+			if Maximized() or (InCombatLockdown() and map:IsProtected()) or InBattleground() then return end
 			handle.moving = true
 			map:SetMovable(true)
 			map:StartMoving()
@@ -680,7 +695,7 @@ SetupQuestLog = function()
 	local logRefitQueued = false
 	local function FlushLogRefit()
 		logRefitQueued = false
-		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring and not LaidByBlizzard() then
+		if not Maximized() and not InCombatLockdown() and map:IsShown() and map.UpdateSpacerFrameAnchoring and not LaidByBlizzard() and not InBattleground() then
 			UpdateSpacer()
 			Refit()
 		end

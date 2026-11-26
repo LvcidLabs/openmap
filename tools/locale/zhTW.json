@@ -193,7 +193,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "各區域邊緣向共用色調靠攏的程度，讓山脈與邊界在區域之間平順銜接。區域內部保留各自的顏色。 低於 100% 時不使用預先產生的區域圖塊，每個區域都以其自身的地圖繪製，縮放時負擔更大。",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "放大到多少（以整個世界視野的倍數計）時開始混入小地圖細節：數值越低越早出現，越高越晚；1x 時從整個世界視野就開始。在比小地圖圖塊本身能繪製的範圍更遠時，會顯示其縮小版本。",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "地圖最多能放大多少，以整個世界視野的倍數計（主城可再放大一半）。超過約 48 倍後，圖片只是被放大而已。",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "放大到多少時開始混入小地圖細節：數值越低越早出現，越高越晚。",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "行走或騎乘時地圖淡化的程度，讓你看得見前方的路。0% 則完全不淡化。滑鼠停在地圖上時不會淡化。",
  "Choose your map": "選擇你的地圖",
  "Icon size": "圖示大小",
@@ -237,7 +236,6 @@
  "Minimap": "小地圖",
  "Minimap button": "小地圖按鈕",
  "Minimap detail": "小地圖細節",
- "Minimap detail from": "小地圖細節起始縮放",
  "Minimap detail from zoom": "小地圖細節起始縮放",
  "Minimap detail, most opacity": "小地圖細節上限",
  "Minimap in the gaps": "以小地圖填補空白",
@@ -589,5 +587,7 @@
  "NPC": "NPC",
  "Quest": "任務",
  "Object": "物件",
- "Not on the map: %s": "不在地圖上：%s"
+ "Not on the map: %s": "不在地圖上：%s",
+ "Always": "總是",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "放大時小地圖細節多早混入：越靠右越早。最右端為「總是」：從整個世界起，任何縮放都顯示。"
 }

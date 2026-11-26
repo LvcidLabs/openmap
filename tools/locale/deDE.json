@@ -192,7 +192,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "Wie stark die Ränder jeder Zone an eine gemeinsame Farbpalette angeglichen werden, damit Gebirge und Grenzen weich von Zone zu Zone übergehen. Das Innere der Zonen behält seine eigenen Farben. Unter 100 % werden die vorgefertigten Zonenkacheln nicht verwendet und jede Zone wird aus ihrer eigenen Grafik gezeichnet, was beim Zoomen mehr kostet.",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "Ab welcher Zoomstufe (als Vielfaches der Weltansicht) die Details der Minikarte eingemischt werden: niedriger früher, höher später; bei 1x schon ab der ganzen Welt. Weiter draußen, als ihre eigenen Kacheln gezeichnet werden können, erscheinen kleinere Kopien davon.",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "Wie weit die Karte hineinzoomt, als Vielfaches der Weltansicht (in Städten noch einmal halb so weit). Ab etwa 48 wird die Grafik nur noch vergrößert.",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "Ab welcher Zoomstufe die Details der Minikarte eingemischt werden: niedriger früher, höher später.",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "Wie durchsichtig die Karte wird, während Ihr lauft oder reitet, damit Ihr seht, wohin Ihr geht. 0% lässt sie undurchsichtig. Solange die Maus darüber ist, wird sie nie durchsichtig.",
  "Choose your map": "Wählt Eure Karte",
  "Icon size": "Symbolgröße",
@@ -236,7 +235,6 @@
  "Minimap": "Minikarte",
  "Minimap button": "Minikarten-Schaltfläche",
  "Minimap detail": "Minikarten-Details",
- "Minimap detail from": "Minikarten-Details ab",
  "Minimap detail from zoom": "Minikarten-Details ab Zoomstufe",
  "Minimap detail, most opacity": "Minikarten-Details, max. Deckkraft",
  "Minimap in the gaps": "Minikarte in den Lücken",
@@ -593,5 +591,7 @@
  "NPC": "NSC",
  "Quest": "Quest",
  "Object": "Objekt",
- "Not on the map: %s": "Nicht auf der Karte: %s"
+ "Not on the map: %s": "Nicht auf der Karte: %s",
+ "Always": "Immer",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "Wie früh die Details der Minikarte beim Hineinzoomen eingemischt werden: weiter rechts früher. Ganz rechts, Immer: ab der ganzen Welt, bei jeder Zoomstufe."
 }

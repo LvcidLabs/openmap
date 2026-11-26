@@ -104,5 +104,40 @@ class MenuToggleTests(unittest.TestCase):
         self.assertIn("local API = { major = 1, version = 5 }", API)
 
 
+
+class MinimapAlwaysTests(unittest.TestCase):
+    """The menu's minimap detail slider (Panel.lua's miniRow): the zoom it mixes in from, the other way round, so its far
+    right is "Always" (from the whole world, at every zoom: minimapFrom at its least, Close.lua's MINI_FROM[1])."""
+
+    def setUp(self):
+        from lupa.lua51 import LuaRuntime
+        block = PANEL[PANEL.index("\tlocal miniLo, miniHi = mod.MINI_FROM[1], mod.MINI_FROM[2]"):]
+        block = block[:block.index("\topacityRow = SliderRow(")]
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute("""
+            L = setmetatable({}, { __index = function(_, k) return k end })
+            mod = { MINI_FROM = { 1, 60, 1 }, db = { minimapFrom = 20 } }
+            function Icon() end
+            function SliderRow(_, _, spec) row = spec return spec end
+            sliders, COL = {}, 100
+        """ + block)
+        self.row = self.lua.eval("row")
+
+    def test_far_right_is_always(self):
+        self.assertEqual(self.row.text(60), "Always")
+        self.row.set(60)
+        self.assertEqual(self.lua.eval("mod.db.minimapFrom"), 1)     # (Close.lua: from the whole world)
+        self.assertEqual(self.row.get(), 60)
+
+    def test_further_right_sooner(self):
+        self.lua.execute("mod.db.minimapFrom = 20")
+        self.assertEqual(self.row.get(), 41)
+        self.assertEqual(self.row.text(41), "20x")
+        self.row.set(1)
+        self.assertEqual(self.lua.eval("mod.db.minimapFrom"), 60)    # (the far left: the latest, 60x)
+        close = (ROOT / "Map" / "Close.lua").read_text(encoding="utf-8")
+        self.assertIn("from <= MINI_FROM[1] and 1", close)            # (at the least: there at every zoom)
+
+
 if __name__ == "__main__":
     unittest.main()

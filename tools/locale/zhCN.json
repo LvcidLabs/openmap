@@ -192,7 +192,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "各区域边缘向统一色调靠拢的程度，使山脉和边界在区域之间平滑过渡。区域内部保留各自的颜色。 低于 100% 时不使用预先生成的区域图块，每个区域都用其自身的地图绘制，缩放时开销更大。",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "小地图细节从多大的缩放倍数（以全世界视图的倍数计）开始混入：数值越低越早出现，越高越晚；为1x时从全世界视图起就有。缩得比小地图图块本身所能绘制的更远时，改用缩小的副本显示。",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "地图最多能放大多少（以全世界视图的倍数计；城市还能再放大一半）。超过约48倍后，图像只是被拉大。",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "小地图细节从多大的缩放倍数开始混入：数值越低越早出现，越高越晚。",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "你步行或骑乘时地图变透明的程度，方便你看清前方的路。0%为保持不透明。鼠标停在地图上时不会变透明。",
  "Choose your map": "选择你的地图",
  "Icon size": "图标大小",
@@ -236,7 +235,6 @@
  "Minimap": "小地图",
  "Minimap button": "小地图按钮",
  "Minimap detail": "小地图细节",
- "Minimap detail from": "小地图细节起始缩放",
  "Minimap detail from zoom": "小地图细节起始缩放倍数",
  "Minimap detail, most opacity": "小地图细节最大不透明度",
  "Minimap in the gaps": "空白处用小地图",
@@ -589,5 +587,7 @@
  "NPC": "NPC",
  "Quest": "任务",
  "Object": "物体",
- "Not on the map: %s": "不在地图上：%s"
+ "Not on the map: %s": "不在地图上：%s",
+ "Always": "始终",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "放大时小地图细节多早混入：越靠右越早。最右端为“始终”：从整个世界起，任何缩放都显示。"
 }

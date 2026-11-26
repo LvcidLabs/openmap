@@ -192,7 +192,6 @@
  "How far each zone's borders move toward a shared palette, so mountains and borders hand over smoothly between zones. Zone interiors keep their own colours. Below 100%, the ready-made zone tiles aren't used and every zone is drawn from its own art, which costs more while zooming.": "À quel point les bords de chaque zone se rapprochent d'une palette commune, pour que montagnes et frontières se raccordent en douceur d'une zone à l'autre. L'intérieur des zones garde ses propres couleurs. En dessous de 100 %, les tuiles de zone préparées ne sont pas utilisées et chaque zone est dessinée à partir de son propre dessin, ce qui coûte plus en zoomant.",
  "How far in (in times the whole-world view) the minimap's detail starts to mix in: lower comes in sooner, higher later; at 1x it's there from the whole world. Further out than its own tiles can be drawn, smaller copies of it show.": "À partir de quel zoom (en multiples de la vue du monde entier) le détail de la minicarte commence à se mêler à la carte : plus bas, plus tôt ; plus haut, plus tard ; à 1x, il est présent dès la vue du monde entier. Au-delà de ce que ses propres tuiles peuvent couvrir, des copies réduites prennent le relais.",
  "How far in the map zooms, in times the whole-world view (cities go half as far again). Past about 48 the art is only enlarged.": "Jusqu'où la carte zoome, en multiples de la vue du monde entier (les villes, moitié plus loin encore). Au-delà d'environ 48, l'image est seulement agrandie.",
- "How far in the minimap's detail starts to mix in: lower comes in sooner, higher later.": "À partir de quel zoom le détail de la minicarte commence à se mêler à la carte : plus bas, plus tôt ; plus haut, plus tard.",
  "How much the map fades while you walk or ride, so you can see where you're going. 0% keeps it solid. It never fades while the mouse is over it.": "À quel point la carte s'estompe pendant que vous marchez ou chevauchez, pour voir où vous allez. 0 % la garde opaque. Elle ne s'estompe jamais quand la souris est dessus.",
  "Choose your map": "Choisissez votre carte",
  "Icon size": "Taille des icônes",
@@ -236,7 +235,6 @@
  "Minimap": "Minicarte",
  "Minimap button": "Bouton de la minicarte",
  "Minimap detail": "Détail de la minicarte",
- "Minimap detail from": "Détail de la minicarte dès",
  "Minimap detail from zoom": "Détail de la minicarte dès le zoom",
  "Minimap detail, most opacity": "Détail de la minicarte, opacité max.",
  "Minimap in the gaps": "Minicarte dans les trous",
@@ -589,5 +587,7 @@
  "NPC": "PNJ",
  "Quest": "Quête",
  "Object": "Objet",
- "Not on the map: %s": "Pas sur la carte : %s"
+ "Not on the map: %s": "Pas sur la carte : %s",
+ "Always": "Toujours",
+ "How soon the minimap's detail mixes in as you zoom in: further right, sooner. At the far right, Always: from the whole world, at every zoom.": "À quel point le détail de la minicarte apparaît tôt en zoomant : plus à droite, plus tôt. Tout à droite, Toujours : dès le monde entier, à tout zoom."
 }

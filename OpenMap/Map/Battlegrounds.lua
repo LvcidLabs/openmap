@@ -197,7 +197,9 @@ end
 
 function mod.SetBattlegroundMaps(on)
 	mod.db.bgMaps = on and true or false
-	if map and map:IsShown() and Data(map:GetMapID()) and not InCombatLockdown() then
+	-- (not from here on the map of the battleground you're in: Blizzard makes its zoom steps again as the map next opens,
+	-- and the switch off leaves nothing of OpenMap's on it from then: no zoom steps written, no tiles, #472)
+	if map and map:IsShown() and Data(map:GetMapID()) and not Inside(map:GetMapID()) and not InCombatLockdown() then
 		sc:CreateZoomLevels()
 		sc:ResetZoom()
 	end
@@ -254,7 +256,7 @@ function mod:SetupBattlegrounds(worldMap)
 	map:HookScript("OnShow", Refresh)
 	map:HookScript("OnHide", Hide)
 	if map:IsShown() then
-		if Data(map:GetMapID()) then sc:CreateZoomLevels() end
+		if Data(map:GetMapID()) and not Inside(map:GetMapID()) then sc:CreateZoomLevels() end
 		Refresh()
 	end
 end
