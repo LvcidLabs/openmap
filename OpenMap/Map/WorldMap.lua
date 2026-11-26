@@ -1461,8 +1461,37 @@ local function OnBlizzardPinAction(_, action, button)
 end
 
 -- one part of the setup, its time kept (ns.loadMs.parts: /openmap status)
+-- /openmap bisect (a test build's): parts of OpenMap's map left out at login, by name, to find which one taints
+-- Blizzard's map (#472): the setups below (Timed's names), and Click, Handlers and Provider (what OpenMap registers on
+-- Blizzard's map). Kept in mod.db.bisect; a /reload applies it
+mod.BISECT = { "Extras", "Flights", "Nav", "Pins", "Friends", "Quests", "Dungeons", "Battlegrounds", "Explore", "News",
+	"Panel", "Paint", "Sketch", "Debug", "Bench", "Gamepad", "Report", "Window", "Compat", "Click", "Handlers", "Provider" }
+function mod.Skipped(name)
+	local s = mod.db and mod.db.bisect
+	return type(s) == "table" and s[name] or false
+end
+function mod:Bisect(arg)
+	local s = type(mod.db.bisect) == "table" and mod.db.bisect or {}
+	arg = (arg or ""):lower()
+	local known = {}
+	for _, n in ipairs(mod.BISECT) do known[n:lower()] = n end
+	if arg == "none" then s = {}
+	elseif arg == "all" then s = {} for _, n in ipairs(mod.BISECT) do s[n] = true end
+	elseif arg ~= "" then
+		for word in arg:gmatch("%S+") do
+			local n = known[word]
+			if n then s[n] = not s[n] or nil else ns:Print("bisect: no part called " .. word) end
+		end
+	end
+	mod.db.bisect = next(s) and s or nil
+	local off = {}
+	for _, n in ipairs(mod.BISECT) do if s[n] then off[#off + 1] = n end end
+	ns:Print("bisect: left out at login: " .. (#off > 0 and table.concat(off, " ") or "nothing") .. ". Parts: "
+		.. table.concat(mod.BISECT, " ") .. ". /openmap bisect <part ...> switches them, none, all; then /reload.")
+end
+
 local function Timed(name, fn, ...)
-	if not fn then return end
+	if not fn or mod.Skipped(name) then return end
 	local t0 = debugprofilestop and debugprofilestop()
 	fn(...)
 	if t0 then ns.loadMs.parts[name] = debugprofilestop() - t0 end
@@ -1603,12 +1632,12 @@ local function Setup()
 	-- map calls its handlers one after another in one call, so OpenMap's run first left the menu Blizzard's then makes
 	-- running as OpenMap's: Report AFK blocked, #472. Tried in test9 while OpenMap's Escape-list entries tainted the map
 	-- anyway (taken off since); a Ctrl-click is OpenMap's pin still unless a handler of Blizzard's takes it first)
-	map:AddCanvasClickHandler(OnCanvasClick, -1)
-	if map.AddGlobalPinMouseActionHandler and MapCanvasMixin and MapCanvasMixin.MouseAction then
+	if not mod.Skipped("Click") then map:AddCanvasClickHandler(OnCanvasClick, -1) end
+	if map.AddGlobalPinMouseActionHandler and MapCanvasMixin and MapCanvasMixin.MouseAction and not mod.Skipped("Handlers") then
 		map:AddGlobalPinMouseActionHandler(OnBlizzardPinAction, 1000)
 	end
 	-- Blizzard's pin cursor while the menu's pin button or Blizzard's map-pin button is on
-	if map.AddCursorHandler then
+	if map.AddCursorHandler and not mod.Skipped("Handlers") then
 		map:AddCursorHandler(function()
 			if active and ((mod.PinMode and mod.PinMode()) or pinBtn.ArmedNow()) then return "MAP_PIN_CURSOR" end
 		end, 1000)
@@ -1731,7 +1760,7 @@ local function Setup()
 		AfterOpening()
 		shown()
 	end
-	map:AddDataProvider(dp)
+	if not mod.Skipped("Provider") then map:AddDataProvider(dp) end
 
 	Timed("Extras", mod.SetupExtras, mod, map)
 	Timed("Flights", mod.SetupFlights, mod)
