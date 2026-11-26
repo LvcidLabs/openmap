@@ -5,7 +5,8 @@
 --                only while the player is still inside the previous view
 --   waypoints    Ctrl-click the map to drop Blizzard's map pin there (and a
 --                TomTom arrow, if TomTom is on); click the pin to clear it
---   search       type a zone, city, dungeon or flight master and glide to it
+--   search       type a zone, city, dungeon or flight master and glide to it (on the
+--                window's title bar)
 --   group        party and raid members as class-coloured dots with a gold
 --                border, wherever they are on the stitched map (Blizzard's own
 --                only show on the map underneath)
@@ -451,15 +452,16 @@ local function ShowResults()
 	list.first = found[1][1]
 end
 
--- the search box, on `parent` (the map's menu), `width` wide; its results drop down below it
+-- the search box, on `parent`, `width` wide; its results drop down below it, their right edge under its
+-- (it sits at the window's right, by its buttons)
 function mod.CreateSearch(parent, width)
 	map = map or _G.WorldMapFrame
 	box = CreateFrame("EditBox", nil, parent, "SearchBoxTemplate")
-	box:SetSize(width, 22)
+	box:SetSize(width, 20)
 	box:SetAutoFocus(false)
 	if box.Instructions then box.Instructions:SetText(L["Find a place"]) end
 	list = CreateFrame("Frame", nil, parent)
-	list:SetPoint("TOPLEFT", box, "BOTTOMLEFT", -6, -2)
+	list:SetPoint("TOPRIGHT", box, "BOTTOMRIGHT", 6, -2)
 	list:SetWidth(240)
 	list:SetFrameStrata("FULLSCREEN_DIALOG")      -- (over the menu's tiles below it: they're in its strata)
 	list:EnableMouse(true)
@@ -471,6 +473,108 @@ function mod.CreateSearch(parent, width)
 	box:HookScript("OnEditFocusLost", function() C_Timer.After(0.2, function() if not box:HasFocus() then list:Hide() end end) end)
 	map:HookScript("OnHide", function() box:ClearFocus() list:Hide() end)
 	return box
+end
+
+-- The search on the map's title bar, left of its window buttons (Blizzard's maximize and close): there whenever
+-- OpenMap's map is, and nowhere else (Blizzard's own maps, the Gamepad UI's). As wide as the bar leaves it beside
+-- the window's title, between these. Its frames are OpenMap's own, on the map as the title bar's drag strip is
+-- (Window.lua), made out of combat; nothing of Blizzard's is written or moved
+local SEARCH_MIN, SEARCH_MAX = 90, 190
+local SEARCH_GAP = 10           -- from the title's text, and from the window's buttons
+local holder
+local function TitleText(border)
+	local c = border.TitleContainer
+	return (c and c.TitleText) or border.TitleText or (border.GetTitleText and border:GetTitleText()) or nil
+end
+local function SearchButtons(border)
+	local mm = border.MaximizeMinimizeFrame
+	if mm and mm.IsShown and mm:IsShown() then return mm end
+	return border.CloseButton
+end
+-- how wide it can be: from the title's right end to the buttons
+local function SearchWidth(border, buttons)
+	local title = TitleText(border)
+	local right = buttons and buttons.GetLeft and buttons:GetLeft()
+	if not (title and right and title.GetCenter) then return SEARCH_MAX end
+	local cx = title:GetCenter()
+	local w = title.GetStringWidth and title:GetStringWidth() or 0
+	if not cx or not w then return SEARCH_MAX end
+	local room = right - (cx + w / 2) - 2 * SEARCH_GAP
+	return math.max(SEARCH_MIN, math.min(SEARCH_MAX, math.floor(room)))
+end
+local function PlaceSearch()
+	if not holder then return end
+	local border = map.BorderFrame
+	local buttons = SearchButtons(border)
+	box:ClearAllPoints()
+	if buttons then box:SetPoint("RIGHT", buttons, "LEFT", -SEARCH_GAP, 0) else box:SetPoint("TOPRIGHT", map, "TOPRIGHT", -80, -2) end
+	local w = SearchWidth(border, buttons)
+	if math.abs((box:GetWidth() or 0) - w) > 0.5 then box:SetWidth(w) end
+	holder.placed = { map:GetWidth(), map:GetHeight(), buttons }
+end
+local function SearchShown()
+	return map:IsShown() and mod.enabled and mod.IsStitched() and not (mod.PadViewOn and mod.PadViewOn()) or false
+end
+local function RefreshSearch()
+	if not holder then return end
+	local on = SearchShown()
+	if not on and box:HasFocus() then box:ClearFocus() end
+	if not on then list:Hide() end
+	holder:SetShown(on)
+	if not on then return end
+	local p = holder.placed
+	local border = map.BorderFrame
+	if not p or p[1] ~= map:GetWidth() or p[2] ~= map:GetHeight() or p[3] ~= SearchButtons(border) then PlaceSearch() end
+end
+mod.RefreshTitleSearch = RefreshSearch
+
+function mod.SetupTitleSearch(worldMap)
+	map = map or worldMap
+	if holder or box or not worldMap or not worldMap.BorderFrame then return end
+	-- (made out of combat: the map is a protected window then)
+	if InCombatLockdown() then
+		local waiter = {}
+		ns.RegisterEvent(waiter, "PLAYER_REGEN_ENABLED", function()
+			ns.UnregisterEvent(waiter, "PLAYER_REGEN_ENABLED")
+			mod.SetupTitleSearch(worldMap)
+		end)
+		return
+	end
+	holder = CreateFrame("Frame", nil, worldMap)
+	holder:SetAllPoints(worldMap)
+	holder:EnableMouse(false)
+	-- (over the title bar's art and its drag strip, Window.lua's at the map's level + 5)
+	local border = worldMap.BorderFrame
+	local level = math.max(worldMap:GetFrameLevel() + 8, (border.GetFrameLevel and border:GetFrameLevel() or 0) + 3)
+	holder:SetFrameLevel(level)
+	mod.CreateSearch(holder, SEARCH_MAX)
+	box:SetFrameLevel(level + 1)
+	holder:Hide()
+	-- (whether OpenMap's map is up, and the window's size and buttons, checked a few times a second while the map is
+	-- open: they change with every map, full screen, the quest log, a drag of a corner)
+	local watch = CreateFrame("Frame", nil, worldMap)
+	local wait = 0
+	watch:SetScript("OnUpdate", function(_, elapsed)
+		wait = wait - elapsed
+		if wait > 0 then return end
+		wait = 0.2
+		RefreshSearch()
+	end)
+	worldMap:HookScript("OnShow", RefreshSearch)
+	RefreshSearch()
+end
+
+-- the key binding's: the map opened if it's closed, then the search typed into
+function mod.FocusSearch()
+	if not box then return end
+	local function focus()
+		RefreshSearch()
+		if holder and holder:IsShown() then box:SetFocus() box:HighlightText() end
+	end
+	if map:IsShown() then focus() return end
+	if InCombatLockdown() then return end          -- (as the menu's buttons: no opening the map in combat)
+	ToggleWorldMap()
+	C_Timer.After(0, function() if map:IsShown() then focus() end end)
 end
 
 --------------------------------------------------------------------------------
@@ -934,6 +1038,7 @@ function mod:SetupNav(worldMap)
 		rosterWait = 0.5
 		RefreshGroup()
 	end)
+	mod.SetupTitleSearch(map)
 end
 
 function mod:NavOptions(opts, get, set, off)

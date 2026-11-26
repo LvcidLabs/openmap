@@ -19,6 +19,9 @@
 
 ### Improved
 
+- **The search is on the map's title bar**: "Find a place" sits at the top of the map window, left of its buttons,
+  whenever OpenMap's map is up, in a small window and full screen alike, instead of inside the menu. A key binding
+  types straight into it (Key Bindings > OpenMap: Find a place), opening the map first if it's closed.
 - **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
   map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
   minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map"). By Lvcidx0.

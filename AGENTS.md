@@ -65,6 +65,7 @@ python -P tools/offline-test/bosses.py
 python -P tools/offline-test/perf.py
 python -P tools/offline-test/flights.py
 python -P tools/offline-test/menutoggle.py
+python -P tools/offline-test/search.py
 ```
 
 All must pass, and the first eight again with `OPENMAP_CLIENT=retail` (retail's toc: one branch holds

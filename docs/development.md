@@ -179,8 +179,8 @@ Blizzard's, cut, masked or hand-edited; facts come from the game's tables or a c
 - **Blend modes**: `MOD` multiplies opacity too (the map turns see-through); masks
   (`MaskTexture`) and plain blends instead.
 - **A region at alpha 0 still costs its full size to draw**: hide it (`Fade` in Stitch.lua).
-- **Order of setup** in `WorldMap.lua` matters (the menu holds Nav's search box, so Nav
-  first). Each step of `Close.lua`'s view update is isolated (`Try`), so one failure
+- **Order of setup** in `WorldMap.lua` matters (Nav before the menu, which reads its
+  pieces). Each step of `Close.lua`'s view update is isolated (`Try`), so one failure
   doesn't take the rest down; failures show in `/openmap status`.
 - **Taint**: never write to Blizzard's layout tables or call protected functions; hook
   with `hooksecurefunc` or a data provider. Map switching waits out combat.
