@@ -1463,15 +1463,18 @@ end
 -- one part of the setup, its time kept (ns.loadMs.parts: /openmap status)
 -- /openmap bisect (a test build's): parts of OpenMap's map left out at login, by name, to find which one taints
 -- Blizzard's map (#472): the setups below (Timed's names), and Click, Handlers and Provider (what OpenMap registers on
--- Blizzard's map). Kept in mod.db.bisect; a /reload applies it
+-- Blizzard's map). Kept in mod.db.bisect for the version it was set in (a new version starts with everything
+-- on); a /reload applies it
 mod.BISECT = { "Extras", "Flights", "Nav", "Pins", "Friends", "Quests", "Dungeons", "Battlegrounds", "Explore", "News",
 	"Panel", "Paint", "Sketch", "Debug", "Bench", "Gamepad", "Report", "Window", "Compat", "Click", "Handlers", "Provider" }
 function mod.Skipped(name)
 	local s = mod.db and mod.db.bisect
-	return type(s) == "table" and s[name] or false
+	if type(s) ~= "table" then return false end
+	if mod.db.bisectVersion ~= ns.version then mod.db.bisect, mod.db.bisectVersion = nil, nil return false end
+	return s[name] or false
 end
 function mod:Bisect(arg)
-	local s = type(mod.db.bisect) == "table" and mod.db.bisect or {}
+	local s = type(mod.db.bisect) == "table" and mod.db.bisectVersion == ns.version and mod.db.bisect or {}
 	arg = (arg or ""):lower()
 	local known = {}
 	for _, n in ipairs(mod.BISECT) do known[n:lower()] = n end
@@ -1484,6 +1487,7 @@ function mod:Bisect(arg)
 		end
 	end
 	mod.db.bisect = next(s) and s or nil
+	mod.db.bisectVersion = mod.db.bisect and ns.version or nil
 	local off = {}
 	for _, n in ipairs(mod.BISECT) do if s[n] then off[#off + 1] = n end end
 	ns:Print("bisect: left out at login: " .. (#off > 0 and table.concat(off, " ") or "nothing") .. ". Parts: "

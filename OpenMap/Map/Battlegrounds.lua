@@ -172,7 +172,8 @@ end
 
 local function Refresh()
 	local mapID = map:GetMapID()
-	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() then
+	-- (the battleground you're in: Blizzard's own map, nothing of OpenMap's on its canvas, #472)
+	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() and not Inside(mapID) then
 		Show(mapID)
 	else
 		Hide()
@@ -184,6 +185,10 @@ end
 -- a map that isn't stitched to Blizzard
 local function ZoomLevels(self)
 	if not On() or not Data(self.mapID) or mod.IsStitched() then return end
+	-- (not on the map of the battleground you're in, whatever the switch: Blizzard works its canvas's scale out from
+	-- these steps as it resets the map, a right-click on a group dot reads that scale before its handlers, and with
+	-- OpenMap's steps written there Report AFK was blocked, #472. Its map opened from outside still zooms)
+	if Inside(self.mapID) then return end
 	local zl = self.zoomLevels
 	local base = zl and zl[1] and zl[1].scale
 	if not base then return end

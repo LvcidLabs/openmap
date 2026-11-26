@@ -33,7 +33,7 @@ class WindowTests(unittest.TestCase):
         function GetCursorPosition() return cursorX, cursorY end
         function IsMouseButtonDown() return true end
         C_Timer = { After = function(_, fn) fn() end }
-        UIParent = { GetWidth = function() return 1920 end, GetHeight = function() return 1080 end }
+        UIParent = { GetWidth = function() return 1920 end, GetHeight = function() return 1080 end, GetEffectiveScale = function() return 1 end }
 
         local function makeFrame()
             local f = { scripts = {}, width = 100, height = 100, scale = 1, shown = true }
@@ -185,6 +185,32 @@ class WindowTests(unittest.TestCase):
             self.assertIn("SetPoint", calls[0], where)
             self.assertGreater(calls[1], 0, where)                 # (the new size kept)
 
+        # in a battleground or arena: Blizzard's window, laid out by Blizzard. Opening it, its quest log, a size or place
+        # saved, the full-screen width: nothing from here (each left the map's scale or anchors OpenMap's, and Report AFK
+        # from a group dot was blocked, #472). Outside, the saved size is put back again
+        bg = lua.execute('''
+        function IsInInstance() return true, "pvp" end
+        mod.db.window, mod.db.windowSize, mod.db.fullWidth = { "TOPLEFT", "TOPLEFT", 40, -40 }, { 900, 620 }, true
+        testMap.width, testMap.height = 700, 500
+        testMap.calls = {}
+        testMap.scripts.OnShow(testMap)
+        testLog.scripts.OnShow(testLog)
+        local windowed = table.concat(testMap.calls, ",")
+        testMap.IsMaximized = function() return true end
+        testMap.calls = {}
+        testMap.scripts.OnShow(testMap)
+        local maximized = table.concat(testMap.calls, ",") .. ":" .. testMap.width
+        testMap.IsMaximized = function() return false end
+        IsInInstance = nil
+        testMap.calls = {}
+        testMap.scripts.OnShow(testMap)
+        return windowed, maximized, table.concat(testMap.calls, ","), testMap.width
+        ''')
+        self.assertEqual(bg[0], "")
+        self.assertEqual(bg[1], ":700")
+        self.assertIn("Spacer,Refit", bg[2])
+        self.assertEqual(bg[3], 900)
+
 
 
     def test_not_clamped_until_moved_or_sized(self):
@@ -196,6 +222,30 @@ class WindowTests(unittest.TestCase):
         self.assertNotIn("\t\tmap:SetClampedToScreen(true)\n", setup)
         self.assertIn("if mod.db.window or mod.db.windowSize then ClampOn() end", setup)
         self.assertEqual(src.count("ClampOn()"), 3 + 1)      # (setup's, the grip's, the title bar's; and its own definition's name)
+
+
+
+class BisectTests(unittest.TestCase):
+    def test_left_out_only_in_the_version_it_was_set_in(self):
+        # (/openmap bisect, for the test builds: a new version starts with everything on, the parts a test left out
+        # forgotten, so nobody plays on with half of OpenMap off)
+        src = (ROOT / 'Map/WorldMap.lua').read_text(encoding='utf-8')
+        part = src[src.index("mod.BISECT = "):src.index("local function Timed(")]
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.execute('printed = {} ns = { version = "v1", Print = function(_, m) printed[#printed + 1] = m end } mod = { db = {} }')
+        lua.execute(part)
+        lua.execute('mod:Bisect("Window Battlegrounds")')
+        self.assertTrue(lua.eval('mod.Skipped("Window")'))
+        self.assertFalse(lua.eval('mod.Skipped("Nav")'))
+        lua.execute('ns.version = "v2"')
+        self.assertFalse(lua.eval('mod.Skipped("Window")'))
+        self.assertIsNone(lua.eval('mod.db.bisect'))
+        lua.execute('mod:Bisect("Nav")')
+        self.assertTrue(lua.eval('mod.Skipped("Nav")'))
+        self.assertFalse(lua.eval('mod.Skipped("Battlegrounds")'))
+        lua.execute('mod:Bisect("none")')
+        self.assertIsNone(lua.eval('mod.db.bisect'))
+        self.assertIsNone(lua.eval('mod.db.bisectVersion'))
 
 
 if __name__ == "__main__":

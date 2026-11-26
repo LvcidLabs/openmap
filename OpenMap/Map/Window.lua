@@ -90,12 +90,16 @@ local function Refit()
 	end
 end
 
--- the battleground you're in, its window at Blizzard's size: Blizzard has laid its map out, and done again from
--- here its scale would be OpenMap's, which its clicks read (Report AFK blocked, #472). A size of your own needs it
-local function LaidByBlizzard()
-	local inside = mod.InsideBattleground and mod.InsideBattleground(map:GetMapID())
-	return inside and not mod.db.windowSize and not (map.IsMaximized and map:IsMaximized() and mod.db.fullWidth) or false
+-- in a battleground or arena the window is Blizzard's to lay out: its place, size, full-screen width and the
+-- map's fit to it, each done again from here, left the map's scale and anchors OpenMap's, which its clicks
+-- read: Report AFK from a group member's dot was blocked (#472, found by leaving parts out). A size or place
+-- of yours, and the full-screen width, are put back outside; dragging its corners or title bar still works
+local function InPvP()
+	if not IsInInstance then return false end
+	local inside, kind = IsInInstance()
+	return inside and (kind == "pvp" or kind == "arena") or false
 end
+local function LaidByBlizzard() return InPvP() end
 
 local function UpdateSpacer()
 	if not map.UpdateSpacerFrameAnchoring then return end
@@ -124,7 +128,7 @@ local function OffScreen()
 end
 
 local function Apply()
-	if not map or Maximized() or ours or sizing or classicMap then return end
+	if not map or Maximized() or ours or sizing or classicMap or LaidByBlizzard() then return end
 	if Locked() then return end
 	-- (a place or size saved that isn't one, NaN or infinite, or no size at all: forgotten, or the map would
 	-- be put there every time it opens, blank: #260)
@@ -163,7 +167,7 @@ end
 -- maximized: Blizzard keeps the map art's shape (black bars at the sides on a wide
 -- screen); the stitched map is the whole world, so it takes the screen's full width
 FillScreen = function()
-	if not map or not Maximized() or classicMap then return end
+	if not map or not Maximized() or classicMap or LaidByBlizzard() then return end
 	if InCombatLockdown() then afterCombat = true return end
 	if not moveAny and math.abs((map:GetScale() or 1) - 1) > 0.001 then map:SetScale(1) end   -- (the windowed size is the window's)
 	if not mod.db.fullWidth then return end

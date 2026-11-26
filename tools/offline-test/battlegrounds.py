@@ -197,29 +197,17 @@ class BattlegroundTests(unittest.TestCase):
             sc.CreateZoomLevels = function(self) create(self) blizzards = self.zoomLevels end
         """ % instanceID)
 
-    def test_inside_its_battleground_zooms_with_its_minimap(self):
-        # (fd9d707 left its map Blizzard's: Report AFK was blocked all the same, and its detail never came in there;
-        # its zoom steps and tiles are OpenMap's again, as outside)
+    def test_inside_its_battleground_blizzards_map(self):
+        # (its zoom steps never OpenMap's there, switch on or off: Blizzard reads them as it resets the map, the scale a
+        # right-click on a group dot reads; Report AFK was blocked, #472)
         self.enter(489)
-        self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460)")
-        zl = self.lua.eval("sc.zoomLevels")
-        self.assertGreater(len(zl), 1)
-        layer = self.lua.eval("canvas.kids[1]")
-        self.assertFalse(layer.shown)                           # (the whole map: the painted map alone)
-        self.lua.execute("sc.scale = sc.zoomLevels[#sc.zoomLevels].scale map:OnCanvasScaleChanged()")
-        self.assertTrue(layer.shown)
-        self.assertTrue(any(t.shown and t.alpha > 0.5 for t in layer.kids.values() if t.kind == "Texture"))
-        # (switched off there: nothing of Blizzard's map called from OpenMap's code; as Blizzard makes its zoom steps
-        # again on the next opening, OpenMap's aren't written: Blizzard's one, its own, and no tiles; #472)
-        before = self.lua.eval("created")
-        self.lua.execute("mod.SetBattlegroundMaps(false)")
-        self.assertEqual(self.lua.eval("created"), before)
-        self.assertFalse(layer.shown)
-        self.lua.execute("map:SetMap(1460)")
-        self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
+        self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460) sc.scale = 4 map:OnCanvasScaleChanged()")
         self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
-        self.lua.execute("mod.SetBattlegroundMaps(true) map:SetMap(1460)")
-        self.assertGreater(len(self.lua.eval("sc.zoomLevels")), 1)
+        self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
+        self.assertFalse(self.lua.eval("canvas.kids[1] and canvas.kids[1].shown or false"))
+        before = self.lua.eval("created")
+        self.lua.execute("mod.SetBattlegroundMaps(false) mod.SetBattlegroundMaps(true)")
+        self.assertEqual(self.lua.eval("created"), before)
 
     def test_diagnostic(self):
         # (/openmap bg: three lines, on a battleground's map and on another)
