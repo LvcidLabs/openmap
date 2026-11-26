@@ -33,9 +33,8 @@ local function PadUI()
 	return (mod.PadViewOn and mod.PadViewOn()) or (InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()) or false
 end
 local function Data(mapID) return ns.MapBattlegrounds and mapID and ns.MapBattlegrounds[mapID] end
--- (the battleground you're in: no zoom steps or tiles of OpenMap's on its map. Its group dots' right-click,
--- Report AFK, is blocked when Blizzard's code there has read what OpenMap wrote; the zoom steps are one such
--- write, not the only one (WorldMap.lua's Attach, #82, #459). Its map opened from outside still zooms)
+-- (the battleground you're in: WorldMap.lua and Window.lua leave its map's layout and clicks to Blizzard, #472.
+-- Its zoom steps and tiles are OpenMap's, as outside: leaving them out didn't keep Report AFK from being blocked)
 local function Inside(mapID)
 	local bg = Data(mapID)
 	if not bg or not IsInInstance then return false end
@@ -45,7 +44,7 @@ local function Inside(mapID)
 	return instanceID == nil or instanceID == bg[1]
 end
 mod.InsideBattleground = Inside
-local function On(mapID) return mod.db.bgMaps ~= false and not PadUI() and not (mapID and Inside(mapID)) end
+local function On() return mod.db.bgMaps ~= false and not PadUI() end
 function mod.IsBattlegroundMap(mapID) return Data(mapID) ~= nil end
 
 local function Smooth(x, r)
@@ -173,7 +172,7 @@ end
 
 local function Refresh()
 	local mapID = map:GetMapID()
-	if map:IsShown() and On(mapID) and Data(mapID) and not mod.IsStitched() then
+	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() then
 		Show(mapID)
 	else
 		Hide()
@@ -184,7 +183,7 @@ end
 -- to the deepest, a wheel notch apart, as the world map's. After WorldMap.lua's own hook, which leaves
 -- a map that isn't stitched to Blizzard
 local function ZoomLevels(self)
-	if not On(self.mapID) or not Data(self.mapID) or mod.IsStitched() then return end
+	if not On() or not Data(self.mapID) or mod.IsStitched() then return end
 	local zl = self.zoomLevels
 	local base = zl and zl[1] and zl[1].scale
 	if not base then return end
@@ -198,7 +197,7 @@ end
 
 function mod.SetBattlegroundMaps(on)
 	mod.db.bgMaps = on and true or false
-	if map and map:IsShown() and Data(map:GetMapID()) and not Inside(map:GetMapID()) and not InCombatLockdown() then
+	if map and map:IsShown() and Data(map:GetMapID()) and not InCombatLockdown() then
 		sc:CreateZoomLevels()
 		sc:ResetZoom()
 	end
@@ -222,6 +221,29 @@ function mod:BattlegroundOptions(opts, get, set, off)
 		desc = L["A battleground's map zooms in like the world map, and the game's minimap of it shows its detail up close (as Minimap detail is set). Off: the game's own map, as it was."] }
 end
 
+-- /openmap bg: what the map of a battleground has of OpenMap's, to tell why its minimap's detail doesn't show
+function mod:BattlegroundDiag()
+	if not map then ns:Print("Battleground maps: not set up.") return end
+	local mapID = map:GetMapID()
+	local bg = Data(mapID)
+	local zl = sc.zoomLevels
+	local scale = sc.GetCanvasScale and sc:GetCanvasScale()
+	local f = layer and layer:GetParent()
+	local shownTiles = 0
+	for _, t in ipairs(tiles) do if t:IsShown() then shownTiles = shownTiles + 1 end end
+	local inside, kind = IsInInstance()
+	ns:Print(("Battleground map: map %s (%s), inside it %s, instance %s/%s; setting %s, gamepad %s, stitched %s"):format(
+		tostring(mapID), bg and bg[2] or "not a battleground's", tostring(Inside(mapID)), tostring(inside), tostring(kind),
+		tostring(mod.db.bgMaps ~= false), tostring(PadUI()), tostring(mod.IsStitched())))
+	ns:Print(("  zoom steps %d (%s to %s), scale %s, zoom %.2f of %.1f; wheel %s, in a fight %s"):format(zl and #zl or 0,
+		tostring(zl and zl[1] and zl[1].scale), tostring(zl and zl[#zl] and zl[#zl].scale), tostring(scale), Zoom(),
+		bg and Deepest(mapID) or 0, tostring(sc.mouseWheelZoomMode), tostring(InCombatLockdown())))
+	ns:Print(("  detail: Minimap %s, strength %s, deepest %s; now %.2f; tiles %d of %d shown, layer %s, canvas %sx%s, up for %s"):format(
+		tostring(mod.db.minimap), tostring(mod.db.minimapMix), tostring(mod.db.minimapDeep), bg and Mix(mapID, Zoom()) or 0,
+		shownTiles, #tiles, tostring(layer and layer:IsShown()), tostring(f and f:GetWidth()), tostring(f and f:GetHeight()),
+		tostring(shownID)))
+end
+
 function mod:SetupBattlegrounds(worldMap)
 	if not ns.MapBattlegrounds then return end
 	map, sc = worldMap, worldMap.ScrollContainer
@@ -232,7 +254,7 @@ function mod:SetupBattlegrounds(worldMap)
 	map:HookScript("OnShow", Refresh)
 	map:HookScript("OnHide", Hide)
 	if map:IsShown() then
-		if Data(map:GetMapID()) and not Inside(map:GetMapID()) then sc:CreateZoomLevels() end
+		if Data(map:GetMapID()) then sc:CreateZoomLevels() end
 		Refresh()
 	end
 end

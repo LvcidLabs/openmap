@@ -197,18 +197,38 @@ class BattlegroundTests(unittest.TestCase):
             sc.CreateZoomLevels = function(self) create(self) blizzards = self.zoomLevels end
         """ % instanceID)
 
-    def test_inside_its_battleground_blizzards_map(self):
-        # (its group dots' Report AFK is Blizzard's only: OpenMap's zoom steps on its map blocked it)
+    def test_inside_its_battleground_zooms_with_its_minimap(self):
+        # (fd9d707 left its map Blizzard's: Report AFK was blocked all the same, and its detail never came in there;
+        # its zoom steps and tiles are OpenMap's again, as outside)
         self.enter(489)
-        self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460) sc.scale = 4 map:OnCanvasScaleChanged()")
-        self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
+        self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460)")
+        zl = self.lua.eval("sc.zoomLevels")
+        self.assertGreater(len(zl), 1)
+        layer = self.lua.eval("canvas.kids[1]")
+        self.assertFalse(layer.shown)                           # (the whole map: the painted map alone)
+        self.lua.execute("sc.scale = sc.zoomLevels[#sc.zoomLevels].scale map:OnCanvasScaleChanged()")
+        self.assertTrue(layer.shown)
+        self.assertTrue(any(t.shown and t.alpha > 0.5 for t in layer.kids.values() if t.kind == "Texture"))
+        # (the setting switched there: its zoom steps made again)
+        self.lua.execute("mod.SetBattlegroundMaps(false)")
         self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
-        self.assertFalse(self.lua.eval("canvas.kids[1] and canvas.kids[1].shown or false"))
-        # (the setting switched there: Blizzard's zoom steps not made again from OpenMap's code)
-        before = self.lua.eval("created")
-        self.lua.execute("mod.SetBattlegroundMaps(false) mod.SetBattlegroundMaps(true)")
-        self.assertEqual(self.lua.eval("created"), before)
-        self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
+        self.lua.execute("mod.SetBattlegroundMaps(true)")
+        self.assertGreater(len(self.lua.eval("sc.zoomLevels")), 1)
+
+    def test_diagnostic(self):
+        # (/openmap bg: three lines, on a battleground's map and on another)
+        self.lua.execute("""
+            printed = {}
+            function ns:Print(t) printed[#printed + 1] = t end
+            function IsInInstance() return true, "pvp" end
+            map:Show() map:SetMap(1460) mod:BattlegroundDiag()
+            names[1413] = 'The Barrens' map:SetMap(1413) mod:BattlegroundDiag()
+        """)
+        printed = list(self.lua.eval("printed").values())
+        self.assertEqual(len(printed), 6)
+        self.assertIn("Warsong Gulch", printed[0])
+        self.assertIn("zoom steps", printed[1])
+        self.assertIn("not a battleground's", printed[3])
 
     def test_inside_one_another_still_zooms(self):
         # (Alterac Valley's map looked at from Warsong Gulch: not the one you're in)

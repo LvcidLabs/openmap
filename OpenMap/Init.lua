@@ -54,6 +54,7 @@ local function Slash(msg)
 		welcome = "ShowWelcome", highlights = "Highlights", warm = "ToggleWarm",
 		reset = "ResetWindow",   -- (reset: the windowed map's size and place, for one off the screen)
 		combatcheck = "CombatCheck",   -- (the map in a fight, OwnView.lua: where its frames are, saved for a report)
+		bg = "BattlegroundDiag",   -- (a battleground's map: its zoom steps and minimap detail, Battlegrounds.lua)
 	}
 	-- (the controller view's diagnostics: it runs while OpenMap's usual map is off, PadView.lua)
 	if msg == "padview" and mod.PadViewDiag then return mod.PadViewDiag() end
