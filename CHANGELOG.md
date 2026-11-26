@@ -22,6 +22,11 @@
 - **The search is on the map's title bar**: "Find a place" sits at the top of the map window, left of its buttons,
   whenever OpenMap's map is up, in a small window and full screen alike, instead of inside the menu. A key binding
   types straight into it (Key Bindings > OpenMap: Find a place), opening the map first if it's closed.
+- **The search finds much more**: as well as zones, dungeons, flight masters and battlegrounds, the areas in each
+  zone (Goldshire, the Crossroads ...), caves, boats, zeppelins and airships by their route, and your map pins by
+  their notes. With Questie: its NPCs, objects and quests by name (a quest shows who gives it and who takes it in),
+  and the townsfolk by kind (Innkeepers, Vendors ...: picking one shows them on the map). Something at several
+  places is marked at each, and the map shows them all. Up to 12 results, grouped by kind, at most 4 of a kind.
 - **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
   map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
   minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map"). By Lvcidx0.

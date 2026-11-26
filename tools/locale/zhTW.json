@@ -579,5 +579,11 @@
  "Right-click: edit it": "右鍵點擊：編輯",
  "Right-click: open its card": "右鍵點擊：開啟資訊卡",
  "TomTom waypoint too": "同時設定 TomTom 路徑點",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "在地圖上追蹤的標記除了 Blizzard 的路徑點之外，也會設定 TomTom 的路徑點與箭頭。"
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "在地圖上追蹤的標記除了 Blizzard 的路徑點之外，也會設定 TomTom 的路徑點與箭頭。",
+ "Area": "地點",
+ "Cave": "洞穴",
+ "NPC": "NPC",
+ "Quest": "任務",
+ "Object": "物件",
+ "Not on the map: %s": "不在地圖上：%s"
 }

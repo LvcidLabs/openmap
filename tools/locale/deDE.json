@@ -583,5 +583,11 @@
  "Right-click: edit it": "Rechtsklick: bearbeiten",
  "Right-click: open its card": "Rechtsklick: Markierungsfenster öffnen",
  "TomTom waypoint too": "Auch TomTom-Wegpunkt",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Eine Markierung, der Ihr auf der Karte folgt, setzt neben dem Wegpunkt von Blizzard auch den Wegpunkt und Pfeil von TomTom."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Eine Markierung, der Ihr auf der Karte folgt, setzt neben dem Wegpunkt von Blizzard auch den Wegpunkt und Pfeil von TomTom.",
+ "Area": "Gebiet",
+ "Cave": "Höhle",
+ "NPC": "NSC",
+ "Quest": "Quest",
+ "Object": "Objekt",
+ "Not on the map: %s": "Nicht auf der Karte: %s"
 }

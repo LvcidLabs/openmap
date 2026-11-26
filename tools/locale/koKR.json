@@ -579,5 +579,11 @@
  "Right-click: edit it": "오른쪽 클릭: 편집",
  "Right-click: open its card": "오른쪽 클릭: 카드 열기",
  "TomTom waypoint too": "TomTom 이동 지점도",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "지도에서 추적하는 핀이 블리자드의 이동 지점과 함께 TomTom의 이동 지점과 화살표도 설정합니다."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "지도에서 추적하는 핀이 블리자드의 이동 지점과 함께 TomTom의 이동 지점과 화살표도 설정합니다.",
+ "Area": "장소",
+ "Cave": "동굴",
+ "NPC": "NPC",
+ "Quest": "퀘스트",
+ "Object": "물체",
+ "Not on the map: %s": "지도에 없음: %s"
 }

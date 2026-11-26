@@ -579,5 +579,11 @@
  "Right-click: edit it": "Clique direito: editar",
  "Right-click: open its card": "Clique direito: abrir o cartão",
  "TomTom waypoint too": "Ponto de rota do TomTom também",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Um marcador que você segue no mapa define também o ponto de rota e a seta do TomTom, além dos da Blizzard."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Um marcador que você segue no mapa define também o ponto de rota e a seta do TomTom, além dos da Blizzard.",
+ "Area": "Área",
+ "Cave": "Caverna",
+ "NPC": "PNJ",
+ "Quest": "Missão",
+ "Object": "Objeto",
+ "Not on the map: %s": "Não está no mapa: %s"
 }

@@ -579,5 +579,11 @@
  "Right-click: edit it": "Правый щелчок: изменить",
  "Right-click: open its card": "Правый щелчок: открыть карточку",
  "TomTom waypoint too": "Путевая точка TomTom тоже",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Метка, которую вы отслеживаете на карте, ставит не только путевую точку Blizzard, но и путевую точку со стрелкой TomTom."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Метка, которую вы отслеживаете на карте, ставит не только путевую точку Blizzard, но и путевую точку со стрелкой TomTom.",
+ "Area": "Местность",
+ "Cave": "Пещера",
+ "NPC": "НИП",
+ "Quest": "Задание",
+ "Object": "Объект",
+ "Not on the map: %s": "Нет на карте: %s"
 }

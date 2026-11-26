@@ -344,9 +344,27 @@ end
 -- Search
 --------------------------------------------------------------------------------
 
-local places                    -- { name, lower, kind, u0, v0, u1, v1 } or a point (u0 == u1)
+-- What it finds: the world's continents and zones, dungeons and raids, flight masters, battlegrounds (their own
+-- map opens), boats and zeppelins, caves, the areas of each zone (Goldshire, the Crossroads ...), your map pins by
+-- their notes; and with Questie, its database's NPCs, objects and quests (a quest: where it's given and handed in),
+-- and its townsfolk by kind (Innkeepers ...: that kind turned on, Townsfolk.lua). Questie's tables are only read,
+-- through its own queries, a few hundred a frame the first time the search is used, never written.
+local places                    -- { name, lower, kind, u0, v0, u1, v1 } (u0 == u1: a point), or { pts = { { u, v } ... } },
+                                -- or { open = uiMapID }, { show = townsfolk kind }, { q = "npc" | "object" | "quest", ids }
 local box, list
-local MAX_RESULTS = 8
+local MAX_RESULTS = 12
+local PER_KIND = 4              -- (so a word that's in hundreds of NPCs' names leaves room for the rest)
+local MAX_PINGS = 40
+local CHUNK = 400               -- Questie's records indexed a frame
+-- the kinds' order in the list: places first, then what's at them
+local RANK = {}
+local function Rank(kind) return RANK[kind] or 50 end
+
+local function Entry(name, kind, e)
+	e = e or {}
+	e.name, e.lower, e.kind = name, name:lower(), kind
+	return e
+end
 
 local function Places()
 	if places then return places end
@@ -357,7 +375,25 @@ local function Places()
 		local key = kind .. name
 		if seen[key] then return end
 		seen[key] = true
-		places[#places + 1] = { name = name, lower = name:lower(), kind = kind, u0, v0, u1 or u0, v1 or v0 }
+		places[#places + 1] = Entry(name, kind, { u0, v0, u1 or u0, v1 or v0 })
+	end
+	-- several places by one name (a route's docks): one entry, every place pinged
+	local multi = {}
+	local function addAt(name, kind, u, v)
+		if not name or name == "" or not u then return end
+		local key = kind .. name
+		local e = multi[key]
+		if not e then
+			e = Entry(name, kind, { pts = {} })
+			multi[key] = e
+			places[#places + 1] = e
+		end
+		for _, p in ipairs(e.pts) do if math.abs(p[1] - u) < 1e-4 and math.abs(p[2] - v) < 1e-4 then return end end
+		e.pts[#e.pts + 1] = { u, v }
+	end
+	for i, k in ipairs({ L["Continent"], L["Zone"], L["Battleground"], L["Dungeon"], L["Raid"], L["Area"], L["Cave"],
+		L["Flight master"], L["Boat"], L["Zeppelin"], L["Airship"], L["Map pin"], L["Townsfolk"], L["NPC"], L["Quest"], L["Object"] }) do
+		RANK[k] = RANK[k] or i
 	end
 	for _, kind in ipairs({ Enum.UIMapType.Continent, Enum.UIMapType.Zone }) do
 		for _, info in ipairs(C_Map.GetMapChildrenInfo(S.WORLD, kind, true) or {}) do
@@ -365,7 +401,8 @@ local function Places()
 			if l then add(info.name, kind == Enum.UIMapType.Continent and L["Continent"] or L["Zone"], l, t, r, b) end
 		end
 	end
-	for _, g in ipairs((ns.MapPlaces or {}).instances or {}) do
+	local data = ns.MapPlaces or {}
+	for _, g in ipairs(data.instances or {}) do
 		local u, v
 		if S.EntranceAt then u, v = S.EntranceAt(g) else u, v = S.FromYards(g[1], g[2], g[3]) end   -- (Dungeons.lua)
 		if u then
@@ -376,23 +413,209 @@ local function Places()
 		local u, v = S.FromYards(node[2], node[3], node[4])
 		add(node[1], L["Flight master"], u, v)
 	end
+	-- boats, zeppelins and airships by their route ("Booty Bay - Ratchet"): both docks (Data's transports)
+	local TRANSPORT = { boat = L["Boat"], zeppelin = L["Zeppelin"], airship = L["Airship"] }
+	for _, t in ipairs(data.transports or {}) do
+		local kind = TRANSPORT[t[1]]
+		if kind then
+			addAt(t[2], kind, S.FromYards(t[3], t[4], t[5]))
+			addAt(t[2], kind, S.FromYards(t[6], t[7], t[8]))
+		end
+	end
+	-- caves (Blizzard's micro maps, Data's Caves): the middle of each
+	for _, c in pairs(ns.MapCaves or {}) do
+		addAt(c[1], L["Cave"], S.FromYards(c[2], (c[3] + c[5]) / 2, (c[4] + c[6]) / 2))
+	end
+	-- the areas of each zone, by the game's names (AreaTable): where to stand to explore them (Data's Explore), and
+	-- the painted land of WoW Forever's own (Data's GapPlaces)
+	local explore = ns.MapExplore
+	if explore and explore.pieces and mod.ToWorld and C_Map.GetAreaInfo then
+		local zoneOf = {}
+		for ach, a in pairs(explore.achievements or {}) do zoneOf[ach] = a[1] end
+		for _, pieces in pairs(explore.pieces) do
+			for _, p in pairs(pieces) do
+				local zone = zoneOf[p[1]]
+				if zone and p[3] then
+					local u, v = mod.ToWorld(zone, p[3], p[4])
+					for _, area in ipairs(p[2] or {}) do add(C_Map.GetAreaInfo(area), L["Area"], u, v) end
+				end
+			end
+		end
+	end
+	for _, g in ipairs(ns.MapGapPlaces or {}) do
+		if g[4] then add(g[2], L["Area"], g[4][1], g[4][2]) end
+	end
 	-- battlegrounds: no place on the world, their own map opens (Battlegrounds.lua)
 	for _, bg in ipairs(mod.BattlegroundPlaces and mod.BattlegroundPlaces() or {}) do
-		places[#places + 1] = { name = bg.name, lower = bg.name:lower(), kind = L["Battleground"], open = bg.mapID }
+		places[#places + 1] = Entry(bg.name, L["Battleground"], { open = bg.mapID })
+	end
+	-- townsfolk by kind, from Questie (Townsfolk.lua): found, that kind is turned on
+	if mod.TOWNSFOLK and mod.HasTownsfolk and mod.HasTownsfolk() then
+		for _, k in ipairs(mod.TOWNSFOLK) do places[#places + 1] = Entry(k.name, L["Townsfolk"], { show = k.key }) end
 	end
 	return places
 end
 
--- a marker on what was found, for a few seconds
+-- your map pins, by their notes (Pins.lua): read each time, they change
+local function PinPlaces()
+	local out = {}
+	local db = mod.db.pins
+	for _, p in ipairs(db and db.list or {}) do
+		if p.note and p.note ~= "" and p.map and mod.ToWorld then
+			local u, v = mod.ToWorld(p.map, p.x, p.y)
+			if u then out[#out + 1] = Entry(p.note, L["Map pin"], { u, v, u, v }) end
+		end
+	end
+	return out
+end
+
+-- Questie's database, if it's loaded: its NPCs', objects' and quests' names, indexed a chunk a frame
+local QUESTIE_KIND = { npc = "NPC", object = "Object", quest = "Quest" }
+local questie = { list = {}, state = nil }      -- state: nil (not begun), "building", "done", "none"
+local function QuestieDBs()
+	local loader = _G.QuestieLoader
+	if not loader or type(loader.ImportModule) ~= "function" then return end
+	local ok, db = pcall(loader.ImportModule, loader, "QuestieDB")
+	local ok2, zones = pcall(loader.ImportModule, loader, "ZoneDB")
+	if ok and ok2 and type(db) == "table" and type(zones) == "table" and db.QueryNPCSingle then return db, zones end
+end
+local ShowResults
+local function IndexQuestie()
+	if questie.state then return end
+	local QDB = QuestieDBs()
+	if not QDB or not QDB.NPCPointers then questie.state = "none" return end
+	questie.state = "building"
+	local todo = {}
+	local function queue(kind, pointers, query)
+		if type(pointers) ~= "table" or type(query) ~= "function" then return end
+		for id in pairs(pointers) do todo[#todo + 1] = { kind, id, query } end
+	end
+	queue("npc", QDB.NPCPointers, QDB.QueryNPCSingle)
+	queue("object", QDB.ObjectPointers, QDB.QueryObjectSingle)
+	queue("quest", QDB.QuestPointers, QDB.QueryQuestSingle)
+	local i, seen = 0, {}
+	local function Step()
+		local ok, err = pcall(function()
+			for _ = 1, CHUNK do
+				i = i + 1
+				local t = todo[i]
+				if not t then questie.state = "done" return end
+				local kind, id, query = t[1], t[2], t[3]
+				local name = query(id, "name")
+				-- (only what has a place: an NPC or object with spawns, a quest with someone to give it)
+				local where = query(id, kind == "quest" and "startedBy" or "spawns")
+				if type(name) == "string" and name ~= "" and type(where) == "table" and next(where) then
+					-- (one entry for every record of one name, as Questie keeps some: Spirit Healers, a quest of each
+					-- faction's: all their places)
+					local key = kind .. name
+					local e = seen[key]
+					if e then
+						e.ids[#e.ids + 1] = id
+					else
+						e = Entry(name, L[QUESTIE_KIND[kind]], { q = kind, ids = { id } })
+						seen[key] = e
+						questie.list[#questie.list + 1] = e
+					end
+				end
+			end
+		end)
+		if not ok then
+			questie.state = "done"
+			geterrorhandler()(err)
+		end
+		if box and box:HasFocus() and ShowResults then ShowResults() end
+		if questie.state == "building" then C_Timer.After(0, Step) end
+	end
+	C_Timer.After(0, Step)
+end
+mod.IndexQuestieSearch = IndexQuestie
+
+-- where a Questie record is on the world (normalized points): its spawns (an NPC that walks about, every point of
+-- its path among them: the one nearest their middle), or a quest's givers' and hand-ins'
+local WANDER = 6
+local function Spawns(QDB, ZoneDB, spawns, out, walker)
+	for areaID, coords in pairs(type(spawns) == "table" and spawns or {}) do
+		local uiMapID = ZoneDB.GetUiMapIdByAreaId and ZoneDB:GetUiMapIdByAreaId(areaID)
+		local l, r, t, b
+		if uiMapID then l, r, t, b = S.Rect(uiMapID) end
+		if l and type(coords) == "table" then
+			local pts = {}
+			for _, c in ipairs(coords) do
+				if type(c) == "table" and c[1] and c[1] >= 0 then pts[#pts + 1] = { l + c[1] / 100 * (r - l), t + c[2] / 100 * (b - t) } end
+			end
+			if walker and #pts > WANDER then
+				local su, sv = 0, 0
+				for _, p in ipairs(pts) do su, sv = su + p[1], sv + p[2] end
+				su, sv = su / #pts, sv / #pts
+				table.sort(pts, function(a, b2) return (a[1] - su) ^ 2 + (a[2] - sv) ^ 2 < (b2[1] - su) ^ 2 + (b2[2] - sv) ^ 2 end)
+				pts = { pts[1] }
+			end
+			for _, p in ipairs(pts) do out[#out + 1] = p end
+		end
+	end
+	return out
+end
+local function QuestiePoints(e)
+	local QDB, ZoneDB = QuestieDBs()
+	if not QDB then return {} end
+	local out = {}
+	local function npcs(ids) for _, id in ipairs(type(ids) == "table" and ids or {}) do Spawns(QDB, ZoneDB, QDB.QueryNPCSingle(id, "spawns"), out, true) end end
+	local function objects(ids)
+		if not QDB.QueryObjectSingle then return end
+		for _, id in ipairs(type(ids) == "table" and ids or {}) do Spawns(QDB, ZoneDB, QDB.QueryObjectSingle(id, "spawns"), out) end
+	end
+	if e.q == "npc" then
+		npcs(e.ids)
+	elseif e.q == "object" then
+		objects(e.ids)
+	elseif e.q == "quest" and QDB.QueryQuestSingle then
+		-- (Questie's startedBy: { NPCs, objects, items }; finishedBy: { NPCs, objects })
+		for _, id in ipairs(e.ids) do
+			for _, by in ipairs({ QDB.QueryQuestSingle(id, "startedBy"), QDB.QueryQuestSingle(id, "finishedBy") }) do
+				if type(by) == "table" then npcs(by[1]) objects(by[2]) end
+			end
+		end
+	end
+	-- (the same place twice, a giver who takes it in too: once)
+	local once, seenAt = {}, {}
+	for _, p in ipairs(out) do
+		local key = math.floor(p[1] * 1e5) .. ":" .. math.floor(p[2] * 1e5)
+		if not seenAt[key] then seenAt[key] = true once[#once + 1] = p end
+	end
+	return once
+end
+
+-- markers on what was found, for a few seconds
 local pingSet, pingTimer
 local PING = { atlas = "Waypoint-MapPin-Untracked", texture = "Interface\\Minimap\\Ping\\ping5", size = 30 }
-local function Ping(u, v)
+local function Ping(pts)
 	if not pingSet then return end
 	S.ClearPinSet(pingSet)
-	local pin = S.AddPin(pingSet, u, v, PING)
-	pin:EnableMouse(false)
+	for i, p in ipairs(pts) do
+		if i > MAX_PINGS then break end
+		local pin = S.AddPin(pingSet, p[1], p[2], PING)
+		pin:EnableMouse(false)
+	end
 	if pingTimer then pingTimer:Cancel() end
 	pingTimer = C_Timer.NewTimer(5, function() S.ClearPinSet(pingSet) end)
+end
+
+-- the least box several places are shown in (normalized: about a small zone's size)
+local MIN_SPAN = 0.012
+local function GoTo(pts)
+	if #pts == 0 then return false end
+	if #pts == 1 then
+		mod.Glide(pts[1][1], pts[1][2], math.max(14, select(3, mod.ViewNow()) or 1))
+	else
+		local u0, v0, u1, v1 = math.huge, math.huge, -math.huge, -math.huge
+		for _, p in ipairs(pts) do
+			u0, v0, u1, v1 = math.min(u0, p[1]), math.min(v0, p[2]), math.max(u1, p[1]), math.max(v1, p[2])
+		end
+		local du, dv = math.max(0, MIN_SPAN - (u1 - u0)) / 2, math.max(0, MIN_SPAN - (v1 - v0)) / 2
+		S.GlideToRect(u0 - du, v0 - dv, u1 + du, v1 + dv, 0.8)
+	end
+	Ping(pts)
+	return true
 end
 
 local function Go(p)
@@ -400,9 +623,16 @@ local function Go(p)
 	list:Hide()
 	if p.open then
 		S.OpenMap(p.open)
+	elseif p.show then
+		mod.db.townsfolk[p.show] = true
+		if mod.RefreshTownsfolk then mod:RefreshTownsfolk() end
+		if mod.RefreshPanel then mod:RefreshPanel() end
+	elseif p.q then
+		if not GoTo(QuestiePoints(p)) then ns:Print(L["Not on the map: %s"]:format(p.name)) end
+	elseif p.pts then
+		GoTo(p.pts)
 	elseif p[1] == p[3] then
-		mod.Glide(p[1], p[2], math.max(14, select(3, mod.ViewNow()) or 1))
-		Ping(p[1], p[2])
+		GoTo({ { p[1], p[2] } })
 	else
 		S.GlideToRect(p[1], p[2], p[3], p[4], 0.95)
 	end
@@ -410,20 +640,45 @@ end
 
 local function Results(text)
 	text = (text or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
-	local out = {}
-	if #text < 2 then return out end
-	for _, p in ipairs(Places()) do
-		local at = p.lower:find(text, 1, true)
-		if at then out[#out + 1] = { p, at == 1 and 0 or 1 } end
+	local found = {}
+	if #text < 2 then return found end
+	local function scan(entries)
+		for _, p in ipairs(entries) do
+			local at = p.lower:find(text, 1, true)
+			if at then found[#found + 1] = { p, at == 1 and 0 or 1 } end
+		end
 	end
-	table.sort(out, function(a, b)
+	scan(Places())
+	scan(PinPlaces())
+	scan(questie.list)
+	-- the best first (a name starting so, then the shorter), at most PER_KIND of a kind; then grouped by kind
+	table.sort(found, function(a, b)
 		if a[2] ~= b[2] then return a[2] < b[2] end
-		return #a[1].name < #b[1].name
+		if #a[1].name ~= #b[1].name then return #a[1].name < #b[1].name end
+		return a[1].name < b[1].name
+	end)
+	local out, per = {}, {}
+	for _, f in ipairs(found) do
+		local kind = f[1].kind
+		if (per[kind] or 0) < PER_KIND then
+			per[kind] = (per[kind] or 0) + 1
+			out[#out + 1] = f
+			if #out >= MAX_RESULTS then break end
+		end
+	end
+	for i, f in ipairs(out) do f[3] = i end
+	table.sort(out, function(a, b)
+		local ra, rb = Rank(a[1].kind), Rank(b[1].kind)
+		if ra ~= rb then return ra < rb end
+		return a[3] < b[3]
 	end)
 	return out
 end
+mod.SearchResults = Results
 
-local function ShowResults()
+local ROW_W = 260
+function ShowResults()
+	if not (box and list) then return end
 	local found = Results(box:GetText())
 	list.rows = list.rows or {}
 	for _, row in ipairs(list.rows) do row:Hide() end
@@ -432,13 +687,16 @@ local function ShowResults()
 		local row = list.rows[i]
 		if not row then
 			row = CreateFrame("Button", nil, list)
-			row:SetSize(220, 18)
+			row:SetSize(ROW_W, 18)
 			row:SetPoint("TOPLEFT", list.pad[1], -list.pad[2] - (i - 1) * 18)
 			row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
-			row.name = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-			row.name:SetPoint("LEFT", 4, 0)
 			row.kind = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 			row.kind:SetPoint("RIGHT", -4, 0)
+			row.name = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+			row.name:SetPoint("LEFT", 4, 0)
+			row.name:SetPoint("RIGHT", row.kind, "LEFT", -6, 0)
+			row.name:SetJustifyH("LEFT")
+			if row.name.SetWordWrap then row.name:SetWordWrap(false) end
 			row:SetScript("OnClick", function(self) Go(self.place) end)
 			list.rows[i] = row
 		end
@@ -462,12 +720,13 @@ function mod.CreateSearch(parent, width)
 	if box.Instructions then box.Instructions:SetText(L["Find a place"]) end
 	list = CreateFrame("Frame", nil, parent)
 	list:SetPoint("TOPRIGHT", box, "BOTTOMRIGHT", 6, -2)
-	list:SetWidth(240)
+	list:SetWidth(ROW_W + 20)
 	list:SetFrameStrata("FULLSCREEN_DIALOG")      -- (over the menu's tiles below it: they're in its strata)
 	list:EnableMouse(true)
 	list.pad = { Look:Dropdown(list) }              -- (the game's own dropdowns' look)
 	list:Hide()
-	box:HookScript("OnTextChanged", ShowResults)
+	box:HookScript("OnTextChanged", function() IndexQuestie() ShowResults() end)
+	box:HookScript("OnEditFocusGained", IndexQuestie)    -- (Questie's names indexed while you start typing)
 	box:SetScript("OnEnterPressed", function() if list:IsShown() and list.first then Go(list.first) else box:ClearFocus() end end)
 	box:HookScript("OnEscapePressed", function() list:Hide() end)
 	box:HookScript("OnEditFocusLost", function() C_Timer.After(0.2, function() if not box:HasFocus() then list:Hide() end end) end)

@@ -579,5 +579,11 @@
  "Right-click: edit it": "Clic droit : la modifier",
  "Right-click: open its card": "Clic droit : ouvrir sa fiche",
  "TomTom waypoint too": "Point de passage TomTom aussi",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un repère suivi sur la carte place aussi le point de passage et la flèche de TomTom, en plus de ceux de Blizzard."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un repère suivi sur la carte place aussi le point de passage et la flèche de TomTom, en plus de ceux de Blizzard.",
+ "Area": "Lieu",
+ "Cave": "Grotte",
+ "NPC": "PNJ",
+ "Quest": "Quête",
+ "Object": "Objet",
+ "Not on the map: %s": "Pas sur la carte : %s"
 }

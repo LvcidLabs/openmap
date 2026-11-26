@@ -579,5 +579,11 @@
  "Right-click: edit it": "Clic destro: modificala",
  "Right-click: open its card": "Clic destro: aprine il pannello",
  "TomTom waypoint too": "Anche il punto di TomTom",
- "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un segnalino che segui sulla mappa imposta anche il punto e la freccia di TomTom, oltre a quelli di Blizzard."
+ "A pin you follow on the map sets TomTom's waypoint and arrow as well as Blizzard's.": "Un segnalino che segui sulla mappa imposta anche il punto e la freccia di TomTom, oltre a quelli di Blizzard.",
+ "Area": "Area",
+ "Cave": "Grotta",
+ "NPC": "PNG",
+ "Quest": "Missione",
+ "Object": "Oggetto",
+ "Not on the map: %s": "Non è sulla mappa: %s"
 }
