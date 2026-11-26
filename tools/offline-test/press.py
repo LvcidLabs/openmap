@@ -133,12 +133,12 @@ class CtrlClickTests(unittest.TestCase):
             for k, v in pairs(map) do assert(before[k] == v, k) end
         """)
 
-    def test_registered_below_blizzards_handlers(self):
-        # (Blizzard's group dots' handler is priority 0 and its map calls them highest first: OpenMap's after it, #472)
+    def test_registered_ahead_of_blizzards_handlers(self):
+        # (Blizzard's handlers are priority 0, called highest first: OpenMap's Ctrl-click pin before its waypoint, #19)
         import re
         found = re.findall(r'map:AddCanvasClickHandler\(OnCanvasClick, (-?\d+)\)', SOURCE)
         self.assertEqual(len(found), 1)
-        self.assertLess(int(found[0]), 0)
+        self.assertGreater(int(found[0]), 0)
 
     def test_controller_b_still_steps_out_when_turned_off(self):
         self.check("mod.db.rightClickOut = false assert(OnCanvasClick(nil, 'RightButton') == true) assert(glided == 1)")

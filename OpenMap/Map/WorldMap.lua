@@ -1599,10 +1599,10 @@ local function Setup()
 			return up(self, ...)
 		end
 	end
-	-- (below Blizzard's own, priority 0: its group dots' Report AFK handler runs before any of OpenMap's code.
-	-- Its map calls the handlers one after another in one call, and OpenMap's run first may have left the menu
-	-- Blizzard's makes after it as OpenMap's: its report was blocked, #472)
-	map:AddCanvasClickHandler(OnCanvasClick, -1)
+	-- (ahead of Blizzard's own, priority 0: its Ctrl-click waypoint and other addons' handlers come after OpenMap's
+	-- pin and zoom. Run after them for a while (#472), Report AFK was blocked all the same, and a Ctrl-click would
+	-- have been Blizzard's waypoint, not OpenMap's pin; OnCanvasClick passes a right-click on a group dot on)
+	map:AddCanvasClickHandler(OnCanvasClick, 1000)
 	if map.AddGlobalPinMouseActionHandler and MapCanvasMixin and MapCanvasMixin.MouseAction then
 		map:AddGlobalPinMouseActionHandler(OnBlizzardPinAction, 1000)
 	end

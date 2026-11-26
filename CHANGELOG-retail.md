@@ -26,10 +26,10 @@
   as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again (#448). By imigu17.
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
   top of the map when Move Any anchored the window at the bottom. By puschie286.
-- **No "auras ... secret while tainted by OpenMap" error from the quest tracker in a fight**: clicking a quest
+- **Fewer "auras ... secret while tainted by OpenMap" errors from the quest tracker in a fight**: clicking a quest
   on the map, Ctrl-click's waypoint and following a pin set the game's tracking and waypoint from OpenMap's
   code, and in a fight the tracker's next redraw failed. In a fight they're set as it ends now, and the
-  automatic move of a waypoint onto its zone waits (#295).
+  automatic move of a waypoint onto its zone waits. The error can still come from other paths (#295).
 - **Share works on a quest opened from the map**: clicking a quest's icon opens the quest log with the quest
   lit, and its details are your click there. Opened by OpenMap, the details' Share button was blocked (#426).
 

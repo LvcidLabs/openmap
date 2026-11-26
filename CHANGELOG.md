@@ -28,8 +28,7 @@
 ### Fixed
 
 - **Right-click on your group's dots is the game's**: on any map, a right-click on a group member's dot, and any
-  right-click on the map of the battleground you're in, goes to the game (its Report AFK menu in a battleground)
-  rather than zooming out. OpenMap's clicks on the map are now handled after the game's own (#472).
+  right-click on the map of the battleground you're in, is left to the game rather than zooming out (#472).
 - **Townsfolk under quests' icons**: vendors, innkeepers and the other townsfolk are OpenMap's lowest icons now, under
   Questie's "!" and "?" (also one Questie draws below its usual level, which could go under a vendor), OpenMap's
   quest icons, your pins, dungeons, flight masters, your group's dots and your arrow, at every zoom.
@@ -46,10 +45,10 @@
   smaller than the window, they showed the map's edge (57.6, 0.0).
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
   top of the map when Move Any anchored the window at the bottom. By puschie286.
-- **No "auras ... secret while tainted by OpenMap" error from the quest tracker in a fight**: clicking a quest
+- **Fewer "auras ... secret while tainted by OpenMap" errors from the quest tracker in a fight**: clicking a quest
   on the map, Ctrl-click's waypoint and following a pin set the game's tracking and waypoint from OpenMap's
   code, and in a fight the tracker's next redraw failed. In a fight they're set as it ends now, and the
-  automatic move of a waypoint onto its zone waits (#295).
+  automatic move of a waypoint onto its zone waits. The error can still come from other paths (#295).
 - **Share works on a quest opened from the map**: clicking a quest's icon opens the quest log with the quest
   lit, and its details are your click there. Opened by OpenMap, the details' Share button was blocked (#426).
 - **Stormwind sits in Elwynn's map**: the city's map had no cut, so the blank parchment round it covered
