@@ -187,5 +187,16 @@ class WindowTests(unittest.TestCase):
 
 
 
+    def test_not_clamped_until_moved_or_sized(self):
+        # (the clamp is OpenMap's change to Blizzard's window: made at login, every opening read OpenMap's taint on its
+        # anchor and Report AFK from a group dot was blocked in battlegrounds, #472. Only once you move or size it, or a
+        # saved place or size is put back)
+        src = (ROOT / 'Map/Window.lua').read_text(encoding='utf-8')
+        setup = src[src.index("function mod:SetupWindow("):]
+        self.assertNotIn("\t\tmap:SetClampedToScreen(true)\n", setup)
+        self.assertIn("if mod.db.window or mod.db.windowSize then ClampOn() end", setup)
+        self.assertEqual(src.count("ClampOn()"), 3 + 1)      # (setup's, the grip's, the title bar's; and its own definition's name)
+
+
 if __name__ == "__main__":
     unittest.main()

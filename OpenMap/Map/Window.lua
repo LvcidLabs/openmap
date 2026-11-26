@@ -218,12 +218,23 @@ local function FitRightGrip()
 	g:SetFrameLevel(log and 9990 or OverIcons() + 1)
 end
 
+-- (the clamp is OpenMap's change to Blizzard's window: made only once you move or size it, or OpenMap puts back a
+-- place or size you saved. Made at login, every opening of the map read OpenMap's taint on its anchor, "WorldMapFrame:
+-- SetPoint()" in the taint log: Report AFK from a group dot blocked in battlegrounds, #472)
+local clampOn = false
 local function Clamp(w, h)
-	if not map or moveAny or classicMap or InCombatLockdown() then return end
+	if not map or moveAny or classicMap or InCombatLockdown() or not clampOn then return end
 	w, h = w or map:GetWidth(), h or map:GetHeight()
 	if not (w and h) or w <= 0 then return end
 	local side = math.max(0, w - 160)
 	map:SetClampRectInsets(side, -side, -TOP_OFF, math.max(0, h - TOP_OFF - 80))
+end
+
+local function ClampOn()
+	if clampOn or not map or moveAny or classicMap or InCombatLockdown() then return end
+	clampOn = true
+	map:SetClampedToScreen(true)
+	Clamp()
 end
 
 local function Grip(corner)
@@ -243,6 +254,7 @@ local function Grip(corner)
 	local start
 	g:SetScript("OnMouseDown", function()
 		if Maximized() or Locked() then return end
+		ClampOn()
 		local x, y = GetCursorPosition()
 		-- (where the window is, now: not known yet, or the drag would anchor it at 0, 0, bottom left: #241)
 		local l, r, t = map:GetLeft(), map:GetRight(), map:GetTop()
@@ -376,10 +388,10 @@ function mod:SetupWindow(worldMap)
 	if classicMap then
 		if not Maximized() then blizzardSize = { map:GetWidth(), map:GetHeight() } end
 	elseif not moveAny then
-		map:SetClampedToScreen(true)
 		-- partly off the screen: sideways and down while some of it stays on, never up (its title bar is
-		-- what moves it; /openmap reset or the Look tab's Reset size and place bring it back)
-		Clamp()
+		-- what moves it; /openmap reset or the Look tab's Reset size and place bring it back). Clamped once
+		-- you move or size it, or a place or size of yours is put back (ClampOn)
+		if mod.db.window or mod.db.windowSize then ClampOn() end
 		map:HookScript("OnSizeChanged", function() Clamp() end)
 		if not Maximized() then blizzardSize = { map:GetWidth(), map:GetHeight() } end
 
@@ -394,6 +406,7 @@ function mod:SetupWindow(worldMap)
 		handle:SetScript("OnDragStart", function()
 			-- (in combat the map's protected: moving it from here is refused)
 			if Maximized() or (InCombatLockdown() and map:IsProtected()) then return end
+			ClampOn()
 			handle.moving = true
 			map:SetMovable(true)
 			map:StartMoving()
