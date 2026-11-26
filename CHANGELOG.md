@@ -25,6 +25,9 @@
 
 ### Fixed
 
+- **Right-click on your group's dots is the game's**: on any map, a right-click on a group member's dot, and any
+  right-click on the map of the battleground you're in, goes to the game (its Report AFK menu in a battleground)
+  rather than zooming out. OpenMap's clicks on the map are now handled after the game's own (#472).
 - **NeedRoll's and Dungeon Journal's dungeon maps aren't covered**: inside a dungeon or raid, OpenMap's world
   art and icons, and its own view in a fight, were drawn over their maps. They're put away while either is up.
   With NeedRoll's Map in dungeons set to Game, "Dungeon maps inside dungeons" works again.

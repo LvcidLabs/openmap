@@ -1341,7 +1341,29 @@ local function PressTrack()
 end
 local function WasDrag() return press.moved end
 
+-- someone of your group's dot under the cursor (Blizzard's GroupMembersPin; read only, nothing written to it)
+local function GroupDotUnderCursor()
+	for pin in map:EnumeratePinsByTemplate("GroupMembersPinTemplate") do
+		if pin:IsShown() and pin.GetMouseOverUnits then
+			local units = { pcall(pin.GetMouseOverUnits, pin) }
+			for i = 2, units[1] and #units or 0 do
+				local unit = ns.Safe.Value(units[i])
+				if type(unit) == "string" and unit ~= "player" then return true end
+			end
+		end
+	end
+	return false
+end
+
 local function OnCanvasClick(from, button)
+	-- (a right-click on the map of the battleground you're in, or on a group dot anywhere, is never OpenMap's:
+	-- Blizzard's group dots' Report AFK menu and its own way up a map, #472)
+	if from and button == "RightButton" then
+		local mapID = map:GetMapID()
+		if mod.InsideBattleground and mapID and mod.InsideBattleground(mapID) then return false end
+		-- (not on the own view in a fight: Blizzard's dots under it get no click, Nav.lua has its own)
+		if not own.on and GroupDotUnderCursor() then return false end
+	end
 	-- NeedRoll draws over a world-map host: a click must not select a zone underneath it.
 	if mod.instanceWorldHidden then return true end
 	if not active then return false end
@@ -1577,7 +1599,10 @@ local function Setup()
 			return up(self, ...)
 		end
 	end
-	map:AddCanvasClickHandler(OnCanvasClick, 1000)
+	-- (below Blizzard's own, priority 0: its group dots' Report AFK handler runs before any of OpenMap's code.
+	-- Its map calls the handlers one after another in one call, and OpenMap's run first may have left the menu
+	-- Blizzard's makes after it as OpenMap's: its report was blocked, #472)
+	map:AddCanvasClickHandler(OnCanvasClick, -1)
 	if map.AddGlobalPinMouseActionHandler and MapCanvasMixin and MapCanvasMixin.MouseAction then
 		map:AddGlobalPinMouseActionHandler(OnBlizzardPinAction, 1000)
 	end
