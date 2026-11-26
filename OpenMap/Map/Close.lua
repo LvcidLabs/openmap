@@ -133,6 +133,7 @@ end
 --------------------------------------------------------------------------------
 
 local tiles, pool = {}, {}      -- cont * 4096 + index -> { texture }
+local fresh = {}                -- { texture, when it was set }: set lately, not yet loaded (or given up on)
 local TileKey = function(cont, tx, ty) return cont * 4096 + tx * 64 + ty end   -- (a number: no string a tile a frame)
 local wantedTiles, wantedGap = {}, {}   -- (reused each update)
 
@@ -156,6 +157,7 @@ end
 
 local function DropTile(key)
 	local t = tiles[key]
+	t.omGone = nil
 	for _, tex in ipairs(t) do tex:Hide(); S.UnplaceWorld(tex) end
 	tiles[key] = nil
 	pool[#pool + 1] = t
@@ -212,14 +214,40 @@ local function ShowLOD(layer, cont, level, per, keys, tx0, tx1, ty0, ty1, alpha)
 						t = LODPiece(layer, cont, -level)
 						t:SetTexture(LOD .. cont .. "_" .. per .. "_" .. col .. "_" .. row, nil, nil, "LINEAR")
 						lodPieces[key] = t
+						fresh[#fresh + 1] = { t, GetTime() }
 						S.PlaceWorld(t, math.min(u0, u1), math.min(v0, v1), math.max(u0, u1), math.max(v0, v1))
 						t:Show()
 					end
 				end
+				if t then t.omGone = nil end
 				if t and t.omA ~= alpha then t.omA = alpha t:SetAlpha(alpha) end
 			end
 		end
 	end
+end
+
+-- The minimap's detail going out of a view is held a moment, at the strength it had, while what comes in loads: the
+-- game draws nothing of a texture until its file is in, and the parchment showed through at each hand-over between
+-- the game's tiles and the smaller copies, and each new piece coming into view (with Always, from the whole world, at
+-- every zoom step). Held at least HOLD, longer while something new hasn't loaded (IsObjectLoaded), never past
+-- HOLD_MOST; then let go, the view looked at again for it (a timer, once)
+local HOLD, HOLD_MOST = 0.3, 1.2
+local function Loaded(tex) return not tex.IsObjectLoaded or tex:IsObjectLoaded() end
+local function Held(t, now, waiting)
+	if not t.omGone then t.omGone = now end
+	local age = now - t.omGone
+	return age < HOLD or (waiting and age < HOLD_MOST)
+end
+S.MinimapHeld = Held            -- (tools/offline-test/caves.py)
+local againSoon = false
+local function LookAgain()
+	if againSoon then return end
+	againSoon = true
+	C_Timer.After(0.1, function()
+		againSoon = false
+		local a = S.closeView.args
+		if a and S.SetView then S.SetView(a[1], a[2], a[3], a[4], a[5], a[6]) end
+	end)
 end
 
 local function UpdateMinimap(layer, conts, u, v, hu, hv, mix)
@@ -267,12 +295,14 @@ local function UpdateMinimap(layer, conts, u, v, hu, hv, mix)
 							if not t then
 								t = Tile(layer, fid, cont)
 								tiles[key] = t
+								fresh[#fresh + 1] = { t[1], GetTime() }
 								t[1]:SetVertexColor(TileTone((u0 + u1) / 2, (v0 + v1) / 2))
 								for _, tex in ipairs(t) do
 									S.PlaceWorld(tex, math.min(u0, u1), math.min(v0, v1), math.max(u0, u1), math.max(v0, v1))
 									tex:Show()
 								end
 							end
+							t.omGone = nil
 							if t.omA ~= a3 then t.omA = a3 t[1]:SetAlpha(a3) end
 						end
 					end
@@ -280,16 +310,34 @@ local function UpdateMinimap(layer, conts, u, v, hu, hv, mix)
 			end
 		end
 	end
-	for key in pairs(tiles) do
-		if not wanted[key] then DropTile(key) end
+	-- (what's gone from the view: held while what came in loads, then let go)
+	local now = GetTime()
+	local waiting = false
+	for i = #fresh, 1, -1 do
+		local f = fresh[i]
+		-- (loaded, or not after HOLD_MOST: a file that never comes isn't waited for, nor looked again for)
+		if Loaded(f[1]) or now - f[2] >= HOLD_MOST then table.remove(fresh, i) else waiting = true end
+	end
+	local held = false
+	for key, t in pairs(tiles) do
+		if not wanted[key] then
+			if Held(t, now, waiting) then held = true else DropTile(key) end
+		end
 	end
 	for key, t in pairs(lodPieces) do
 		if not wantedLOD[key] then
-			t:Hide(); S.UnplaceWorld(t)
-			lodPieces[key] = nil
-			lodPool[#lodPool + 1] = t
+			if Held(t, now, waiting) then
+				held = true
+			else
+				t.omGone = nil
+				t:Hide(); S.UnplaceWorld(t)
+				lodPieces[key] = nil
+				lodPool[#lodPool + 1] = t
+			end
 		end
 	end
+	if held or waiting then LookAgain() end
+	if #fresh > 64 then wipe(fresh) end     -- (never a long list: the hold has its cap anyway)
 end
 
 --------------------------------------------------------------------------------
@@ -812,6 +860,8 @@ function S.SetView(u, v, hu, hv, zoom, steps)
 	local cv = S.closeView
 	local start = debugprofilestop and debugprofilestop()
 	cv.zoom, cv.time, cv.updates = zoom, GetTime(), (cv.updates or 0) + 1
+	cv.args = cv.args or {}
+	cv.args[1], cv.args[2], cv.args[3], cv.args[4], cv.args[5], cv.args[6] = u, v, hu, hv, zoom, steps   -- (LookAgain)
 	if S.Moved then S.Moved() end
 	local cont = Try("continent", ContinentAt, u, v)
 	Try("sea", S.SetSea, u, v, hu, hv)
