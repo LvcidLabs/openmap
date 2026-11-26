@@ -361,6 +361,8 @@ local function Rows()
 	if _G.TomTom and TomTom.AddWaypoint then      -- (#444: only with TomTom on)
 		fromOptions(L["TomTom waypoint too"], "tomtom", Icon("INV_Misc_Map_01"))
 	end
+	-- (the game's waypoint arrow's distance in meters, Nav.lua: here, as OpenMap's settings open on this menu)
+	fromOptions(L["Waypoint distance in meters"], "waypointMeters", Icon("INV_Misc_Map_01"))
 	rows[#rows + 1] = { L["Reopen map (choose one)"] }
 	for _, choice in ipairs({ { "player", L["Center on player"] }, { "zoom", L["Center on player, keep zoom"] }, { "inzone", L["Center on your zone"] }, { "always", L["Always remember"] },
 		{ "visible", L["Remember while visible"] } }) do
