@@ -1466,7 +1466,8 @@ end
 -- Blizzard's map). Kept in mod.db.bisect for the version it was set in (a new version starts with everything
 -- on); a /reload applies it
 mod.BISECT = { "Extras", "Flights", "Nav", "Pins", "Friends", "Quests", "Dungeons", "Battlegrounds", "Explore", "News",
-	"Panel", "Paint", "Sketch", "Debug", "Bench", "Gamepad", "Report", "Window", "Compat", "Click", "Handlers", "Provider" }
+	"Panel", "Paint", "Sketch", "Debug", "Bench", "Gamepad", "Report", "Window", "Compat", "Click", "Handlers", "Provider",
+	"WindowPlace", "WindowClamp", "WindowLog", "WindowGrips" }   -- (the last four: parts of Window's)
 function mod.Skipped(name)
 	local s = mod.db and mod.db.bisect
 	if type(s) ~= "table" then return false end

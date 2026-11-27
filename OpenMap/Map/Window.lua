@@ -99,7 +99,7 @@ local function InPvP()
 	local inside, kind = IsInInstance()
 	return inside and (kind == "pvp" or kind == "arena") or false
 end
-local function LaidByBlizzard() return InPvP() end
+local function LaidByBlizzard() return InPvP() or mod.Skipped("WindowPlace") end
 
 local function UpdateSpacer()
 	if not map.UpdateSpacerFrameAnchoring then return end
@@ -235,7 +235,7 @@ local function Clamp(w, h)
 end
 
 local function ClampOn()
-	if clampOn or not map or moveAny or classicMap or InCombatLockdown() then return end
+	if clampOn or not map or moveAny or classicMap or InCombatLockdown() or InPvP() or mod.Skipped("WindowClamp") then return end
 	clampOn = true
 	map:SetClampedToScreen(true)
 	Clamp()
@@ -394,8 +394,9 @@ function mod:SetupWindow(worldMap)
 	elseif not moveAny then
 		-- partly off the screen: sideways and down while some of it stays on, never up (its title bar is
 		-- what moves it; /openmap reset or the Look tab's Reset size and place bring it back). Clamped once
-		-- you move or size it, or a place or size of yours is put back (ClampOn)
-		if mod.db.window or mod.db.windowSize then ClampOn() end
+		-- you move or size it (ClampOn), not in a battleground or arena. Not at login, even with a place or size of
+		-- yours saved: clamped from here, the window's anchor was OpenMap's for the session and Report AFK from a
+		-- group dot in a battleground was blocked (test19's taint log, #472)
 		map:HookScript("OnSizeChanged", function() Clamp() end)
 		if not Maximized() then blizzardSize = { map:GetWidth(), map:GetHeight() } end
 
@@ -472,7 +473,7 @@ function mod:SetupWindow(worldMap)
 		end
 	end
 	-- Both clients use the same corner grips; only their resize anchoring differs.
-	if not classicMap then grip = { Grip("BOTTOMRIGHT"), Grip("BOTTOMLEFT") } end
+	if not classicMap and not mod.Skipped("WindowGrips") then grip = { Grip("BOTTOMRIGHT"), Grip("BOTTOMLEFT") } end
 	local function Mode()
 		local max = Maximized()
 		if not max then maxRefitted = false end
@@ -518,7 +519,7 @@ function mod:SetupWindow(worldMap)
 	map:HookScript("OnShow", Mode)
 	for _, g in ipairs(grip) do g:SetFrameLevel(OverIcons() + 1) end
 	FitRightGrip()
-	SetupQuestLog()
+	if not mod.Skipped("WindowLog") then SetupQuestLog() end
 	if moveAny then
 		-- Keep the resize grip in the bottom-right corner: put the quest toggle at
 		-- the bottom of the right-hand tab rail, above the coordinate labels.

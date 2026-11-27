@@ -119,6 +119,7 @@ class WindowTests(unittest.TestCase):
             ChatOverMap = noop,
             EndResize = noop,
             KeepPadCursor = function(fn, self) return fn(self) end,
+            Skipped = function() return false end,
         }
         ns.WorldMap = mod
         ''')
@@ -215,14 +216,15 @@ class WindowTests(unittest.TestCase):
 
     def test_not_clamped_until_moved_or_sized(self):
         # (the clamp is OpenMap's change to Blizzard's window: made at login, every opening read OpenMap's taint on its
-        # anchor and Report AFK from a group dot was blocked in battlegrounds, #472. Only once you move or size it, or a
-        # saved place or size is put back)
+        # anchor and Report AFK from a group dot was blocked in battlegrounds, #472. test19's log: with a place or size
+        # saved it was still clamped at login, and blocked. Only once you move or size it, never in a battleground)
         src = (ROOT / 'Map/Window.lua').read_text(encoding='utf-8')
         setup = src[src.index("function mod:SetupWindow("):]
         self.assertNotIn("\t\tmap:SetClampedToScreen(true)\n", setup)
-        self.assertIn("if mod.db.window or mod.db.windowSize then ClampOn() end", setup)
-        self.assertEqual(src.count("ClampOn()"), 3 + 1)      # (setup's, the grip's, the title bar's; and its own definition's name)
-
+        self.assertNotIn("then ClampOn() end", setup)
+        self.assertEqual(src.count("ClampOn()"), 2 + 1)      # (the grip's, the title bar's; and its own definition's name)
+        on = src[src.index("local function ClampOn()"):]
+        self.assertIn("InPvP()", on[:on.index("\nend")])
 
 
 class BisectTests(unittest.TestCase):
