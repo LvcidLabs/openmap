@@ -27,6 +27,10 @@
 
 ### Improved
 
+- **A smoother map on a German client**: the zones' art from further out is drawn from tiles baked
+  from the deDE client's own maps, place names and city banners in German, as on an English, a
+  Brazilian Portuguese or a Russian client (it was every zone's art drawn live, #287). By byi77. (New
+  textures: restart the game.)
 - **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
   map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
   minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map"). By Lvcidx0.
