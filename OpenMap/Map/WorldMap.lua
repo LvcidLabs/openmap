@@ -1805,8 +1805,9 @@ local function Setup()
 	Timed("Dungeons", mod.SetupDungeons, mod, map)
 	Timed("Battlegrounds", mod.SetupBattlegrounds, mod, map)
 	if mod.SetupExplore then Timed("Explore", mod.SetupExplore, mod, map) end   -- (Forever's toc only)
-	-- (test10, a diagnostic build: Combat.lua's pins pointed at OpenMap's Deferred left Blizzard's map refresh running
-	-- OpenMap's code, and its scale and group dot read on a right-click as OpenMap's: Report AFK blocked, #472. Off here)
+	-- (off since 0.8.14: Combat.lua points every pin's mouse setters at OpenMap's, Blizzard's group dots' too, so
+	-- Blizzard's map refresh ran OpenMap's code and the dot a right-click reads was OpenMap's: Report AFK from the
+	-- battleground map was blocked, #472. Without it no "action blocked" in a fight has been seen since)
 	-- Timed("Combat", mod.SetupCombat, mod, map)
 	ns.RegisterEvent(viewOwner, "PLAYER_REGEN_ENABLED", mod.CombatOver)
 	-- (a fight with the map open: the own view, OwnView.lua)

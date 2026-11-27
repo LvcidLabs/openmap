@@ -4,7 +4,7 @@
 local _, ns = ...
 
 ns.MapChangelog = {
-	{ version = "Unreleased", date = "", heads = { [1] = "New", [6] = "Improved", [10] = "Known issue", [11] = "Fixed", }, items = {
+	{ version = "v0.8.14", date = "2026-11-27", heads = { [1] = "New", [6] = "Improved", [10] = "Known issue", [11] = "Fixed", }, items = {
 		"|cff6e2c0aBattleground maps zoom in|r: the maps of Warsong Gulch, Arathi Basin, Alterac Valley and Darkspear Islands zoom in like the world map, and up close the game's own minimap of the battleground shows its buildings, trees and rocks, as Minimap detail does on the world. It's still the game's map, with your arrow, your group, the flags and the bases on it. Find a battleground in the map's search to open its map from anywhere. The map of the battleground you're in doesn't zoom (the game's report from a group member's dot needs its map as the game made it); it shows the minimap's detail only with Minimap detail set to Always. /openmap bg says what its map has of OpenMap's. To turn it off: OpenMap's menu > Dungeons > Battleground maps.",
 		"|cff6e2c0aA right-click for other addons' buttons|r (API version 5): RegisterMenuToggle takes onRightClick and rightClickTip, so an addon's button on the map can do something of its own on a right-click, and lit and grey, so its gold edge and its greying can show something other than its switch; RefreshMenuToggles() draws the buttons again (docs/api.md). By Lvcidx0.",
 		"|cff6e2c0aThe waypoint's distance in meters|r: \"Waypoint distance in meters\" (OpenMap's menu > More, off by default) shows the distance under the game's waypoint arrow on your screen in meters, and in km from 1000 m, instead of yards.",

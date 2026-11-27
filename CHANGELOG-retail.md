@@ -1,6 +1,6 @@
 # OpenMap changelog
 
-## Unreleased
+## v0.8.14 (2026-11-27)
 
 ### New
 
@@ -13,9 +13,18 @@
 
 ### Improved
 
+- **Minimap detail at every zoom**: the far right of the Minimap detail slider in the menu is now "Always",
+  and with it the map no longer flickers back to the painted map while you zoom in: the detail stays up
+  while what comes in loads.
+- **Minimap strength goes up to 100%** (it stopped at 80%).
 - **Keys in gold in the tooltips**: Click, Right-click, Shift-click, Alt-click, Drag, on the map's buttons,
   map pins, notes, the waypoint, quests, dungeon entrances, flight masters, boats and zeppelins, the
   minimap button and the window's corners. Each reads "Key: what it does" ("Click: open its map"). By Lvcidx0.
+
+### Known issue
+
+- Until you've moved or resized the map window in a session, it can be dragged partly off the screen.
+  `/openmap reset` brings it back.
 
 ### Fixed
 
@@ -26,12 +35,12 @@
   as the map closed or the fight ended. It's hidden now, till its addon puts it on the map again (#448). By imigu17.
 - **With Move Any, a bottom corner's resize keeps the map's top in place**: dragging a bottom resize grip lifted the
   top of the map when Move Any anchored the window at the bottom. By puschie286.
-- **Clicking a quest's icon no longer breaks the quest tracker or Share**: a click tracked the quest and opened
-  the quest log from OpenMap's code, which left the game's tracker and quest log marked as OpenMap's: "auras
-  ... secret while tainted by OpenMap" errors, a tracker that stopped updating, and a blocked Share button
-  (#295, #426, #446). A click now zooms to the quest and makes it the one you follow if it's tracked; to track
-  a quest or see its details, use the quest log. Ctrl-click's waypoint and following a pin wait for a fight
-  to end. From sato942's PR #504.
+- **Fewer "auras ... secret while tainted by OpenMap" errors from the quest tracker in a fight**: Ctrl-click's
+  waypoint and following a pin set the game's waypoint from OpenMap's code, and in a fight the tracker's next
+  redraw failed. In a fight they're set as it ends now (#295).
+- **Fewer "blocked" errors from the map window**: OpenMap's own windows are off the game's Escape list (they
+  still close with Escape), and in a battleground or arena the map window's place, size and full-screen width
+  are left to the game (#472).
 
 ## v0.8.13 (2026-11-22)
 

@@ -396,7 +396,7 @@ function mod:SetupWindow(worldMap)
 		-- what moves it; /openmap reset or the Look tab's Reset size and place bring it back). Clamped once
 		-- you move or size it (ClampOn), not in a battleground or arena. Not at login, even with a place or size of
 		-- yours saved: clamped from here, the window's anchor was OpenMap's for the session and Report AFK from a
-		-- group dot in a battleground was blocked (test19's taint log, #472)
+		-- group dot in a battleground was blocked (#472)
 		map:HookScript("OnSizeChanged", function() Clamp() end)
 		if not Maximized() then blizzardSize = { map:GetWidth(), map:GetHeight() } end
 
