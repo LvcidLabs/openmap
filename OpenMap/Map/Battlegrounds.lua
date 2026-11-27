@@ -33,8 +33,8 @@ local function PadUI()
 	return (mod.PadViewOn and mod.PadViewOn()) or (InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()) or false
 end
 local function Data(mapID) return ns.MapBattlegrounds and mapID and ns.MapBattlegrounds[mapID] end
--- (the battleground you're in: WorldMap.lua and Window.lua leave its map's layout and clicks to Blizzard, #472.
--- Its zoom steps and tiles are OpenMap's, as outside: leaving them out didn't keep Report AFK from being blocked)
+-- (the battleground you're in: WorldMap.lua and Window.lua leave its map's layout and clicks to Blizzard, and here
+-- its zoom steps are Blizzard's (Report AFK reads them, #472); only the minimap's detail is put over it)
 local function Inside(mapID)
 	local bg = Data(mapID)
 	if not bg or not IsInInstance then return false end
@@ -87,6 +87,8 @@ local function Mix(mapID, zoom)
 	local base = mod.db.minimap ~= false and (mod.db.minimapMix or 0) or 0
 	if base <= 0 then return 0 end
 	local most = mod.db.minimapDeep or 1
+	-- (the battleground you're in: its map doesn't zoom there, so the detail is at Minimap strength at Blizzard's own view)
+	if Inside(mapID) then return math.min(base, most) end
 	local mix = math.min(base, most) * Smooth(zoom, MINI_FADE)
 	local deep = Deepest(mapID)
 	return mix + (most - mix) * Smooth(zoom, { deep * DEEP_FADE[1], deep * DEEP_FADE[2] })
@@ -172,8 +174,9 @@ end
 
 local function Refresh()
 	local mapID = map:GetMapID()
-	-- (the battleground you're in: Blizzard's own map, nothing of OpenMap's on its canvas, #472)
-	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() and not Inside(mapID) then
+	-- (the battleground you're in too: only the tiles' layer, OpenMap's own frame among the canvas's, as the stitched
+	-- map's art is; nothing written on Blizzard's frames or its zoom steps, which Report AFK reads, #472)
+	if map:IsShown() and On() and Data(mapID) and not mod.IsStitched() then
 		Show(mapID)
 	else
 		Hide()
