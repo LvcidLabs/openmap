@@ -204,7 +204,11 @@ class BattlegroundTests(unittest.TestCase):
         self.lua.execute("map:Show() hooks.OnShow() map:SetMap(1460) sc.scale = 4 map:OnCanvasScaleChanged()")
         self.assertTrue(self.lua.eval("sc.zoomLevels == blizzards"))
         self.assertEqual(len(self.lua.eval("sc.zoomLevels")), 1)
-        # (the minimap's detail there all the same, at Minimap strength at Blizzard's one view: OpenMap's own layer)
+        # (the minimap's detail there only with Minimap detail at "Always", at Minimap strength at Blizzard's one view:
+        # OpenMap's own layer. Not otherwise: it has no zoom to wait for, and nobody gets it who didn't ask)
+        self.assertFalse(self.lua.eval("canvas.kids[1] and canvas.kids[1].shown or false"))
+        self.assertEqual(self.lua.eval("mod.BattlegroundMix(1460, 1)"), 0)
+        self.lua.execute("mod.db.minimapFrom = 1 map:OnCanvasScaleChanged()")
         self.assertTrue(self.lua.eval("canvas.kids[1] and canvas.kids[1].shown or false"))
         self.assertAlmostEqual(self.lua.eval("mod.BattlegroundMix(1460, 1)"), 0.45, places=3)
         self.lua.execute("mod.db.minimap = false map:OnCanvasScaleChanged()")

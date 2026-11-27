@@ -87,8 +87,9 @@ local function Mix(mapID, zoom)
 	local base = mod.db.minimap ~= false and (mod.db.minimapMix or 0) or 0
 	if base <= 0 then return 0 end
 	local most = mod.db.minimapDeep or 1
-	-- (the battleground you're in: its map doesn't zoom there, so the detail is at Minimap strength at Blizzard's own view)
-	if Inside(mapID) then return math.min(base, most) end
+	-- (the battleground you're in: its map doesn't zoom there, so the detail shows only with Minimap detail set to show
+	-- at every zoom, "Always" (minimapFrom at its least, Close.lua), at Minimap strength; otherwise none)
+	if Inside(mapID) then return (mod.db.minimapFrom or 20) <= 1 and math.min(base, most) or 0 end
 	local mix = math.min(base, most) * Smooth(zoom, MINI_FADE)
 	local deep = Deepest(mapID)
 	return mix + (most - mix) * Smooth(zoom, { deep * DEEP_FADE[1], deep * DEEP_FADE[2] })
